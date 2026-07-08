@@ -1,0 +1,44 @@
+# Dependencies
+/node_modules
+/.pnp
+.pnp.*
+
+# Next.js build output
+/.next/
+/out/
+/build
+
+# Testing
+/coverage
+
+# Env files
+.env
+.env.*
+!.env.example
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Deployment
+.vercel
+
+# Editors & OS
+.DS_Store
+.idea/
+.vscode/
+
+# Certificates
+*.pem
+
+# Claude Code local settings
+.claude/settings.local.json
+
+# Local design references
+.figma-ref/
