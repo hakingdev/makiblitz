@@ -37,8 +37,8 @@ next-env.d.ts
 # Certificates
 *.pem
 
-# Claude Code local settings
-.claude/settings.local.json
+# Claude Code
+.claude/
 
 # Local design references
 .figma-ref/
