@@ -3,14 +3,16 @@
  * Must stay free of Node-only imports — the form component uses it too.
  */
 
+import isEmail from "validator/lib/isEmail";
 import { isRealGermanPlz } from "./plz-data";
 
-// Pragmatic RFC-5322-style check: one @, no spaces, and — unlike a plain
-// "dot somewhere" test — the TLD label must be alphabetic (kills foo@1.2,
-// IP-ish domains and other keyboard mashing; 163.com-style numeric SLDs
-// stay valid).
-const EMAIL_RE =
-  /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*\.[a-zA-Z]{2,63}$/;
+// RFC-5322 format is delegated to validator.js (isomorphic — safe in the
+// form bundle too). It enforces the single "@", the local-part (≤64) and
+// overall (≤254) length limits, a real alphabetic TLD (kills foo@1.2 and
+// IP-ish domains), and rejects leading/trailing/consecutive dots — so only
+// the business-specific numeric-garbage guard below has to stay hand-rolled.
+// allow_utf8_local_part:false keeps the previous ASCII-only local part.
+const EMAIL_OPTIONS = { allow_utf8_local_part: false } as const;
 
 const PLZ_RE = /^\d{5}$/;
 
@@ -31,19 +33,12 @@ function isNumericGarbageDomain(domain: string): boolean {
 export function normalizeEmail(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const email = value.trim().toLowerCase();
-  if (email.length < 6 || email.length > 254 || !EMAIL_RE.test(email)) {
-    return null;
-  }
-  const [local, domain] = email.split("@") as [string, string];
-  // Unquoted local parts must not start/end with a dot or contain "..".
-  if (
-    local.length > 64 ||
-    local.startsWith(".") ||
-    local.endsWith(".") ||
-    email.includes("..")
-  ) {
-    return null;
-  }
+  if (!isEmail(email, EMAIL_OPTIONS)) return null;
+
+  // isEmail accepts 163.com-style providers but also 12345@1235.com — the
+  // latter is the keyboard mashing every fake signup used, so it still has
+  // to be rejected here.
+  const domain = email.split("@").pop()!;
   if (isNumericGarbageDomain(domain)) return null;
   return email;
 }
