@@ -7,17 +7,19 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "test": "vitest run",
+    "mail:selftest": "tsx scripts/mail-selftest.ts",
     "waitlist:cleanup": "tsx scripts/cleanup-pending.ts",
     "waitlist:selftest": "tsx scripts/validate-selftest.ts",
+    "waitlist:email-selftest": "tsx scripts/email-selftest.ts",
     "plz:update": "tsx scripts/generate-plz-data.ts"
   },
   "dependencies": {
-    "@upstash/redis": "^1.38.0",
+    "@supabase/supabase-js": "^2.45.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.3.19",
     "lucide-react": "^0.412.0",
     "next": "14.2.5",
-    "nodemailer": "^9.0.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.4.0",
@@ -25,7 +27,6 @@
   },
   "devDependencies": {
     "@types/node": "^20.14.12",
-    "@types/nodemailer": "^8.0.1",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@types/validator": "^13.15.10",
@@ -33,6 +34,7 @@
     "postcss": "^8.4.40",
     "tailwindcss": "^3.4.7",
     "tsx": "^4.16.2",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "vitest": "^2.1.9"
   }
 }

@@ -8,16 +8,21 @@
 /out/
 /build
 
-# Testing
+# Testing (not needed on prod)
 /coverage
+__tests__/
+__test__/
+**/tests/
+**/test/
 
 # Env files
 .env
 .env.*
 !.env.example
 
-# Waitlist backup log (contains personal data — never commit)
+# Waitlist logs (contain personal data — never commit)
 waitlist-submissions.jsonl
+waitlist-events.jsonl
 
 # Debug logs
 npm-debug.log*

@@ -6,12 +6,14 @@ import {
   normalizePlz,
 } from "@/lib/waitlist/validate";
 import {
-  appendWaitlistRecord,
+  appendEvent,
+  getSubscriberState,
   type WaitlistRecord,
 } from "@/lib/waitlist/store";
+import { decideSubscribe } from "@/lib/waitlist/subscriber-state";
 import { hasValidMailDomain } from "@/lib/waitlist/email-dns";
 import {
-  isSmtpConfigured,
+  isMailConfigured,
   sendConfirmMail,
   sendOwnerPendingMail,
 } from "@/lib/waitlist/mailer";
@@ -34,6 +36,8 @@ type SubscribeBody = {
 };
 
 const ok = () => NextResponse.json({ status: "ok" });
+const alreadySubscribed = () =>
+  NextResponse.json({ status: "already_subscribed" });
 const error = (field: string | null, httpStatus: number) =>
   NextResponse.json(
     { status: "error", ...(field ? { field } : {}) },
@@ -96,11 +100,42 @@ export async function POST(req: NextRequest) {
   // reject them like a malformed address. DNS failures fail open.
   if (!(await hasValidMailDomain(email))) return error("email", 422);
 
-  const consentAt = new Date().toISOString();
+  const now = new Date();
+  const consentAt = now.toISOString();
   const userAgent = req.headers.get("user-agent") ?? "unknown";
 
-  // Consent evidence (Art. 7 Abs. 1 DSGVO): what was agreed to, when,
-  // from which (hashed) IP and client.
+  // Machine state instead of "always send": look up what already happened to
+  // this normalized address and act accordingly (bug: re-signups used to fire
+  // another confirmation mail every time).
+  const state = await getSubscriberState(email);
+  const decision = decideSubscribe(state, now.getTime());
+
+  // Already confirmed → send nothing and tell the form to show an inline
+  // notice WITHOUT redirecting to /danke, so the Meta "Lead" event does not
+  // double-fire on a duplicate signup.
+  if (decision === "already_subscribed") return alreadySubscribed();
+
+  // Pending and still inside the 15-min cooldown → neutral ok, no mail.
+  if (decision === "cooldown") return ok();
+
+  // Opted out with re-subscribe disabled → suppression list: neutral ok, no
+  // mail, no status change; only an audit trace.
+  if (decision === "suppressed") {
+    await appendEvent({
+      type: "suppressed_signup",
+      email,
+      at: consentAt,
+      ipHash,
+      userAgent,
+    });
+    return ok();
+  }
+
+  // "create" | "resend" | "resubscribe" → a confirmation mail will go out.
+  const isResend = decision === "resend";
+
+  // Consent evidence (Art. 7 Abs. 1 DSGVO): what was agreed to, when, from
+  // which (hashed) IP and client. Owner heads-up uses this too.
   const record: WaitlistRecord = {
     type: "pending",
     email,
@@ -111,7 +146,22 @@ export async function POST(req: NextRequest) {
     ipHash,
     userAgent,
   };
-  const logged = await appendWaitlistRecord(record);
+
+  const logged = await appendEvent(
+    isResend
+      ? { type: "resend", email, at: consentAt, ipHash, userAgent }
+      : {
+          type: "pending",
+          email,
+          at: consentAt,
+          plz,
+          phone,
+          consentAt,
+          consentTextVersion: CONSENT_TEXT_VERSION,
+          ipHash,
+          userAgent,
+        },
+  );
 
   const base = getBaseUrl(req.nextUrl.origin);
   const confirmToken = createConfirmToken({
@@ -124,7 +174,7 @@ export async function POST(req: NextRequest) {
   const confirmUrl = `${base}/api/confirm?token=${confirmToken}`;
   const unsubscribeUrl = `${base}/api/unsubscribe?token=${createUnsubscribeToken(email)}`;
 
-  if (isSmtpConfigured()) {
+  if (isMailConfigured()) {
     try {
       await sendConfirmMail({ to: email, confirmUrl, unsubscribeUrl });
     } catch (err) {
@@ -133,12 +183,14 @@ export async function POST(req: NextRequest) {
       return error(null, 500);
     }
 
-    // Owner heads-up about every submission, before the double-opt-in click.
-    // Best-effort: a failure here must not fail the signup itself.
-    try {
-      await sendOwnerPendingMail(record);
-    } catch (err) {
-      console.error("[waitlist] owner pending mail failed:", err);
+    // Owner heads-up only on the first signup — not on a resend, to avoid
+    // duplicate notifications. Best-effort: a failure must not fail the signup.
+    if (!isResend) {
+      try {
+        await sendOwnerPendingMail(record);
+      } catch (err) {
+        console.error("[waitlist] owner pending mail failed:", err);
+      }
     }
   } else {
     // Dev fallback: no SMTP → print the link so the flow stays testable.

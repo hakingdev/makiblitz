@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hashIp, verifyConfirmToken } from "@/lib/waitlist/crypto";
 import {
-  appendWaitlistRecord,
-  hasWaitlistRecord,
+  appendEvent,
+  getSubscriberState,
   type WaitlistRecord,
 } from "@/lib/waitlist/store";
 import {
-  isSmtpConfigured,
+  isMailConfigured,
   sendOwnerConfirmedMail,
 } from "@/lib/waitlist/mailer";
 
@@ -25,7 +25,7 @@ function clientIp(req: NextRequest): string {
  * signup notification) → show /confirm?state=success.
  */
 export async function GET(req: NextRequest) {
-  const redirect = (state: "success" | "invalid" | "expired") =>
+  const redirect = (state: "success" | "already" | "invalid" | "expired") =>
     NextResponse.redirect(new URL(`/confirm?state=${state}`, req.url), 303);
 
   const token = req.nextUrl.searchParams.get("token") ?? "";
@@ -33,11 +33,25 @@ export async function GET(req: NextRequest) {
   if (!result.ok) return redirect(result.reason);
 
   const payload = result.payload;
+  const userAgent = req.headers.get("user-agent") ?? "unknown";
+  const state = await getSubscriberState(payload.email);
 
-  // Repeated clicks on the same link stay idempotent: no duplicate log
-  // lines, no duplicate owner mails.
-  if (await hasWaitlistRecord("confirmed", payload.email)) {
-    return redirect("success");
+  // Already confirmed → repeated click on the link, or a stale confirm mail
+  // from a second signup attempt. Do nothing: no owner mail, no duplicate
+  // "confirmed" record. /confirm?state=already must NOT fire the pixel.
+  if (state?.status === "confirmed") {
+    await appendEvent({
+      type: "confirm_repeat",
+      email: payload.email,
+      at: new Date().toISOString(),
+      userAgent,
+    });
+    return redirect("already");
+  }
+
+  // Opted out already → a confirm link must not silently resurrect the address.
+  if (state?.status === "unsubscribed") {
+    return redirect("invalid");
   }
 
   let ipHash: string;
@@ -48,6 +62,7 @@ export async function GET(req: NextRequest) {
     return redirect("invalid");
   }
 
+  const confirmedAt = new Date().toISOString();
   const record: WaitlistRecord = {
     type: "confirmed",
     email: payload.email,
@@ -55,15 +70,25 @@ export async function GET(req: NextRequest) {
     plz: payload.plz,
     consentAt: payload.consentAt,
     consentTextVersion: payload.consentTextVersion,
-    confirmedAt: new Date().toISOString(),
+    confirmedAt,
     ipHash,
-    userAgent: req.headers.get("user-agent") ?? "unknown",
+    userAgent,
   };
 
-  const logged = await appendWaitlistRecord(record);
+  const logged = await appendEvent({
+    type: "confirmed",
+    email: payload.email,
+    at: confirmedAt,
+    plz: payload.plz,
+    phone: payload.phone,
+    consentAt: payload.consentAt,
+    consentTextVersion: payload.consentTextVersion,
+    ipHash,
+    userAgent,
+  });
 
   let mailed = false;
-  if (isSmtpConfigured()) {
+  if (isMailConfigured()) {
     try {
       await sendOwnerConfirmedMail(record);
       mailed = true;
@@ -75,7 +100,7 @@ export async function GET(req: NextRequest) {
   }
 
   // Nothing persisted anywhere → don't pretend the confirmation worked.
-  if (!logged && isSmtpConfigured() && !mailed) return redirect("invalid");
+  if (!logged && isMailConfigured() && !mailed) return redirect("invalid");
 
   return redirect("success");
 }

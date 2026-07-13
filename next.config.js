@@ -2,13 +2,15 @@ const isDev = process.env.NODE_ENV === "development";
 
 // Art. 32 DSGVO — restrictive defaults. 'unsafe-inline' is required by
 // Next.js hydration/styles; 'unsafe-eval' only by the dev tooling.
+// The facebook/meta hosts allow the Meta Pixel to load and beacon — but only
+// after consent injects the snippet; the policy itself triggers no requests.
 const contentSecurityPolicy = [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
+  `script-src 'self' 'unsafe-inline' https://connect.facebook.net${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://images.unsplash.com https://*.figma.com",
+  "img-src 'self' data: blob: https://images.unsplash.com https://*.figma.com https://www.facebook.com",
   "font-src 'self'",
-  "connect-src 'self'",
+  "connect-src 'self' https://www.facebook.com https://connect.facebook.net",
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

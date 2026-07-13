@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import { Mulish, Rock_Salt } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/lib/cart/CartContext";
+import { ConsentProvider } from "@/lib/consent";
+import { ConsentBanner } from "@/components/consent/ConsentBanner";
+import { FacebookPixel } from "@/components/analytics/FacebookPixel";
 
 const mulish = Mulish({
   subsets: ["latin"],
@@ -39,7 +42,13 @@ export default function RootLayout({
   return (
     <html lang="de" className={`${mulish.variable} ${rockSalt.variable}`}>
       <body>
-        <CartProvider>{children}</CartProvider>
+        <CartProvider>
+          <ConsentProvider>
+            {children}
+            <ConsentBanner />
+            <FacebookPixel />
+          </ConsentProvider>
+        </CartProvider>
       </body>
     </html>
   );

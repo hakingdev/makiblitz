@@ -3,44 +3,19 @@
  * Must stay free of Node-only imports — the form component uses it too.
  */
 
-import isEmail from "validator/lib/isEmail";
+import { validateEmail } from "@/lib/email/validate-email";
 import { isRealGermanPlz } from "./plz-data";
-
-// RFC-5322 format is delegated to validator.js (isomorphic — safe in the
-// form bundle too). It enforces the single "@", the local-part (≤64) and
-// overall (≤254) length limits, a real alphabetic TLD (kills foo@1.2 and
-// IP-ish domains), and rejects leading/trailing/consecutive dots — so only
-// the business-specific numeric-garbage guard below has to stay hand-rolled.
-// allow_utf8_local_part:false keeps the previous ASCII-only local part.
-const EMAIL_OPTIONS = { allow_utf8_local_part: false } as const;
 
 const PLZ_RE = /^\d{5}$/;
 
-// The only real mailbox providers whose domain is a bare number (NetEase &
-// friends). Any other all-digit domain label (1235.com, 123456789.de …) is
-// keyboard mashing — every fake signup so far used one, and the SMTP server
-// behind it just bounces the double-opt-in mail into the owner's inbox.
-const NUMERIC_DOMAIN_ALLOW = ["163.com", "126.com", "139.com", "189.cn"];
-
-function isNumericGarbageDomain(domain: string): boolean {
-  const labels = domain.split(".");
-  if (!labels.slice(0, -1).some((label) => /^\d+$/.test(label))) return false;
-  return !NUMERIC_DOMAIN_ALLOW.some(
-    (allow) => domain === allow || domain.endsWith(`.${allow}`),
-  );
-}
-
+/**
+ * Waitlist-facing adapter over the shared, multi-stage e-mail validator
+ * (lib/email/validate-email.ts): stage 1 syntax + stage 2 anti-garbage
+ * heuristics, run identically on client and server. The server additionally
+ * layers the DNS-MX check (lib/waitlist/email-dns.ts) on top.
+ */
 export function normalizeEmail(value: unknown): string | null {
-  if (typeof value !== "string") return null;
-  const email = value.trim().toLowerCase();
-  if (!isEmail(email, EMAIL_OPTIONS)) return null;
-
-  // isEmail accepts 163.com-style providers but also 12345@1235.com — the
-  // latter is the keyboard mashing every fake signup used, so it still has
-  // to be rejected here.
-  const domain = email.split("@").pop()!;
-  if (isNumericGarbageDomain(domain)) return null;
-  return email;
+  return validateEmail(value);
 }
 
 export function normalizePlz(value: unknown): string | null {

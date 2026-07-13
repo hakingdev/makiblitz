@@ -1,11 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { hashIp, verifyUnsubscribeToken } from "@/lib/waitlist/crypto";
+import { appendEvent, getSubscriberState } from "@/lib/waitlist/store";
 import {
-  appendWaitlistRecord,
-  hasWaitlistRecord,
-} from "@/lib/waitlist/store";
-import {
-  isSmtpConfigured,
+  isMailConfigured,
   sendOwnerUnsubscribedMail,
 } from "@/lib/waitlist/mailer";
 
@@ -30,9 +27,18 @@ export async function GET(req: NextRequest) {
   if (!result.ok) return redirect("invalid");
 
   const email = result.payload.email;
+  const userAgent = req.headers.get("user-agent") ?? "unknown";
+  const state = await getSubscriberState(email);
 
-  // Repeated clicks stay idempotent (no duplicate records/mails).
-  if (await hasWaitlistRecord("unsubscribed", email)) {
+  // Already unsubscribed → repeated click: show the same page, but send no
+  // owner mail and record no new opt-out.
+  if (state?.status === "unsubscribed") {
+    await appendEvent({
+      type: "unsubscribe_repeat",
+      email,
+      at: new Date().toISOString(),
+      userAgent,
+    });
     return redirect("success");
   }
 
@@ -45,16 +51,16 @@ export async function GET(req: NextRequest) {
   }
 
   const unsubscribedAt = new Date().toISOString();
-  const logged = await appendWaitlistRecord({
+  const logged = await appendEvent({
     type: "unsubscribed",
     email,
-    unsubscribedAt,
+    at: unsubscribedAt,
     ipHash,
-    userAgent: req.headers.get("user-agent") ?? "unknown",
+    userAgent,
   });
 
   let mailed = false;
-  if (isSmtpConfigured()) {
+  if (isMailConfigured()) {
     try {
       await sendOwnerUnsubscribedMail({ email, unsubscribedAt });
       mailed = true;
@@ -66,7 +72,7 @@ export async function GET(req: NextRequest) {
   }
 
   // The opt-out must actually be recorded somewhere before we claim success.
-  if (!logged && isSmtpConfigured() && !mailed) return redirect("invalid");
+  if (!logged && isMailConfigured() && !mailed) return redirect("invalid");
 
   return redirect("success");
 }

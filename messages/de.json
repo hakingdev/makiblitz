@@ -44,6 +44,7 @@
     "successTitle": "Fast geschafft! 📬",
     "successBody": "Wir haben dir eine E-Mail geschickt – bitte bestätige deine Anmeldung. Nichts angekommen? Schau kurz in deinen Spam-Ordner.",
     "errorGeneric": "Ups, das hat nicht geklappt. Bitte prüf deine Eingaben und versuch es noch einmal.",
+    "already": "Du bist schon auf der Liste – wir freuen uns auf dich! 🍣",
     "errorEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
     "errorPhone": "Bitte gib eine gültige deutsche Telefonnummer ein (z. B. +49 171 2345678).",
     "errorPlz": "Bitte gib eine gültige deutsche Postleitzahl ein."
@@ -54,6 +55,10 @@
       "title": "Willkommen an Bord! 🎉",
       "body": "Du gehörst jetzt zu den Ersten, die erfahren, wann MakiBlitz startet."
     },
+    "already": {
+      "title": "Du bist schon auf der Liste – wir freuen uns auf dich! 🍣",
+      "body": ""
+    },
     "expired": {
       "title": "Dieser Link ist abgelaufen.",
       "body": "Der Bestätigungslink war 48 Stunden gültig. Kein Problem: Trag dich einfach noch einmal ein – wir schicken dir eine neue E-Mail."
@@ -63,6 +68,44 @@
       "body": "Der Bestätigungslink ist ungültig oder unvollständig. Kein Problem: Trag dich einfach noch einmal in die Warteliste ein."
     },
     "cta": "Zur Warteliste"
+  },
+  "danke": {
+    "metaTitle": "Fast geschafft",
+    "h1": "Fast geschafft! 📬",
+    "subline": "Wir haben dir eine E-Mail geschickt. Klick auf den Bestätigungslink, dann bist du offiziell auf der MakiBlitz-Warteliste.",
+    "stepsHeading": "So geht's weiter",
+    "steps": [
+      {
+        "title": "Postfach öffnen",
+        "body": "Schau in dein E-Mail-Postfach – und zur Sicherheit auch in den Spam-Ordner."
+      },
+      {
+        "title": "Anmeldung bestätigen",
+        "body": "Klick auf den Button in unserer E-Mail. Das dauert nur einen Moment."
+      },
+      {
+        "title": "Vorfreude genießen",
+        "body": "Wir melden uns, sobald MakiBlitz bei dir startet. 🍣"
+      }
+    ],
+    "hinweis": "Keine E-Mail bekommen? Prüf deinen Spam-Ordner oder trag dich einfach noch einmal ein.",
+    "backLink": "Zurück zur Startseite"
+  },
+  "conversion": {
+    "trust": [
+      "⚡ Blitzschnell",
+      "🍣 Immer frisch",
+      "📍 Bald in deiner Stadt"
+    ]
+  },
+  "consent": {
+    "ariaLabel": "Cookie-Einstellungen",
+    "textPrefix": "Wir nutzen Cookies, um den Erfolg unserer Werbung zu messen (Meta Pixel). Das hilft uns, MakiBlitz bekannter zu machen. Details findest du in der ",
+    "privacyLink": "Datenschutzerklärung",
+    "textSuffix": ".",
+    "acceptAll": "Alle akzeptieren",
+    "necessaryOnly": "Nur notwendige",
+    "settingsLink": "Cookie-Einstellungen"
   },
   "unsubscribePage": {
     "metaTitle": "Abmeldung",
@@ -274,14 +317,32 @@
       {
         "heading": "6. Cookies",
         "intro": [
-          "Diese Website setzt keine Cookies zu Analyse-, Marketing- oder Tracking-Zwecken ein und bindet keine Tracker von Drittanbietern ein. Deshalb findest du hier auch keinen Cookie-Banner.",
-          "Soweit für den Betrieb der Website technisch zwingend erforderliche Informationen auf deinem Endgerät gespeichert oder ausgelesen werden, geschieht dies auf Grundlage von § 25 Abs. 2 Nr. 2 TDDDG; eine Einwilligung ist dafür nicht erforderlich."
+          "Technisch notwendige Cookies bzw. vergleichbare Speichervorgänge sind für den Betrieb der Website erforderlich und werden auf Grundlage von § 25 Abs. 2 Nr. 2 TDDDG gesetzt; eine Einwilligung ist dafür nicht erforderlich. Hierzu zählt auch die Speicherung deiner Cookie-Auswahl selbst.",
+          "Darüber hinaus binden wir mit dem Meta Pixel (siehe folgenden Abschnitt) eine optionale Marketing-Technologie ein. Diese wird ausschließlich nach deiner ausdrücklichen Einwilligung über unseren Cookie-Banner geladen. Ohne deine Einwilligung wird der Meta Pixel nicht geladen; es werden dafür keine Cookies gesetzt und keine Daten an Meta übermittelt.",
+          "Deine Auswahl kannst du jederzeit mit Wirkung für die Zukunft ändern oder widerrufen – über den Link „Cookie-Einstellungen“ im Footer der Website."
         ],
         "list": [],
         "outro": []
       },
       {
-        "heading": "7. Keine automatisierte Entscheidungsfindung",
+        "heading": "7. Meta Pixel (Facebook Pixel)",
+        "intro": [
+          "Auf Grundlage deiner Einwilligung setzen wir das „Meta Pixel“ (auch „Facebook Pixel“) ein, einen Dienst der Meta Platforms Ireland Limited, Merrion Road, Dublin 4, Irland („Meta“). Der Pixel wird erst geladen, nachdem du im Cookie-Banner „Alle akzeptieren“ ausgewählt hast."
+        ],
+        "list": [
+          "Zweck: Messung und Optimierung unserer Werbekampagnen (Conversion-Tracking) – insbesondere um zu erkennen, welche Anzeigen zu einer Anmeldung führen.",
+          "Verarbeitete Daten: Cookie-IDs, die von dir besuchten Seiten (u. a. die Bestätigung deiner Anmeldung) sowie Geräte- und Browserdaten.",
+          "Rechtsgrundlage: deine Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO in Verbindung mit § 25 Abs. 1 TDDDG.",
+          "Kein Klartext deiner Kontaktdaten: Wir übergeben dem Pixel keine E-Mail-Adresse, Telefonnummer oder Postleitzahl. „Advanced Matching“ ist deaktiviert."
+        ],
+        "outro": [
+          "Übermittlung in die USA: Meta kann Daten auch in den USA verarbeiten. Die Übermittlung ist durch die Zertifizierung von Meta nach dem EU-U.S. Data Privacy Framework sowie durch EU-Standardvertragsklauseln (Art. 46 DSGVO) abgesichert.",
+          "Widerruf: Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen – über den Link „Cookie-Einstellungen“ im Footer der Website. Nach einem Widerruf wird der Pixel beim nächsten Seitenaufruf nicht mehr geladen.",
+          "Weitere Informationen zur Datenverarbeitung durch Meta findest du in den Datenschutzhinweisen von Meta unter https://www.facebook.com/privacy/policy."
+        ]
+      },
+      {
+        "heading": "8. Keine automatisierte Entscheidungsfindung",
         "intro": [
           "Eine automatisierte Entscheidungsfindung einschließlich Profiling (Art. 22 DSGVO) findet nicht statt."
         ],

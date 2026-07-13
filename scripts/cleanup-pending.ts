@@ -69,7 +69,9 @@ const kept = parsed.filter(({ line, record }) => {
 
   const timestamp = Date.parse(record.consentAt ?? record.createdAt ?? "");
   if (Number.isNaN(timestamp)) {
-    console.warn(`Keeping pending record without readable timestamp: ${record.email ?? "?"}`);
+    console.warn(
+      `Keeping pending record without readable timestamp: ${record.email ?? "?"}`,
+    );
     return true;
   }
   if (now - timestamp <= MAX_AGE_MS) return true;
@@ -83,9 +85,13 @@ const kept = parsed.filter(({ line, record }) => {
 });
 
 if (dropped === 0) {
-  console.log(`No unconfirmed pending records older than ${MAX_AGE_DAYS} days.`);
+  console.log(
+    `No unconfirmed pending records older than ${MAX_AGE_DAYS} days.`,
+  );
 } else if (dryRun) {
-  console.log(`[dry] ${dropped} record(s) would be deleted, ${kept.length} kept.`);
+  console.log(
+    `[dry] ${dropped} record(s) would be deleted, ${kept.length} kept.`,
+  );
 } else {
   const content = kept.map(({ line }) => line).join("\n");
   writeFileSync(LOG_FILE, content === "" ? "" : `${content}\n`, "utf8");

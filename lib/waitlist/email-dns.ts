@@ -1,9 +1,10 @@
 import { promises as dns } from "dns";
 
 /**
- * Server-side deliverability check for the address domain: without a usable
- * MX record the double-opt-in mail can never arrive, so the typo is surfaced
- * to the user immediately instead of silently ending in "no mail arrived".
+ * Stage 3 — server-only deliverability check for the address domain. Without a
+ * usable MX record the double-opt-in mail can never arrive, so the typo is
+ * surfaced to the user immediately instead of silently ending in "no mail
+ * arrived".
  *
  * Deliberately MX-only. RFC 5321 allows falling back to A/AAAA, but every
  * real-world mailbox provider publishes MX — in practice the fallback only
@@ -18,17 +19,37 @@ import { promises as dns } from "dns";
  * signup — only a definitive "domain/records do not exist" rejects.
  */
 
-const TIMEOUT_MS = 2500;
+const TIMEOUT_MS = 3000; // ~3 s — a real user must not wait longer on our DNS
 const CACHE_TTL_MS = 60 * 60 * 1000; // 1 h
 const CACHE_MAX = 5000;
 
+/**
+ * The slice of node:dns/promises this module needs. Injectable so the MX stage
+ * can be unit-tested with a fake resolver (no real network, no flakiness).
+ */
+export type MailDnsResolver = {
+  resolveMx: (hostname: string) => Promise<{ exchange: string; priority: number }[]>;
+  resolve4: (hostname: string) => Promise<string[]>;
+  resolve6: (hostname: string) => Promise<string[]>;
+};
+
+// Arrow wrappers, not bare method references: dns.promises' methods must be
+// invoked *on* the promises object. A detached `resolveMx: dns.resolveMx`
+// throws when later called as `resolver.resolveMx(host)`, which would silently
+// fail-open the whole MX stage.
+const defaultResolver: MailDnsResolver = {
+  resolveMx: (hostname) => dns.resolveMx(hostname),
+  resolve4: (hostname) => dns.resolve4(hostname),
+  resolve6: (hostname) => dns.resolve6(hostname),
+};
+
 const cache = new Map<string, { ok: boolean; expires: number }>();
 
-function withTimeout<T>(promise: Promise<T>): Promise<T> {
+function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(
       () => reject(new Error("DNS lookup timed out")),
-      TIMEOUT_MS,
+      timeoutMs,
     );
     timer.unref?.();
     promise.then(
@@ -81,12 +102,16 @@ function isPubliclyRoutable(addr: string): boolean {
 }
 
 /** True when the MX host has at least one publicly routable address. */
-async function exchangeIsReachable(host: string): Promise<boolean> {
+async function exchangeIsReachable(
+  host: string,
+  resolver: MailDnsResolver,
+  timeoutMs: number,
+): Promise<boolean> {
   if (host === "localhost" || host.endsWith(".localhost")) return false;
 
-  for (const resolve of [dns.resolve4, dns.resolve6]) {
+  for (const resolve of [resolver.resolve4, resolver.resolve6]) {
     try {
-      if ((await withTimeout(resolve(host))).some(isPubliclyRoutable)) {
+      if ((await withTimeout(resolve(host), timeoutMs)).some(isPubliclyRoutable)) {
         return true;
       }
     } catch (err) {
@@ -96,10 +121,14 @@ async function exchangeIsReachable(host: string): Promise<boolean> {
   return false;
 }
 
-async function domainAcceptsMail(domain: string): Promise<boolean> {
+async function domainAcceptsMail(
+  domain: string,
+  resolver: MailDnsResolver,
+  timeoutMs: number,
+): Promise<boolean> {
   let mx;
   try {
-    mx = await withTimeout(dns.resolveMx(domain));
+    mx = await withTimeout(resolver.resolveMx(domain), timeoutMs);
   } catch (err) {
     if (!isDefinitiveMiss(err)) throw err;
     return false; // no MX published at all
@@ -118,12 +147,41 @@ async function domainAcceptsMail(domain: string): Promise<boolean> {
     .slice(0, 3);
 
   for (const host of candidates) {
-    if (await exchangeIsReachable(host)) return true;
+    if (await exchangeIsReachable(host, resolver, timeoutMs)) return true;
   }
   return false;
 }
 
-/** `email` must already be normalized (see lib/waitlist/validate.ts). */
+/**
+ * Core MX check for a single domain, without the module-level cache. Exposed
+ * (and given an injectable resolver + explicit fail-open switch) so the stage
+ * is unit-testable.
+ *
+ * Returns true when the domain plausibly accepts mail, false on a definitive
+ * miss (no MX / NXDOMAIN / only unroutable exchanges). On a DNS hiccup
+ * (timeout, SERVFAIL, …) it honours `failOpen`: default true resolves to true
+ * (never punish a real user); false re-throws so a caller can decide.
+ */
+export async function checkMailDomain(
+  domain: string,
+  opts: {
+    resolver?: MailDnsResolver;
+    timeoutMs?: number;
+    failOpen?: boolean;
+  } = {},
+): Promise<boolean> {
+  const resolver = opts.resolver ?? defaultResolver;
+  const timeoutMs = opts.timeoutMs ?? TIMEOUT_MS;
+  const failOpen = opts.failOpen ?? true;
+  try {
+    return await domainAcceptsMail(domain, resolver, timeoutMs);
+  } catch (err) {
+    if (failOpen) return true;
+    throw err;
+  }
+}
+
+/** `email` must already be normalized (see lib/email/validate-email.ts). */
 export async function hasValidMailDomain(email: string): Promise<boolean> {
   const domain = email.split("@")[1];
   if (!domain) return false;
@@ -133,9 +191,11 @@ export async function hasValidMailDomain(email: string): Promise<boolean> {
 
   let ok: boolean;
   try {
-    ok = await domainAcceptsMail(domain);
+    // failOpen:false here so a DNS hiccup stays *uncached* — the next
+    // submission retries DNS instead of memoizing a fail-open "true".
+    ok = await checkMailDomain(domain, { failOpen: false });
   } catch {
-    return true; // fail-open, uncached — retry DNS on the next submission
+    return true; // fail-open, uncached
   }
 
   if (cache.size >= CACHE_MAX) cache.clear();

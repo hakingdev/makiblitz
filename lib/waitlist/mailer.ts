@@ -1,22 +1,75 @@
-import nodemailer from "nodemailer";
 import { getMessages } from "@/lib/i18n";
 import type { WaitlistRecord } from "@/lib/waitlist/store";
 
 const t = getMessages();
 
-export function isSmtpConfigured(): boolean {
-  return Boolean(process.env.SMTP_HOST && process.env.MAIL_TO);
+/** True once we have a Brevo API key to send through. */
+export function isMailConfigured(): boolean {
+  return Boolean(process.env.BREVO_API_KEY);
 }
 
-function getTransporter() {
-  return nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT) || 587,
-    secure: process.env.SMTP_SECURE === "true",
-    auth: process.env.SMTP_USER
-      ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
-      : undefined,
-  });
+const BREVO_ENDPOINT = "https://api.brevo.com/v3/smtp/email";
+const SEND_TIMEOUT_MS = 10_000;
+
+/**
+ * Sender for every mail. MAIL_FROM must be a VERIFIED sender (or an
+ * authenticated domain) in Brevo — an unverified address is rejected with
+ * HTTP 400. Accepts a bare address or "Name <addr>"; MAIL_FROM_NAME adds a
+ * display name to a bare address.
+ */
+function sender(): { email: string; name?: string } {
+  const raw = process.env.MAIL_FROM || "info@makiblitz.de";
+  const named = raw.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
+  if (named) {
+    const name = named[1]?.trim();
+    return name ? { name, email: named[2]! } : { email: named[2]! };
+  }
+  const name = process.env.MAIL_FROM_NAME?.trim();
+  return name ? { name, email: raw } : { email: raw };
+}
+
+/**
+ * Transport for all outgoing mail: Brevo's transactional API over HTTPS.
+ * Chosen over SMTP because Vercel serverless functions have no stable
+ * outbound IP and SMTP sockets are unreliable there; a plain POST is not.
+ */
+async function sendMail(opts: {
+  to: string;
+  subject: string;
+  text: string;
+  html: string;
+}): Promise<void> {
+  const apiKey = process.env.BREVO_API_KEY;
+  if (!apiKey) throw new Error("BREVO_API_KEY is not set");
+
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), SEND_TIMEOUT_MS);
+  let res: Response;
+  try {
+    res = await fetch(BREVO_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "api-key": apiKey,
+        "content-type": "application/json",
+        accept: "application/json",
+      },
+      body: JSON.stringify({
+        sender: sender(),
+        to: [{ email: opts.to }],
+        subject: opts.subject,
+        htmlContent: opts.html,
+        textContent: opts.text,
+      }),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new Error(`Brevo API ${res.status}: ${body}`);
+  }
 }
 
 function escapeHtml(value: string): string {
@@ -35,7 +88,6 @@ function formatBerlinTime(iso: string): string {
   }).format(new Date(iso));
 }
 
-const FROM = () => process.env.MAIL_FROM || "noreply@makiblitz.de";
 /** Owner notifications always have a working fallback destination. */
 const OWNER_TO = () => process.env.MAIL_TO || "info@makiblitz.de";
 
@@ -109,8 +161,7 @@ export async function sendConfirmMail(opts: {
       ${subscriberFooterHtml(opts.unsubscribeUrl)}
     </div>`;
 
-  await getTransporter().sendMail({
-    from: FROM(),
+  await sendMail({
     to: opts.to,
     subject: m.subject,
     text,
@@ -165,8 +216,7 @@ export async function sendOwnerPendingMail(
       <p style="margin:14px 0 0;font-size:13px;color:#6b7280;">${escapeHtml(m.note)}</p>
     </div>`;
 
-  await getTransporter().sendMail({
-    from: FROM(),
+  await sendMail({
     to: OWNER_TO(),
     subject: m.subject.replace("{plz}", record.plz ?? "?"),
     text,
@@ -214,8 +264,7 @@ export async function sendOwnerConfirmedMail(
       </table>
     </div>`;
 
-  await getTransporter().sendMail({
-    from: FROM(),
+  await sendMail({
     to: OWNER_TO(),
     subject: m.subject.replace("{plz}", record.plz ?? "?"),
     text,
@@ -247,8 +296,7 @@ export async function sendOwnerUnsubscribedMail(opts: {
       </table>
     </div>`;
 
-  await getTransporter().sendMail({
-    from: FROM(),
+  await sendMail({
     to: OWNER_TO(),
     subject: m.subject.replace("{email}", opts.email),
     text,

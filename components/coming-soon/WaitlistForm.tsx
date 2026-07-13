@@ -2,6 +2,7 @@
 
 import { FormEvent, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { getMessages } from "@/lib/i18n";
 import {
@@ -10,8 +11,15 @@ import {
   normalizePlz,
 } from "@/lib/waitlist/validate";
 import { Button } from "@/components/ui/Button";
+import { trackCustom } from "@/lib/fbpixel";
 
 const t = getMessages();
+
+// Shared params for the funnel micro-events. No PII (never e-mail/phone/PLZ).
+const PIXEL_PARAMS = {
+  content_name: "makiblitz_waitlist",
+  content_category: "coming_soon",
+} as const;
 
 type FieldErrors = { email?: string; phone?: string; plz?: string };
 
@@ -19,6 +27,8 @@ const inputBase =
   "h-12 w-full rounded-card border bg-white/5 px-4 text-base text-white placeholder:text-white/35 outline-none transition-colors focus:border-brand-light focus:ring-2 focus:ring-brand/40";
 
 export function WaitlistForm() {
+  const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [plz, setPlz] = useState("");
@@ -26,15 +36,25 @@ export function WaitlistForm() {
   const [hp, setHp] = useState("");
 
   const [submitting, setSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [consentInvalid, setConsentInvalid] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+  const [formNotice, setFormNotice] = useState<string | null>(null);
 
   const emailRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
   const plzRef = useRef<HTMLInputElement>(null);
   const consentRef = useRef<HTMLInputElement>(null);
+
+  // Meta "FormStart" — fired once, the moment the visitor first types into any
+  // field ("just entered data"). Consent-gated + no PII via trackCustom, so a
+  // no-op without the pixel.
+  const startedRef = useRef(false);
+  function trackFormStart() {
+    if (startedRef.current) return;
+    startedRef.current = true;
+    trackCustom("FormStart", PIXEL_PARAMS);
+  }
 
   // Inline validation on blur: only flag non-empty invalid input — an empty
   // required field is announced on submit, not while tabbing through.
@@ -52,6 +72,11 @@ export function WaitlistForm() {
     event.preventDefault();
     if (submitting) return;
 
+    // CTA click: the visitor activated the submit button (intent), regardless
+    // of whether validation passes. The successful submission itself becomes
+    // the standard "Lead" event on /danke.
+    trackCustom("CTAClick", PIXEL_PARAMS);
+
     const errors: FieldErrors = {};
     if (!normalizeEmail(email)) errors.email = t.status.errorEmail;
     // Phone is optional ("" is fine) — only reject unparsable input (null).
@@ -62,6 +87,7 @@ export function WaitlistForm() {
     setFieldErrors(errors);
     setConsentInvalid(missingConsent);
     setFormError(missingConsent ? t.status.errorGeneric : null);
+    setFormNotice(null);
 
     if (errors.email || errors.phone || errors.plz || missingConsent) {
       (errors.email
@@ -84,7 +110,26 @@ export function WaitlistForm() {
       });
 
       if (res.ok) {
-        setSuccess(true);
+        const data = (await res.json().catch(() => ({}))) as {
+          status?: string;
+        };
+
+        // Already confirmed: show an inline notice and stay put — no /danke
+        // redirect, so the Meta "Lead" event does not fire on a duplicate.
+        if (data.status === "already_subscribed") {
+          setFormNotice(t.status.already);
+          setSubmitting(false);
+          return;
+        }
+
+        // One-shot flag: /danke fires the Meta "Lead" event only if this is
+        // set, then clears it — so a direct visit or reload doesn't re-convert.
+        try {
+          sessionStorage.setItem("mb_lead", "1");
+        } catch {
+          // Storage blocked: still redirect; the Lead event is best-effort.
+        }
+        router.push("/danke");
         return;
       }
 
@@ -109,19 +154,6 @@ export function WaitlistForm() {
     } finally {
       setSubmitting(false);
     }
-  }
-
-  if (success) {
-    return (
-      <div role="alert" className="py-6 text-center sm:py-10">
-        <p className="text-2xl font-bold text-white">
-          {t.status.successTitle}
-        </p>
-        <p className="mx-auto mt-3 max-w-sm text-sm leading-relaxed text-white/70">
-          {t.status.successBody}
-        </p>
-      </div>
-    );
   }
 
   return (
@@ -176,6 +208,7 @@ export function WaitlistForm() {
             placeholder={t.form.email.placeholder}
             value={email}
             onChange={(e) => {
+              trackFormStart();
               setEmail(e.target.value);
               setFieldErrors((f) => ({ ...f, email: undefined }));
             }}
@@ -215,6 +248,7 @@ export function WaitlistForm() {
             placeholder={t.form.phone.placeholder}
             value={phone}
             onChange={(e) => {
+              trackFormStart();
               setPhone(e.target.value);
               setFieldErrors((f) => ({ ...f, phone: undefined }));
             }}
@@ -257,6 +291,7 @@ export function WaitlistForm() {
             placeholder={t.form.plz.placeholder}
             value={plz}
             onChange={(e) => {
+              trackFormStart();
               setPlz(e.target.value);
               setFieldErrors((f) => ({ ...f, plz: undefined }));
             }}
@@ -327,6 +362,12 @@ export function WaitlistForm() {
         {formError && (
           <p role="alert" className="text-sm font-semibold text-red-300">
             {formError}
+          </p>
+        )}
+
+        {formNotice && (
+          <p role="status" className="text-sm font-semibold text-brand-light">
+            {formNotice}
           </p>
         )}
 

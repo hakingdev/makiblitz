@@ -11,6 +11,7 @@ const ALLOWED_PATHS = new Set([
   "/impressum",
   "/datenschutz",
   "/confirm",
+  "/danke",
   "/abmelden",
   "/api/subscribe",
   "/api/confirm",
