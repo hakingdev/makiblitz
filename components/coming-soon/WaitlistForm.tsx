@@ -211,6 +211,7 @@ export function WaitlistForm() {
             name="phone"
             type="tel"
             autoComplete="tel"
+            maxLength={26}
             placeholder={t.form.phone.placeholder}
             value={phone}
             onChange={(e) => {

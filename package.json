@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "waitlist:cleanup": "tsx scripts/cleanup-pending.ts"
+    "waitlist:cleanup": "tsx scripts/cleanup-pending.ts",
+    "waitlist:selftest": "tsx scripts/validate-selftest.ts",
+    "plz:update": "tsx scripts/generate-plz-data.ts"
   },
   "dependencies": {
     "clsx": "^2.1.1",

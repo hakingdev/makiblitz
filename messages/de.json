@@ -25,7 +25,7 @@
     },
     "phone": {
       "label": "Telefon / WhatsApp (optional)",
-      "placeholder": "+49 …"
+      "placeholder": "z. B. +49 171 2345678"
     },
     "plz": {
       "label": "Postleitzahl",
@@ -45,8 +45,8 @@
     "successBody": "Wir haben dir eine E-Mail geschickt – bitte bestätige deine Anmeldung. Nichts angekommen? Schau kurz in deinen Spam-Ordner.",
     "errorGeneric": "Ups, das hat nicht geklappt. Bitte prüf deine Eingaben und versuch es noch einmal.",
     "errorEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
-    "errorPhone": "Bitte gib eine gültige Telefonnummer ein.",
-    "errorPlz": "Bitte gib eine gültige 5-stellige Postleitzahl ein."
+    "errorPhone": "Bitte gib eine gültige deutsche Telefonnummer ein (z. B. +49 171 2345678).",
+    "errorPlz": "Bitte gib eine gültige deutsche Postleitzahl ein."
   },
   "confirmPage": {
     "metaTitle": "Anmeldung bestätigen",

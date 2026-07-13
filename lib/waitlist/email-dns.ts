@@ -1,10 +1,14 @@
 import { promises as dns } from "dns";
 
 /**
- * Server-side deliverability check for the address domain: a domain that
- * publishes neither usable MX nor A/AAAA records can never receive the
- * double-opt-in mail, so the typo is surfaced to the user immediately
- * instead of silently ending in "no mail arrived".
+ * Server-side deliverability check for the address domain: without a usable
+ * MX record the double-opt-in mail can never arrive, so the typo is surfaced
+ * to the user immediately instead of silently ending in "no mail arrived".
+ *
+ * Deliberately MX-only. RFC 5321 allows falling back to A/AAAA, but every
+ * real-world mailbox provider publishes MX — in practice the fallback only
+ * ever matched parked domains (12345@1235.com passed via the parking page's
+ * wildcard A record).
  *
  * Fail-open by design: DNS hiccups (timeouts, SERVFAIL) must never block a
  * signup — only a definitive "domain/records do not exist" rejects.
@@ -46,23 +50,11 @@ async function domainAcceptsMail(domain: string): Promise<boolean> {
   try {
     const mx = await withTimeout(dns.resolveMx(domain));
     // RFC 7505 null MX ("0 .") explicitly announces "no mail accepted".
-    const usable = mx.filter((r) => r.exchange && r.exchange !== ".");
-    if (usable.length > 0) return true;
-    if (mx.length > 0) return false; // null MX only
+    return mx.some((r) => r.exchange && r.exchange !== ".");
   } catch (err) {
     if (!isDefinitiveMiss(err)) throw err;
+    return false;
   }
-
-  // No MX published — SMTP falls back to the A/AAAA record of the domain.
-  for (const resolve of [dns.resolve4, dns.resolve6]) {
-    try {
-      if ((await withTimeout(resolve(domain))).length > 0) return true;
-    } catch (err) {
-      if (!isDefinitiveMiss(err)) throw err;
-    }
-  }
-
-  return false;
 }
 
 /** `email` must already be normalized (see lib/waitlist/validate.ts). */
