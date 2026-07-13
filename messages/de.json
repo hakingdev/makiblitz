@@ -11,7 +11,11 @@
     "h1": "MakiBlitz kommt bald zu dir.",
     "subline": "Frisches Sushi, blitzschnell geliefert. Willst du es als Erste:r probieren? Trag dich ein – wir sagen dir Bescheid, sobald wir bei dir öffnen.",
     "sublineShort": "Frisches Sushi. Blitzschnell. Bald bei dir. Sei von Anfang an dabei.",
-    "trust": ["⚡ Blitzschnell", "🍣 Immer frisch", "📍 Bald in Bad Kissingen"]
+    "trust": [
+      "⚡ Blitzschnell",
+      "🍣 Immer frisch",
+      "📍 Bald in Bad Kissingen"
+    ]
   },
   "form": {
     "title": "Sei dabei, wenn wir starten",
@@ -88,6 +92,11 @@
         "Kurhausstr. 11-A, 97688 Bad Kissingen"
       ],
       "unsubscribe": "Keine E-Mails mehr von uns erhalten? Hier abmelden:"
+    },
+    "ownerPending": {
+      "subject": "🍣 Neue Anmeldung (Bestätigung ausstehend): {plz}",
+      "heading": "Neue Waitlist-Anmeldung – Bestätigung ausstehend",
+      "note": "Die Double-Opt-In-Mail wurde soeben verschickt. Für Werbung zählt die Anmeldung erst nach Klick auf den Bestätigungslink."
     },
     "ownerConfirmed": {
       "subject": "🍣 Bestätigte Anmeldung: {plz}",

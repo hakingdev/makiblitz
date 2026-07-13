@@ -5,9 +5,16 @@ import {
   normalizePhone,
   normalizePlz,
 } from "@/lib/waitlist/validate";
-import { appendWaitlistRecord } from "@/lib/waitlist/store";
+import {
+  appendWaitlistRecord,
+  type WaitlistRecord,
+} from "@/lib/waitlist/store";
 import { hasValidMailDomain } from "@/lib/waitlist/email-dns";
-import { isSmtpConfigured, sendConfirmMail } from "@/lib/waitlist/mailer";
+import {
+  isSmtpConfigured,
+  sendConfirmMail,
+  sendOwnerPendingMail,
+} from "@/lib/waitlist/mailer";
 import {
   createConfirmToken,
   createUnsubscribeToken,
@@ -94,7 +101,7 @@ export async function POST(req: NextRequest) {
 
   // Consent evidence (Art. 7 Abs. 1 DSGVO): what was agreed to, when,
   // from which (hashed) IP and client.
-  const logged = await appendWaitlistRecord({
+  const record: WaitlistRecord = {
     type: "pending",
     email,
     phone,
@@ -103,7 +110,8 @@ export async function POST(req: NextRequest) {
     consentTextVersion: CONSENT_TEXT_VERSION,
     ipHash,
     userAgent,
-  });
+  };
+  const logged = await appendWaitlistRecord(record);
 
   const base = getBaseUrl(req.nextUrl.origin);
   const confirmToken = createConfirmToken({
@@ -123,6 +131,14 @@ export async function POST(req: NextRequest) {
       // Without the mail the signup can never be confirmed — surface the error.
       console.error("[waitlist] confirm mail failed:", err);
       return error(null, 500);
+    }
+
+    // Owner heads-up about every submission, before the double-opt-in click.
+    // Best-effort: a failure here must not fail the signup itself.
+    try {
+      await sendOwnerPendingMail(record);
+    } catch (err) {
+      console.error("[waitlist] owner pending mail failed:", err);
     }
   } else {
     // Dev fallback: no SMTP → print the link so the flow stays testable.

@@ -36,6 +36,8 @@ function formatBerlinTime(iso: string): string {
 }
 
 const FROM = () => process.env.MAIL_FROM || "noreply@makiblitz.de";
+/** Owner notifications always have a working fallback destination. */
+const OWNER_TO = () => process.env.MAIL_TO || "info@makiblitz.de";
 
 /**
  * § 7 UWG / DSGVO footer for every mail sent TO subscribers:
@@ -120,6 +122,55 @@ const row = (label: string, value: string) =>
   `<tr><td style="padding:6px 16px 6px 0;color:#6b7280;white-space:nowrap;vertical-align:top;">${escapeHtml(label)}</td><td style="padding:6px 0;color:#111827;">${escapeHtml(value)}</td></tr>`;
 
 /**
+ * Owner heads-up for EVERY form submission — sent right after the
+ * double-opt-in mail, before any confirmation. The "confirmed" mail below
+ * stays the legally meaningful one (§ 7 UWG).
+ */
+export async function sendOwnerPendingMail(
+  record: WaitlistRecord,
+): Promise<void> {
+  const m = t.emails.ownerPending;
+  const labels = t.emails.ownerConfirmed.labels;
+  const phone = record.phone || "–";
+  const consentAt = record.consentAt ? formatBerlinTime(record.consentAt) : "–";
+
+  const text = [
+    m.heading,
+    "",
+    `${labels.email}:          ${record.email}`,
+    `${labels.phone}:         ${phone}`,
+    `${labels.plz}:             ${record.plz ?? "–"}`,
+    `${labels.consentAt}:   ${consentAt}`,
+    `${labels.consentVersion}: ${record.consentTextVersion ?? "–"}`,
+    `${labels.userAgent}:      ${record.userAgent}`,
+    "",
+    m.note,
+  ].join("\n");
+
+  const html = `
+    <div style="font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;color:#111827;">
+      <h2 style="margin:0 0 12px;">🍣 ${escapeHtml(m.heading)}</h2>
+      <table style="border-collapse:collapse;">
+        ${row(labels.email, record.email)}
+        ${row(labels.phone, phone)}
+        ${row(labels.plz, record.plz ?? "–")}
+        ${row(labels.consentAt, consentAt)}
+        ${row(labels.consentVersion, record.consentTextVersion ?? "–")}
+        ${row(labels.userAgent, record.userAgent)}
+      </table>
+      <p style="margin:14px 0 0;font-size:13px;color:#6b7280;">${escapeHtml(m.note)}</p>
+    </div>`;
+
+  await getTransporter().sendMail({
+    from: FROM(),
+    to: OWNER_TO(),
+    subject: m.subject.replace("{plz}", record.plz ?? "?"),
+    text,
+    html,
+  });
+}
+
+/**
  * Owner notification — sent ONLY after the subscriber clicked the
  * confirmation link. This is the actual "signup" mail.
  */
@@ -161,7 +212,7 @@ export async function sendOwnerConfirmedMail(
 
   await getTransporter().sendMail({
     from: FROM(),
-    to: process.env.MAIL_TO,
+    to: OWNER_TO(),
     subject: m.subject.replace("{plz}", record.plz ?? "?"),
     text,
     html,
@@ -194,7 +245,7 @@ export async function sendOwnerUnsubscribedMail(opts: {
 
   await getTransporter().sendMail({
     from: FROM(),
-    to: process.env.MAIL_TO,
+    to: OWNER_TO(),
     subject: m.subject.replace("{email}", opts.email),
     text,
     html,
