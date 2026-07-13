@@ -53,11 +53,11 @@ export function ProductDetail({ product }: { product: Product }) {
         <button
           onClick={() => router.back()}
           aria-label="Back"
-          className="grid h-10 w-10 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/15"
+          className="grid h-10 w-10 place-items-center rounded-full bg-brand-gradient text-white shadow-brand transition hover:brightness-110"
         >
           <ArrowLeft className="h-5 w-5" />
         </button>
-        <Rating value={product.rating} className="rounded-full bg-white/10 px-3 py-2" />
+        <Rating value={product.rating} className="rounded-full bg-brand-gradient px-3 py-2 shadow-brand" />
       </div>
 
       <div className="md:grid md:grid-cols-2 md:gap-12">
@@ -164,18 +164,20 @@ export function ProductDetail({ product }: { product: Product }) {
         </div>
       </div>
 
-      {/* Mobile sticky bar */}
-      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-white/10 bg-ink-800/95 px-5 py-4 backdrop-blur-lg md:hidden">
+      {/* Mobile sticky bar — kit's red payment panel with inverse white CTA */}
+      <div className="fixed inset-x-0 bottom-0 z-30 rounded-t-[20px] bg-brand-gradient-v px-5 py-4 shadow-brand md:hidden">
         <div className="mx-auto flex max-w-shell items-center justify-between gap-4">
           <div>
-            <p className="text-xs text-white/55">Grand total</p>
+            <p className="text-xs text-white/80">Grand total</p>
             <p className="text-xl font-extrabold text-white">
               {formatPrice(total)}
             </p>
           </div>
-          <Button size="lg" onClick={handleAdd} className="flex-1">
-            {added ? <Check className="h-5 w-5" /> : null}
-            {added ? "Added" : "Add to Cart"}
+          <Button size="lg" variant="light" onClick={handleAdd} className="flex-1">
+            {added ? <Check className="h-5 w-5 text-brand-600" /> : null}
+            <span className="bg-brand-gradient-v bg-clip-text text-transparent">
+              {added ? "Added" : "Add to Cart"}
+            </span>
           </Button>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { forwardRef } from "react";
 import { cn } from "@/lib/utils";
 
-type Variant = "primary" | "ghost" | "outline";
+type Variant = "primary" | "ghost" | "outline" | "light";
 type Size = "sm" | "md" | "lg";
 
 type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
@@ -16,6 +16,8 @@ const variants: Record<Variant, string> = {
   primary: "bg-brand-gradient text-white shadow-brand hover:brightness-110",
   ghost: "bg-white/5 text-white hover:bg-white/10",
   outline: "border border-white/15 text-white hover:bg-white/5",
+  // Kit's inverse CTA for red surfaces: white pill, gradient-red label
+  light: "bg-white text-brand-600 shadow-card hover:bg-cream",
 };
 
 const sizes: Record<Size, string> = {

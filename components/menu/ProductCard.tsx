@@ -16,7 +16,7 @@ export function ProductCard({ product }: { product: Product }) {
             size="lg"
             className="h-32 w-32"
           />
-          <span className="absolute right-0 top-0 rounded-full bg-ink-800/90 px-2 py-1">
+          <span className="absolute right-0 top-0 rounded-full bg-brand-gradient px-2 py-1 shadow-brand">
             <Rating value={product.rating} />
           </span>
         </div>

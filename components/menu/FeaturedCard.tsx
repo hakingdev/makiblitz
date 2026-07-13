@@ -27,7 +27,7 @@ export function FeaturedCard({
         className="absolute -top-6 left-6 h-20 w-20 md:h-24 md:w-24"
       />
       {/* Floating rating */}
-      <div className="absolute -top-3 right-6 rounded-full bg-ink-800 px-3 py-1.5">
+      <div className="absolute -top-3 right-6 rounded-full bg-brand-gradient px-3 py-1.5 shadow-brand">
         <Rating value={product.rating} />
       </div>
 
@@ -43,7 +43,7 @@ export function FeaturedCard({
 
       <div className="mt-5 flex items-center gap-3">
         <Link href={`/product/${product.slug}`}>
-          <span className="rounded-pill border border-white/15 px-5 py-2 text-xs font-semibold text-white/80 transition hover:bg-white/5">
+          <span className="rounded-pill border border-brand px-5 py-2 text-xs font-semibold text-white transition hover:bg-brand/10">
             Details
           </span>
         </Link>

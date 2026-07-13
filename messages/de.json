@@ -1,0 +1,285 @@
+{
+  "meta": {
+    "title": "MakiBlitz – Sushi blitzschnell geliefert. Bald bei dir!",
+    "description": "MakiBlitz startet bald: frisches Sushi, blitzschnell geliefert. Trag dich auf die Warteliste ein und erfahre als Erste:r, wann wir bei dir öffnen.",
+    "ogTitle": "MakiBlitz kommt bald zu dir 🍣⚡",
+    "ogDescription": "Sichere dir deinen Platz auf der Warteliste."
+  },
+  "comingSoon": {
+    "brand": "MakiBlitz",
+    "eyebrow": "DEMNÄCHST · BALD BEI DIR",
+    "h1": "MakiBlitz kommt bald zu dir.",
+    "subline": "Frisches Sushi, blitzschnell geliefert. Willst du es als Erste:r probieren? Trag dich ein – wir sagen dir Bescheid, sobald wir bei dir öffnen.",
+    "sublineShort": "Frisches Sushi. Blitzschnell. Bald bei dir. Sei von Anfang an dabei.",
+    "trust": ["⚡ Blitzschnell", "🍣 Immer frisch", "📍 Bald in Bad Kissingen"]
+  },
+  "form": {
+    "title": "Sei dabei, wenn wir starten",
+    "email": {
+      "label": "E-Mail-Adresse",
+      "placeholder": "deine@email.de"
+    },
+    "phone": {
+      "label": "Telefon / WhatsApp (optional)",
+      "placeholder": "+49 …"
+    },
+    "plz": {
+      "label": "Postleitzahl",
+      "placeholder": "z. B. 10115",
+      "hint": "Deine PLZ hilft uns zu sehen, wo die Nachfrage am größten ist – so kommen wir schneller in deine Nachbarschaft."
+    },
+    "consent": "Ja, ich möchte per E-Mail/WhatsApp über den Start von MakiBlitz informiert werden.",
+    "consentPrivacyPrefix": "Hinweise zum Datenschutz findest du in der ",
+    "consentPrivacyLink": "Datenschutzerklärung",
+    "consentPrivacySuffix": ".",
+    "submit": "Benachrichtige mich",
+    "submitting": "Wird gesendet…",
+    "microcopy": "Kein Spam – versprochen. Wir melden uns nur, wenn MakiBlitz bei dir an den Start geht. Du kannst dich jederzeit mit einem Klick abmelden."
+  },
+  "status": {
+    "successTitle": "Fast geschafft! 📬",
+    "successBody": "Wir haben dir eine E-Mail geschickt – bitte bestätige deine Anmeldung. Nichts angekommen? Schau kurz in deinen Spam-Ordner.",
+    "errorGeneric": "Ups, das hat nicht geklappt. Bitte prüf deine Eingaben und versuch es noch einmal.",
+    "errorEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
+    "errorPhone": "Bitte gib eine gültige Telefonnummer ein.",
+    "errorPlz": "Bitte gib eine gültige 5-stellige Postleitzahl ein."
+  },
+  "confirmPage": {
+    "metaTitle": "Anmeldung bestätigen",
+    "success": {
+      "title": "Willkommen an Bord! 🎉",
+      "body": "Du gehörst jetzt zu den Ersten, die erfahren, wann MakiBlitz startet."
+    },
+    "expired": {
+      "title": "Dieser Link ist abgelaufen.",
+      "body": "Der Bestätigungslink war 48 Stunden gültig. Kein Problem: Trag dich einfach noch einmal ein – wir schicken dir eine neue E-Mail."
+    },
+    "invalid": {
+      "title": "Dieser Link ist leider ungültig.",
+      "body": "Der Bestätigungslink ist ungültig oder unvollständig. Kein Problem: Trag dich einfach noch einmal in die Warteliste ein."
+    },
+    "cta": "Zur Warteliste"
+  },
+  "unsubscribePage": {
+    "metaTitle": "Abmeldung",
+    "success": {
+      "title": "Du bist abgemeldet.",
+      "body": "Schade – aber vielleicht bis bald! 🍣"
+    },
+    "invalid": {
+      "title": "Dieser Abmelde-Link ist leider ungültig.",
+      "body": "Du möchtest dich abmelden? Schreib uns einfach kurz an {email} – wir kümmern uns darum."
+    },
+    "cta": "Zur Startseite"
+  },
+  "emails": {
+    "confirm": {
+      "subject": "Fast geschafft – bestätige deine Anmeldung bei MakiBlitz 🍣",
+      "greeting": "Hi!",
+      "body": "Schön, dass du dabei sein willst. Klick nur noch kurz auf den Button, dann bist du offiziell auf der MakiBlitz-Warteliste:",
+      "button": "Anmeldung bestätigen",
+      "validity": "Der Bestätigungslink ist 48 Stunden gültig.",
+      "ignore": "Du hast dich nicht angemeldet? Dann ignorier diese E-Mail einfach."
+    },
+    "footer": {
+      "sender": "Diese E-Mail wurde versendet von:",
+      "senderLines": [
+        "Weisses Haus GmbH",
+        "Kurhausstr. 11-A, 97688 Bad Kissingen"
+      ],
+      "unsubscribe": "Keine E-Mails mehr von uns erhalten? Hier abmelden:"
+    },
+    "ownerConfirmed": {
+      "subject": "🍣 Bestätigte Anmeldung: {plz}",
+      "heading": "Bestätigte Waitlist-Anmeldung",
+      "labels": {
+        "email": "E-Mail",
+        "phone": "Telefon",
+        "plz": "PLZ",
+        "consentAt": "Angemeldet am",
+        "confirmedAt": "Bestätigt am",
+        "consentVersion": "Einwilligungstext (Version)",
+        "userAgent": "User-Agent"
+      }
+    },
+    "ownerUnsubscribed": {
+      "subject": "Abmeldung: {email}",
+      "heading": "Abmeldung von der Warteliste",
+      "labels": {
+        "email": "E-Mail",
+        "unsubscribedAt": "Abgemeldet am"
+      }
+    }
+  },
+  "footer": {
+    "impressum": "Impressum",
+    "datenschutz": "Datenschutz",
+    "contactEmail": "info@makiblitz.de",
+    "instagramLabel": "Instagram",
+    "tiktokLabel": "TikTok"
+  },
+  "legal": {
+    "backToHome": "Zurück zur Startseite",
+    "impressumTitle": "Impressum",
+    "datenschutzTitle": "Datenschutzerklärung"
+  },
+  "impressum": {
+    "anbieter": {
+      "heading": "Angaben gemäß § 5 DDG",
+      "lines": [
+        "Weisses Haus GmbH",
+        "Kurhausstr. 11-A",
+        "97688 Bad Kissingen",
+        "Deutschland"
+      ]
+    },
+    "vertretenDurch": {
+      "heading": "Vertreten durch",
+      "lines": [
+        "Mykhailo Barkhan (Geschäftsführer)"
+      ]
+    },
+    "kontakt": {
+      "heading": "Kontakt",
+      "lines": [
+        "Telefon: 0971 72730",
+        "E-Mail: info@makiblitz.de"
+      ]
+    },
+    "handelsregister": {
+      "heading": "Registereintrag",
+      "lines": [
+        "Eintragung im Handelsregister.",
+        "Registergericht: Amtsgericht Schweinfurt",
+        "Registernummer: HRB 9292"
+      ]
+    },
+    "ustId": {
+      "heading": "Umsatzsteuer-ID",
+      "lines": [
+        "Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz: DE365866180"
+      ]
+    },
+    "steuernummer": {
+      "heading": "Wirtschafts-Identifikationsnummer",
+      "lines": [
+        "Steuernummer: 205/142/20396"
+      ]
+    },
+    "optional": {
+      "aufsichtsbehoerde": {
+        "heading": "Aufsichtsbehörde",
+        "lines": [
+          "[TODO: Name und Anschrift der zuständigen Aufsichtsbehörde]"
+        ]
+      },
+      "mstv": {
+        "heading": "Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV",
+        "lines": [
+          "[TODO: Vorname Name]",
+          "[TODO: Straße Hausnummer, PLZ Ort]"
+        ]
+      }
+    },
+    "streitschlichtung": {
+      "heading": "Streitschlichtung",
+      "odrNote": "Hinweis zur EU-Plattform: Die Plattform der EU-Kommission zur Online-Streitbeilegung (OS-Plattform) wurde zum 20. Juli 2025 eingestellt. Informationen zum Verbraucherrecht findest du direkt auf den Seiten der Europäischen Kommission.",
+      "verbraucherschlichtung": "Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen."
+    }
+  },
+  "datenschutz": {
+    "intro": "Der Schutz deiner persönlichen Daten ist uns wichtig. Hier erfährst du, welche Daten wir auf dieser Website verarbeiten, zu welchem Zweck – und welche Rechte du hast.",
+    "sections": [
+      {
+        "heading": "1. Verantwortlicher",
+        "intro": [
+          "Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO) ist:",
+          "Weisses Haus GmbH\nVertreten durch: Mykhailo Barkhan (Geschäftsführer)\nKurhausstr. 11-A\n97688 Bad Kissingen, Deutschland\nTelefon: 0971 72730\nE-Mail: info@makiblitz.de"
+        ],
+        "list": [],
+        "outro": []
+      },
+      {
+        "heading": "2. Hosting & Server-Logfiles",
+        "intro": [
+          "Diese Website wird bei Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA („Vercel“) gehostet. Beim Aufruf der Website verarbeitet der Hosting-Provider automatisch technische Zugriffsdaten (Server-Logfiles), die dein Browser übermittelt:"
+        ],
+        "list": [
+          "IP-Adresse des zugreifenden Geräts",
+          "Datum und Uhrzeit des Zugriffs",
+          "aufgerufene Seite bzw. Datei (URL) und übertragene Datenmenge",
+          "Referrer-URL (zuvor besuchte Seite)",
+          "Browser-Typ und -Version sowie Betriebssystem (User-Agent)"
+        ],
+        "outro": [
+          "Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes Interesse liegt in der sicheren, stabilen und performanten Bereitstellung der Website. Die Server-Logfiles werden bei Vercel automatisch nach kurzer Zeit gelöscht (je nach Tarif nach wenigen Stunden bis wenigen Tagen).",
+          "Mit Vercel haben wir einen Vertrag über Auftragsverarbeitung (AVV) nach Art. 28 DSGVO geschlossen. Vercel verarbeitet Daten auch in den USA; die Übermittlung ist durch die Zertifizierung von Vercel nach dem EU-US Data Privacy Framework sowie durch EU-Standardvertragsklauseln (Art. 46 DSGVO) abgesichert."
+        ]
+      },
+      {
+        "heading": "3. Warteliste / Benachrichtigung zum Start",
+        "intro": [
+          "Wenn du dich in unsere Warteliste einträgst, verarbeiten wir die folgenden Daten:"
+        ],
+        "list": [
+          "E-Mail-Adresse (Pflichtangabe)",
+          "Postleitzahl (Pflichtangabe)",
+          "Telefonnummer / WhatsApp (freiwillige Angabe)"
+        ],
+        "outro": [
+          "Zweck: Die Daten nutzen wir ausschließlich, um dich einmalig bzw. gelegentlich über den Start von MakiBlitz zu benachrichtigen. Deine Postleitzahl hilft uns zu planen, in welchen Gebieten wir zuerst starten.",
+          "Rechtsgrundlage: deine Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO. Die Angabe deiner Daten ist freiwillig – ohne die Pflichtangaben können wir dich allerdings nicht benachrichtigen.",
+          "Double-Opt-In: Nach dem Absenden des Formulars erhältst du eine Bestätigungs-E-Mail. Erst wenn du den darin enthaltenen Bestätigungslink anklickst, wird deine Anmeldung wirksam; der Link ist 48 Stunden gültig. Zum Nachweis deiner Einwilligung (Art. 7 Abs. 1 DSGVO) protokollieren wir den Zeitpunkt der Anmeldung und der Bestätigung, die Version des Einwilligungstextes, deinen User-Agent sowie deine IP-Adresse – Letztere ausschließlich in pseudonymisierter Form als kryptografischer Hash (HMAC-Verfahren). Deine IP-Adresse wird nicht im Klartext gespeichert.",
+          "Widerruf: Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen (Art. 7 Abs. 3 DSGVO) – über den Abmelde-Link, den jede unserer E-Mails enthält, oder formlos per E-Mail an info@makiblitz.de. Die Rechtmäßigkeit der bis zum Widerruf erfolgten Verarbeitung bleibt unberührt.",
+          "Speicherdauer: Nicht bestätigte Anmeldungen werden nach 30 Tagen automatisch gelöscht. Nach einem Widerruf löschen wir deine Daten aus dem Verteiler; den Nachweis deiner zuvor erteilten Einwilligung bewahren wir bis zum Ablauf der gesetzlichen Verjährungsfristen auf (Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO – Nachweis- und Verteidigungsinteresse).",
+          "Empfänger: Für den Versand der E-Mails nutzen wir den E-Mail-Dienst „Private Email“ von Namecheap, Inc., 4600 East Washington Street, Suite 300, Phoenix, AZ 85034, USA, als Auftragsverarbeiter (AVV nach Art. 28 DSGVO). Namecheap kann Daten dabei auch in den USA verarbeiten; die Übermittlung ist durch EU-Standardvertragsklauseln (Art. 46 DSGVO) abgesichert."
+        ]
+      },
+      {
+        "heading": "4. Deine Rechte (Betroffenenrechte)",
+        "intro": [
+          "Dir stehen nach der DSGVO folgende Rechte zu:"
+        ],
+        "list": [
+          "Auskunft über die von uns verarbeiteten Daten (Art. 15 DSGVO)",
+          "Berichtigung unrichtiger Daten (Art. 16 DSGVO)",
+          "Löschung (Art. 17 DSGVO)",
+          "Einschränkung der Verarbeitung (Art. 18 DSGVO)",
+          "Datenübertragbarkeit (Art. 20 DSGVO)",
+          "Widerspruch gegen Verarbeitungen auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO (Art. 21 DSGVO)",
+          "Widerruf erteilter Einwilligungen mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO)"
+        ],
+        "outro": [
+          "Zur Ausübung deiner Rechte genügt eine formlose E-Mail an info@makiblitz.de."
+        ]
+      },
+      {
+        "heading": "5. Beschwerderecht bei einer Aufsichtsbehörde",
+        "intro": [
+          "Du hast das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren (Art. 77 DSGVO) – insbesondere in dem Mitgliedstaat deines gewöhnlichen Aufenthaltsorts, deines Arbeitsplatzes oder des Orts des mutmaßlichen Verstoßes.",
+          "Für uns zuständig: Bayerisches Landesamt für Datenschutzaufsicht (BayLDA), Promenade 18, 91522 Ansbach."
+        ],
+        "list": [],
+        "outro": []
+      },
+      {
+        "heading": "6. Cookies",
+        "intro": [
+          "Diese Website setzt keine Cookies zu Analyse-, Marketing- oder Tracking-Zwecken ein und bindet keine Tracker von Drittanbietern ein. Deshalb findest du hier auch keinen Cookie-Banner.",
+          "Soweit für den Betrieb der Website technisch zwingend erforderliche Informationen auf deinem Endgerät gespeichert oder ausgelesen werden, geschieht dies auf Grundlage von § 25 Abs. 2 Nr. 2 TDDDG; eine Einwilligung ist dafür nicht erforderlich."
+        ],
+        "list": [],
+        "outro": []
+      },
+      {
+        "heading": "7. Keine automatisierte Entscheidungsfindung",
+        "intro": [
+          "Eine automatisierte Entscheidungsfindung einschließlich Profiling (Art. 22 DSGVO) findet nicht statt."
+        ],
+        "list": [],
+        "outro": []
+      }
+    ],
+    "stand": "Stand: 13. Juli 2026"
+  }
+}

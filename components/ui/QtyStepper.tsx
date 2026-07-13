@@ -27,7 +27,7 @@ export function QtyStepper({
         aria-label="Decrease"
         onClick={() => onChange(Math.max(min, value - 1))}
         className={cn(
-          "grid place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 active:scale-90",
+          "grid place-items-center rounded-full bg-brand-gradient text-white shadow-brand transition hover:brightness-110 active:scale-90",
           btn,
         )}
       >

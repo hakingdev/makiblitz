@@ -18,6 +18,7 @@ const rockSalt = Rock_Salt({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://makiblitz.de"),
   title: "Makiblitz — Fresh Sushi Delivery",
   description:
     "Authentic sushi made by master chefs. Quick delivery or easy pickup across the city.",
@@ -36,7 +37,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${mulish.variable} ${rockSalt.variable}`}>
+    <html lang="de" className={`${mulish.variable} ${rockSalt.variable}`}>
       <body>
         <CartProvider>{children}</CartProvider>
       </body>

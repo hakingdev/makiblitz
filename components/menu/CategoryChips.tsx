@@ -15,10 +15,8 @@ export function CategoryChips({ activeSlug }: { activeSlug?: string }) {
           >
             <span
               className={cn(
-                "grid h-12 w-12 place-items-center rounded-full text-xl transition-all md:h-14 md:w-14",
-                active
-                  ? "bg-brand-gradient shadow-brand"
-                  : "bg-white/5 hover:bg-white/10",
+                "grid h-12 w-12 place-items-center rounded-full bg-brand-gradient text-xl shadow-brand transition-all hover:brightness-110 md:h-14 md:w-14",
+                active && "ring-2 ring-brand ring-offset-2 ring-offset-ink-900",
               )}
             >
               {c.emoji}

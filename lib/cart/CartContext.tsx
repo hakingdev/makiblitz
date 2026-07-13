@@ -132,9 +132,18 @@ export function CartProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  // Persist on change.
+  // Persist on change. § 25 TDDDG: never touch storage for pristine visitors
+  // (e.g. on the coming-soon page) — only once there is real cart state.
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    try {
+      const isPristine =
+        state.items.length === 0 &&
+        state.deliveryType === initialState.deliveryType;
+      if (isPristine && localStorage.getItem(STORAGE_KEY) === null) return;
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch {
+      /* storage unavailable (private mode etc.) — cart just won't persist */
+    }
   }, [state]);
 
   const value = useMemo<CartContextValue>(() => {

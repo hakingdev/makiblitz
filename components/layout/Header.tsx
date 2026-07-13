@@ -22,7 +22,7 @@ export function Header() {
       <div className="mx-auto flex h-16 max-w-shell items-center justify-between px-5 md:h-20 md:px-8">
         {/* Left: location (mobile) / logo (desktop) */}
         <div className="flex items-center gap-3">
-          <IconButton aria-label="Location" className="md:hidden">
+          <IconButton aria-label="Location" tone="brand" className="md:hidden">
             <MapPin className="h-4 w-4" />
           </IconButton>
           <Link
@@ -57,7 +57,7 @@ export function Header() {
 
         {/* Right: search + cart */}
         <div className="flex items-center gap-3">
-          <IconButton aria-label="Search" className="hidden md:inline-flex">
+          <IconButton aria-label="Search" tone="brand" className="hidden md:inline-flex">
             <Search className="h-[18px] w-[18px]" />
           </IconButton>
           <CartButton />

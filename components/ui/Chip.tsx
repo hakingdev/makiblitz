@@ -20,10 +20,10 @@ export function Chip({
       onClick={onClick}
       aria-pressed={active}
       className={cn(
-        "rounded-pill px-5 py-1.5 text-xs font-semibold transition-all duration-200",
+        "rounded-pill border px-5 py-1.5 text-xs font-semibold text-white transition-all duration-200",
         active
-          ? "bg-brand-gradient text-white shadow-brand"
-          : "bg-white/5 text-white/70 hover:bg-white/10",
+          ? "border-transparent bg-brand-gradient shadow-brand"
+          : "border-brand bg-transparent hover:bg-brand/10",
         className,
       )}
     >
