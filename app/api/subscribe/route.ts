@@ -6,6 +6,7 @@ import {
   normalizePlz,
 } from "@/lib/waitlist/validate";
 import { appendWaitlistRecord } from "@/lib/waitlist/store";
+import { hasValidMailDomain } from "@/lib/waitlist/email-dns";
 import { isSmtpConfigured, sendConfirmMail } from "@/lib/waitlist/mailer";
 import {
   createConfirmToken,
@@ -83,6 +84,10 @@ export async function POST(req: NextRequest) {
 
   // Consent must be an explicit true — the checkbox is never pre-ticked.
   if (body.consent !== true) return error("consent", 422);
+
+  // Typo'd domains (gmial.com …) could never receive the confirmation mail —
+  // reject them like a malformed address. DNS failures fail open.
+  if (!(await hasValidMailDomain(email))) return error("email", 422);
 
   const consentAt = new Date().toISOString();
   const userAgent = req.headers.get("user-agent") ?? "unknown";

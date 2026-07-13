@@ -36,6 +36,18 @@ export function WaitlistForm() {
   const plzRef = useRef<HTMLInputElement>(null);
   const consentRef = useRef<HTMLInputElement>(null);
 
+  // Inline validation on blur: only flag non-empty invalid input — an empty
+  // required field is announced on submit, not while tabbing through.
+  function validateOnBlur(field: keyof FieldErrors) {
+    const message =
+      field === "email"
+        ? email && !normalizeEmail(email) && t.status.errorEmail
+        : field === "phone"
+          ? normalizePhone(phone) === null && t.status.errorPhone
+          : plz && !normalizePlz(plz) && t.status.errorPlz;
+    setFieldErrors((f) => ({ ...f, [field]: message || undefined }));
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (submitting) return;
@@ -127,7 +139,10 @@ export function WaitlistForm() {
         noValidate
         onSubmit={handleSubmit}
       >
-        {/* Honeypot — invisible to humans, tempting for bots */}
+        {/* Honeypot — invisible to humans, tempting for bots.
+            readOnly until focused: browser autofill and password managers
+            skip readonly fields, so real users can never trip it (autofill
+            used to fill this and silently drop genuine signups). */}
         <div
           aria-hidden="true"
           className="absolute -left-[9999px] top-0 h-px w-px overflow-hidden"
@@ -137,6 +152,8 @@ export function WaitlistForm() {
             name="hp"
             tabIndex={-1}
             autoComplete="off"
+            readOnly
+            onFocus={(e) => e.currentTarget.removeAttribute("readonly")}
             value={hp}
             onChange={(e) => setHp(e.target.value)}
           />
@@ -162,6 +179,7 @@ export function WaitlistForm() {
               setEmail(e.target.value);
               setFieldErrors((f) => ({ ...f, email: undefined }));
             }}
+            onBlur={() => validateOnBlur("email")}
             aria-invalid={fieldErrors.email ? true : undefined}
             aria-describedby={fieldErrors.email ? "wl-email-error" : undefined}
             className={cn(
@@ -199,6 +217,7 @@ export function WaitlistForm() {
               setPhone(e.target.value);
               setFieldErrors((f) => ({ ...f, phone: undefined }));
             }}
+            onBlur={() => validateOnBlur("phone")}
             aria-invalid={fieldErrors.phone ? true : undefined}
             aria-describedby={fieldErrors.phone ? "wl-phone-error" : undefined}
             className={cn(
@@ -240,6 +259,7 @@ export function WaitlistForm() {
               setPlz(e.target.value);
               setFieldErrors((f) => ({ ...f, plz: undefined }));
             }}
+            onBlur={() => validateOnBlur("plz")}
             aria-invalid={fieldErrors.plz ? true : undefined}
             aria-describedby={
               fieldErrors.plz ? "wl-plz-error wl-plz-hint" : "wl-plz-hint"
