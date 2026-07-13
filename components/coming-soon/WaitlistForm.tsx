@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
@@ -55,6 +55,24 @@ export function WaitlistForm() {
     startedRef.current = true;
     trackCustom("FormStart", PIXEL_PARAMS);
   }
+
+  // Meta "FormComplete" — fired once the moment the form is fully ready to
+  // submit: every required data field valid (phone is optional, so "not
+  // invalid" is enough) AND the consent checkbox ticked — even before the
+  // visitor clicks submit.
+  const completedRef = useRef(false);
+  useEffect(() => {
+    if (completedRef.current) return;
+    const readyToSubmit =
+      !!normalizeEmail(email) &&
+      !!normalizePlz(plz) &&
+      normalizePhone(phone) !== null &&
+      consent;
+    if (readyToSubmit) {
+      completedRef.current = true;
+      trackCustom("FormComplete", PIXEL_PARAMS);
+    }
+  }, [email, phone, plz, consent]);
 
   // Inline validation on blur: only flag non-empty invalid input — an empty
   // required field is announced on submit, not while tabbing through.
