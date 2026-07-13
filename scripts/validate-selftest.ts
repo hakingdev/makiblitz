@@ -25,8 +25,10 @@ const validEmails: Array<[string, string]> = [
   ["  Max.Mustermann@Web.DE ", "max.mustermann@web.de"],
   ["mueller-k@t-online.de", "mueller-k@t-online.de"],
   ["info@mail.uni-wuerzburg.de", "info@mail.uni-wuerzburg.de"],
-  ["li.wei@163.com", "li.wei@163.com"], // numeric SLD is legal — TLD is not
+  ["li.wei@163.com", "li.wei@163.com"], // allowlisted numeric provider
+  ["zhang@vip.163.com", "zhang@vip.163.com"],
   ["o'brien+sushi@gmx.net", "o'brien+sushi@gmx.net"],
+  ["kunde2024@web.de", "kunde2024@web.de"], // digits in local part are fine
 ];
 for (const [input, expected] of validEmails) {
   check(`email ${input}`, normalizeEmail(input), expected);
@@ -46,6 +48,10 @@ const invalidEmails = [
   "@gmail.com",
   "foo@",
   "12345",
+  "12345678@123456789.de", // all-digit domains = keyboard mashing …
+  "12345@1235.com",
+  "123456@123456.de",
+  "x@mail.4711.de",        // … also as inner label
 ];
 for (const input of invalidEmails) {
   check(`email ${input}`, normalizeEmail(input), null);

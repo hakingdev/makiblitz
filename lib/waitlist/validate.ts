@@ -14,13 +14,27 @@ const EMAIL_RE =
 
 const PLZ_RE = /^\d{5}$/;
 
+// The only real mailbox providers whose domain is a bare number (NetEase &
+// friends). Any other all-digit domain label (1235.com, 123456789.de …) is
+// keyboard mashing — every fake signup so far used one, and the SMTP server
+// behind it just bounces the double-opt-in mail into the owner's inbox.
+const NUMERIC_DOMAIN_ALLOW = ["163.com", "126.com", "139.com", "189.cn"];
+
+function isNumericGarbageDomain(domain: string): boolean {
+  const labels = domain.split(".");
+  if (!labels.slice(0, -1).some((label) => /^\d+$/.test(label))) return false;
+  return !NUMERIC_DOMAIN_ALLOW.some(
+    (allow) => domain === allow || domain.endsWith(`.${allow}`),
+  );
+}
+
 export function normalizeEmail(value: unknown): string | null {
   if (typeof value !== "string") return null;
   const email = value.trim().toLowerCase();
   if (email.length < 6 || email.length > 254 || !EMAIL_RE.test(email)) {
     return null;
   }
-  const local = email.split("@")[0]!;
+  const [local, domain] = email.split("@") as [string, string];
   // Unquoted local parts must not start/end with a dot or contain "..".
   if (
     local.length > 64 ||
@@ -30,6 +44,7 @@ export function normalizeEmail(value: unknown): string | null {
   ) {
     return null;
   }
+  if (isNumericGarbageDomain(domain)) return null;
   return email;
 }
 
