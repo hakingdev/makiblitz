@@ -93,11 +93,6 @@
       ],
       "unsubscribe": "Keine E-Mails mehr von uns erhalten? Hier abmelden:"
     },
-    "ownerPending": {
-      "subject": "🍣 Neue Anmeldung (Bestätigung ausstehend): {plz}",
-      "heading": "Neue Waitlist-Anmeldung – Bestätigung ausstehend",
-      "note": "Die Double-Opt-In-Mail wurde soeben verschickt. Für Werbung zählt die Anmeldung erst nach Klick auf den Bestätigungslink."
-    },
     "ownerConfirmed": {
       "subject": "🍣 Bestätigte Anmeldung: {plz}",
       "heading": "Bestätigte Waitlist-Anmeldung",

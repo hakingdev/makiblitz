@@ -10,11 +10,7 @@ import {
   type WaitlistRecord,
 } from "@/lib/waitlist/store";
 import { hasValidMailDomain } from "@/lib/waitlist/email-dns";
-import {
-  isSmtpConfigured,
-  sendConfirmMail,
-  sendOwnerPendingMail,
-} from "@/lib/waitlist/mailer";
+import { isSmtpConfigured, sendConfirmMail } from "@/lib/waitlist/mailer";
 import {
   createConfirmToken,
   createUnsubscribeToken,
@@ -132,14 +128,9 @@ export async function POST(req: NextRequest) {
       console.error("[waitlist] confirm mail failed:", err);
       return error(null, 500);
     }
-
-    // Owner heads-up about every submission, before the double-opt-in click.
-    // Best-effort: a failure here must not fail the signup itself.
-    try {
-      await sendOwnerPendingMail(record);
-    } catch (err) {
-      console.error("[waitlist] owner pending mail failed:", err);
-    }
+    // The owner is deliberately NOT notified here: pre-opt-in submissions are
+    // unverified (invented mailboxes on real domains pass every DNS check) and
+    // were spamming the inbox. /api/confirm sends the owner mail instead.
   } else {
     // Dev fallback: no SMTP → print the link so the flow stays testable.
     console.info(`[waitlist] SMTP not configured — confirm URL: ${confirmUrl}`);
