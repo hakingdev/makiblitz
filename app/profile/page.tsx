@@ -1,7 +1,7 @@
 import { Shell } from "@/components/layout/Shell";
 import { User, Clock, MapPin, Heart, Gift } from "lucide-react";
 
-export const metadata = { title: "Profile — Makiblitz" };
+export const metadata = { title: "Profile — MakiLove" };
 
 const ITEMS = [
   { icon: Clock, label: "Order history", note: "Past orders & reorder" },

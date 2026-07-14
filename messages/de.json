@@ -1,14 +1,14 @@
 {
   "meta": {
-    "title": "MakiBlitz – Sushi blitzschnell geliefert. Bald bei dir!",
-    "description": "MakiBlitz startet bald: frisches Sushi, blitzschnell geliefert. Trag dich auf die Warteliste ein und erfahre als Erste:r, wann wir bei dir öffnen.",
-    "ogTitle": "MakiBlitz kommt bald zu dir 🍣⚡",
+    "title": "MakiLove – Sushi blitzschnell geliefert. Bald bei dir!",
+    "description": "MakiLove startet bald: frisches Sushi, blitzschnell geliefert. Trag dich auf die Warteliste ein und erfahre als Erste:r, wann wir bei dir öffnen.",
+    "ogTitle": "MakiLove kommt bald zu dir 🍣⚡",
     "ogDescription": "Sichere dir deinen Platz auf der Warteliste."
   },
   "comingSoon": {
-    "brand": "MakiBlitz",
+    "brand": "MakiLove",
     "eyebrow": "DEMNÄCHST · BALD BEI DIR",
-    "h1": "MakiBlitz kommt bald zu dir.",
+    "h1": "MakiLove kommt bald zu dir.",
     "subline": "Frisches Sushi, blitzschnell geliefert. Willst du es als Erste:r probieren? Trag dich ein – wir sagen dir Bescheid, sobald wir bei dir öffnen.",
     "sublineShort": "Frisches Sushi. Blitzschnell. Bald bei dir. Sei von Anfang an dabei.",
     "trust": [
@@ -32,13 +32,13 @@
       "placeholder": "z. B. 10115",
       "hint": "Deine PLZ hilft uns zu sehen, wo die Nachfrage am größten ist – so kommen wir schneller in deine Nachbarschaft."
     },
-    "consent": "Ja, ich möchte per E-Mail/WhatsApp über den Start von MakiBlitz informiert werden.",
+    "consent": "Ja, ich möchte per E-Mail/WhatsApp über den Start von MakiLove informiert werden.",
     "consentPrivacyPrefix": "Hinweise zum Datenschutz findest du in der ",
     "consentPrivacyLink": "Datenschutzerklärung",
     "consentPrivacySuffix": ".",
     "submit": "Benachrichtige mich",
     "submitting": "Wird gesendet…",
-    "microcopy": "Kein Spam – versprochen. Wir melden uns nur, wenn MakiBlitz bei dir an den Start geht. Du kannst dich jederzeit mit einem Klick abmelden."
+    "microcopy": "Kein Spam – versprochen. Wir melden uns nur, wenn MakiLove bei dir an den Start geht. Du kannst dich jederzeit mit einem Klick abmelden."
   },
   "status": {
     "successTitle": "Fast geschafft! 📬",
@@ -53,7 +53,7 @@
     "metaTitle": "Anmeldung bestätigen",
     "success": {
       "title": "Willkommen an Bord! 🎉",
-      "body": "Du gehörst jetzt zu den Ersten, die erfahren, wann MakiBlitz startet."
+      "body": "Du gehörst jetzt zu den Ersten, die erfahren, wann MakiLove startet."
     },
     "already": {
       "title": "Du bist schon auf der Liste – wir freuen uns auf dich! 🍣",
@@ -72,7 +72,7 @@
   "danke": {
     "metaTitle": "Fast geschafft",
     "h1": "Fast geschafft! 📬",
-    "subline": "Wir haben dir eine E-Mail geschickt. Klick auf den Bestätigungslink, dann bist du offiziell auf der MakiBlitz-Warteliste.",
+    "subline": "Wir haben dir eine E-Mail geschickt. Klick auf den Bestätigungslink, dann bist du offiziell auf der MakiLove-Warteliste.",
     "stepsHeading": "So geht's weiter",
     "steps": [
       {
@@ -85,7 +85,7 @@
       },
       {
         "title": "Vorfreude genießen",
-        "body": "Wir melden uns, sobald MakiBlitz bei dir startet. 🍣"
+        "body": "Wir melden uns, sobald MakiLove bei dir startet. 🍣"
       }
     ],
     "hinweis": "Keine E-Mail bekommen? Prüf deinen Spam-Ordner oder trag dich einfach noch einmal ein.",
@@ -100,7 +100,7 @@
   },
   "consent": {
     "ariaLabel": "Cookie-Einstellungen",
-    "textPrefix": "Wir nutzen Cookies, um den Erfolg unserer Werbung zu messen (Meta Pixel). Das hilft uns, MakiBlitz bekannter zu machen. Details findest du in der ",
+    "textPrefix": "Wir nutzen Cookies, um den Erfolg unserer Werbung zu messen (Meta Pixel). Das hilft uns, MakiLove bekannter zu machen. Details findest du in der ",
     "privacyLink": "Datenschutzerklärung",
     "textSuffix": ".",
     "acceptAll": "Alle akzeptieren",
@@ -121,9 +121,9 @@
   },
   "emails": {
     "confirm": {
-      "subject": "Fast geschafft – bestätige deine Anmeldung bei MakiBlitz 🍣",
+      "subject": "Fast geschafft – bestätige deine Anmeldung bei MakiLove 🍣",
       "greeting": "Hi!",
-      "body": "Schön, dass du dabei sein willst. Klick nur noch kurz auf den Button, dann bist du offiziell auf der MakiBlitz-Warteliste:",
+      "body": "Schön, dass du dabei sein willst. Klick nur noch kurz auf den Button, dann bist du offiziell auf der MakiLove-Warteliste:",
       "button": "Anmeldung bestätigen",
       "validity": "Der Bestätigungslink ist 48 Stunden gültig.",
       "ignore": "Du hast dich nicht angemeldet? Dann ignorier diese E-Mail einfach."
@@ -279,7 +279,7 @@
           "Telefonnummer / WhatsApp (freiwillige Angabe)"
         ],
         "outro": [
-          "Zweck: Die Daten nutzen wir ausschließlich, um dich einmalig bzw. gelegentlich über den Start von MakiBlitz zu benachrichtigen. Deine Postleitzahl hilft uns zu planen, in welchen Gebieten wir zuerst starten.",
+          "Zweck: Die Daten nutzen wir ausschließlich, um dich einmalig bzw. gelegentlich über den Start von MakiLove zu benachrichtigen. Deine Postleitzahl hilft uns zu planen, in welchen Gebieten wir zuerst starten.",
           "Rechtsgrundlage: deine Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO. Die Angabe deiner Daten ist freiwillig – ohne die Pflichtangaben können wir dich allerdings nicht benachrichtigen.",
           "Double-Opt-In: Nach dem Absenden des Formulars erhältst du eine Bestätigungs-E-Mail. Erst wenn du den darin enthaltenen Bestätigungslink anklickst, wird deine Anmeldung wirksam; der Link ist 48 Stunden gültig. Zum Nachweis deiner Einwilligung (Art. 7 Abs. 1 DSGVO) protokollieren wir den Zeitpunkt der Anmeldung und der Bestätigung, die Version des Einwilligungstextes, deinen User-Agent sowie deine IP-Adresse – Letztere ausschließlich in pseudonymisierter Form als kryptografischer Hash (HMAC-Verfahren). Deine IP-Adresse wird nicht im Klartext gespeichert.",
           "Widerruf: Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen (Art. 7 Abs. 3 DSGVO) – über den Abmelde-Link, den jede unserer E-Mails enthält, oder formlos per E-Mail an info@makiblitz.de. Die Rechtmäßigkeit der bis zum Widerruf erfolgten Verarbeitung bleibt unberührt.",

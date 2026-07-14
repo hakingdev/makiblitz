@@ -120,7 +120,7 @@ async function main() {
           ? { name: MAIL_FROM_NAME, email: MAIL_FROM }
           : { email: MAIL_FROM },
         to: [{ email: MAIL_TO }],
-        subject: "MakiBlitz · Brevo-Test",
+        subject: "MakiLove · Brevo-Test",
         textContent: "Wenn du das liest, funktioniert der Brevo-Versand. 🍣",
         htmlContent: "<p>Wenn du das liest, funktioniert der Brevo-Versand. 🍣</p>",
       }),

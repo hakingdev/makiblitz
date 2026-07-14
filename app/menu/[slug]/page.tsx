@@ -19,7 +19,7 @@ export function generateMetadata({
   params: { slug: string };
 }): Metadata {
   const category = getCategoryBySlug(params.slug);
-  return { title: category ? `${category.name} — Makiblitz` : "Makiblitz" };
+  return { title: category ? `${category.name} — MakiLove` : "MakiLove" };
 }
 
 export default function CategoryPage({

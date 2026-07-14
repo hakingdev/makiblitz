@@ -4,7 +4,7 @@ import { ProductCard } from "@/components/menu/ProductCard";
 import { SectionHeader } from "@/components/ui/SectionHeader";
 import { categories, getProductsByCategory } from "@/lib/data/menu";
 
-export const metadata = { title: "Menu — Makiblitz" };
+export const metadata = { title: "Menu — MakiLove" };
 
 export default function MenuPage() {
   return (

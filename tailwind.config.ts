@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 /**
- * Makiblitz — design tokens extracted from the Figma kit
+ * MakiLove — design tokens extracted from the Figma kit
  * "Sushi Resto Mobile Apps UI Kit" (node 21:44).
  * Dark premium theme with a red accent gradient.
  */

@@ -21,7 +21,7 @@ export function generateMetadata({
 }): Metadata {
   const product = getProductBySlug(params.slug);
   return {
-    title: product ? `${product.name} — Makiblitz` : "Makiblitz",
+    title: product ? `${product.name} — MakiLove` : "MakiLove",
     description: product?.description,
   };
 }

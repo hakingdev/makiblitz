@@ -22,7 +22,7 @@ const rockSalt = Rock_Salt({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://makiblitz.de"),
-  title: "Makiblitz — Fresh Sushi Delivery",
+  title: "MakiLove — Fresh Sushi Delivery",
   description:
     "Authentic sushi made by master chefs. Quick delivery or easy pickup across the city.",
   keywords: ["sushi", "delivery", "sashimi", "maki", "nigiri", "Lieferung"],

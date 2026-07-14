@@ -29,7 +29,7 @@ export function Header() {
             href="/"
             className="font-display text-lg text-white md:text-2xl"
           >
-            Maki<span className="text-brand">blitz</span>
+            Maki<span className="text-brand">Love</span>
           </Link>
         </div>
 

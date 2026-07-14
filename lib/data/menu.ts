@@ -1,5 +1,5 @@
 /**
- * Mock catalogue for Makiblitz.
+ * Mock catalogue for MakiLove.
  * Frontend-only data — replaced by the MongoDB / API layer later.
  * Shape mirrors the dumbospizza Product/Category models (simplified).
  */
@@ -152,8 +152,8 @@ export const products: Product[] = [
   },
   {
     id: "p7",
-    slug: "makiblitz-deluxe-set",
-    name: "Makiblitz Deluxe Set",
+    slug: "makilove-deluxe-set",
+    name: "MakiLove Deluxe Set",
     description: "24 pieces — chef's signature selection.",
     longDescription:
       "Our signature 24-piece set: a curated mix of nigiri, maki rolls and sashimi. Perfect for sharing.",
