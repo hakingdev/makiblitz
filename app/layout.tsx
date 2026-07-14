@@ -21,7 +21,7 @@ const rockSalt = Rock_Salt({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://makiblitz.de"),
+  metadataBase: new URL("https://www.makilove.de"),
   title: "MakiLove — Fresh Sushi Delivery",
   description:
     "Authentic sushi made by master chefs. Quick delivery or easy pickup across the city.",

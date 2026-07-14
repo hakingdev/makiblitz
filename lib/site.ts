@@ -1,4 +1,4 @@
-export const SITE_URL = "https://makiblitz.de";
+export const SITE_URL = "https://www.makilove.de";
 
 /**
  * Absolute base URL for links embedded in e-mails (confirm/unsubscribe).

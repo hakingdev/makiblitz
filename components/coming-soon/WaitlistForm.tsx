@@ -17,7 +17,7 @@ const t = getMessages();
 
 // Shared params for the funnel micro-events. No PII (never e-mail/phone/PLZ).
 const PIXEL_PARAMS = {
-  content_name: "makiblitz_waitlist",
+  content_name: "makilove_waitlist",
   content_category: "coming_soon",
 } as const;
 

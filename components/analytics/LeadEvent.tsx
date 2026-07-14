@@ -32,7 +32,7 @@ export function LeadEvent() {
     if (!hasFlag) return;
 
     track("Lead", {
-      content_name: "makiblitz_waitlist",
+      content_name: "makilove_waitlist",
       content_category: "coming_soon",
     });
   }, [pixelReady]);

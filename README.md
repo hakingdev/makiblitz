@@ -1,4 +1,4 @@
-# Makiblitz 🍣
+# MakiLove 🍣
 
 Sushi delivery storefront. Frontend built from the Figma "Sushi Resto Mobile
 Apps UI Kit", adapted to a fully responsive **mobile · tablet · desktop** web

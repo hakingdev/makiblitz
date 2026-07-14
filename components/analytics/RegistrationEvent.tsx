@@ -27,7 +27,7 @@ export function RegistrationEvent({ active }: { active: boolean }) {
     }
 
     track("CompleteRegistration", {
-      content_name: "makiblitz_waitlist",
+      content_name: "makilove_waitlist",
       content_category: "coming_soon",
     });
   }, [active, pixelReady]);

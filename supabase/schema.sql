@@ -1,4 +1,4 @@
--- MakiBlitz waitlist storage (run once in the Supabase SQL Editor).
+-- MakiLove waitlist storage (run once in the Supabase SQL Editor).
 --
 -- Two tables:
 --   waitlist_events      — append-only audit log (Art. 7 Abs. 1 DSGVO consent
