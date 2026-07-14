@@ -18,7 +18,7 @@ const SEND_TIMEOUT_MS = 10_000;
  * display name to a bare address.
  */
 function sender(): { email: string; name?: string } {
-  const raw = process.env.MAIL_FROM || "info@makiblitz.de";
+  const raw = process.env.MAIL_FROM || "info@makilove.de";
   const named = raw.match(/^\s*(.*?)\s*<([^>]+)>\s*$/);
   if (named) {
     const name = named[1]?.trim();
@@ -89,7 +89,7 @@ function formatBerlinTime(iso: string): string {
 }
 
 /** Owner notifications always have a working fallback destination. */
-const OWNER_TO = () => process.env.MAIL_TO || "info@makiblitz.de";
+const OWNER_TO = () => process.env.MAIL_TO || "info@makilove.de";
 
 /**
  * § 7 UWG / DSGVO footer for every mail sent TO subscribers:
