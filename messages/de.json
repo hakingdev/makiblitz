@@ -1,18 +1,18 @@
 {
   "meta": {
-    "title": "MakiLove – Sushi blitzschnell geliefert. Bald bei dir!",
-    "description": "MakiLove startet bald: frisches Sushi, blitzschnell geliefert. Trag dich auf die Warteliste ein und erfahre als Erste:r, wann wir bei dir öffnen.",
-    "ogTitle": "MakiLove kommt bald zu dir 🍣⚡",
+    "title": "MakiLove – Frisches Sushi in bester Qualität. Bald bei dir!",
+    "description": "MakiLove startet bald: frisches Sushi, mit Sorgfalt aus besten Zutaten zubereitet. Trag dich auf die Warteliste ein und erfahre als Erste:r, wann wir bei dir öffnen.",
+    "ogTitle": "MakiLove kommt bald zu dir 🍣",
     "ogDescription": "Sichere dir deinen Platz auf der Warteliste."
   },
   "comingSoon": {
     "brand": "MakiLove",
     "eyebrow": "DEMNÄCHST · BALD BEI DIR",
     "h1": "MakiLove kommt bald zu dir.",
-    "subline": "Frisches Sushi, blitzschnell geliefert. Willst du es als Erste:r probieren? Trag dich ein – wir sagen dir Bescheid, sobald wir bei dir öffnen.",
-    "sublineShort": "Frisches Sushi. Blitzschnell. Bald bei dir. Sei von Anfang an dabei.",
+    "subline": "Frisches Sushi. Willst du es als Erste:r probieren? Trag dich ein – wir sagen dir Bescheid, sobald wir bei dir öffnen.",
+    "sublineShort": "Frisches Sushi. Handgemacht. Bald bei dir. Sei von Anfang an dabei.",
     "trust": [
-      "⚡ Blitzschnell",
+      "👨‍🍳 Handgemacht",
       "🍣 Immer frisch",
       "📍 Bald in Bad Kissingen"
     ]
@@ -93,7 +93,7 @@
   },
   "conversion": {
     "trust": [
-      "⚡ Blitzschnell",
+      "👨‍🍳 Handgemacht",
       "🍣 Immer frisch",
       "📍 Bald in deiner Stadt"
     ]
