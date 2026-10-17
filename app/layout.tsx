@@ -4,6 +4,7 @@ import "./globals.css";
 import { ConsentProvider } from "@/lib/consent";
 import { ConsentBanner } from "@/components/consent/ConsentBanner";
 import { FacebookPixel } from "@/components/analytics/FacebookPixel";
+import { GoogleAds } from "@/components/analytics/GoogleAds";
 import { getMessages } from "@/lib/i18n";
 import { SITE_URL } from "@/lib/site";
 
@@ -57,6 +58,7 @@ export default function RootLayout({
           {children}
           <ConsentBanner />
           <FacebookPixel />
+          <GoogleAds />
         </ConsentProvider>
       </body>
     </html>

@@ -335,7 +335,7 @@
   },
   "consent": {
     "ariaLabel": "Cookie-Einstellungen",
-    "textPrefix": "Wir nutzen Cookies, um den Erfolg unserer Werbung zu messen (Meta Pixel). Das hilft uns, MakiLove bekannter zu machen. Details findest du in der ",
+    "textPrefix": "Wir nutzen Cookies, um den Erfolg unserer Werbung zu messen (Meta Pixel, Google Ads). Das hilft uns, MakiLove bekannter zu machen. Details findest du in der ",
     "privacyLink": "Datenschutzerklärung",
     "textSuffix": ".",
     "acceptAll": "Alle akzeptieren",
@@ -609,7 +609,7 @@
         "heading": "6. Cookies",
         "intro": [
           "Technisch notwendige Cookies bzw. vergleichbare Speichervorgänge sind für den Betrieb der Website erforderlich und werden auf Grundlage von § 25 Abs. 2 Nr. 2 TDDDG gesetzt; eine Einwilligung ist dafür nicht erforderlich. Hierzu zählt auch die Speicherung deiner Cookie-Auswahl selbst.",
-          "Darüber hinaus binden wir mit dem Meta Pixel (siehe folgenden Abschnitt) eine optionale Marketing-Technologie ein. Diese wird ausschließlich nach deiner ausdrücklichen Einwilligung über unseren Cookie-Banner geladen. Ohne deine Einwilligung wird der Meta Pixel nicht geladen; es werden dafür keine Cookies gesetzt und keine Daten an Meta übermittelt.",
+          "Darüber hinaus binden wir mit dem Meta Pixel und dem Conversion-Tracking von Google Ads (siehe folgende Abschnitte) optionale Marketing-Technologien ein. Diese werden ausschließlich nach deiner ausdrücklichen Einwilligung über unseren Cookie-Banner geladen. Ohne deine Einwilligung werden sie nicht geladen; es werden dafür keine Cookies gesetzt und keine Daten an Meta oder Google übermittelt.",
           "Deine Auswahl kannst du jederzeit mit Wirkung für die Zukunft ändern oder widerrufen – über den Link „Cookie-Einstellungen“ im Footer der Website."
         ],
         "list": [],
@@ -633,7 +633,24 @@
         ]
       },
       {
-        "heading": "8. Google Maps (Anfahrtskarte)",
+        "heading": "8. Google Ads (Conversion-Tracking)",
+        "intro": [
+          "Auf Grundlage deiner Einwilligung nutzen wir das Conversion-Tracking von Google Ads, einem Dienst der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland („Google“). Das Google-Tag (gtag.js) wird erst geladen, nachdem du im Cookie-Banner „Alle akzeptieren“ ausgewählt hast."
+        ],
+        "list": [
+          "Zweck: Messung, welche unserer Google-Anzeigen zu einer Tischreservierung führen (Conversion-Tracking). Personalisierte Werbung (Remarketing) ist deaktiviert.",
+          "Verarbeitete Daten: Cookie- bzw. Klick-IDs aus der Anzeige, die von dir besuchten Seiten (u. a. die Bestätigung deiner Tischreservierung), deine IP-Adresse sowie Geräte- und Browserdaten.",
+          "Rechtsgrundlage: deine Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO in Verbindung mit § 25 Abs. 1 TDDDG.",
+          "Kein Klartext deiner Kontaktdaten: Wir übergeben Google weder deinen Namen noch E-Mail-Adresse, Telefonnummer oder Reservierungsdetails."
+        ],
+        "outro": [
+          "Übermittlung in die USA: Google kann Daten auch in den USA verarbeiten. Die Übermittlung ist durch die Zertifizierung von Google nach dem EU-U.S. Data Privacy Framework sowie durch EU-Standardvertragsklauseln (Art. 46 DSGVO) abgesichert.",
+          "Widerruf: Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen – über den Link „Cookie-Einstellungen“ im Footer der Website. Nach einem Widerruf wird das Google-Tag beim nächsten Seitenaufruf nicht mehr geladen.",
+          "Weitere Informationen findest du in der Datenschutzerklärung von Google unter https://policies.google.com/privacy."
+        ]
+      },
+      {
+        "heading": "9. Google Maps (Anfahrtskarte)",
         "intro": [
           "Auf unserer Kontaktseite kannst du eine Karte von Google Maps laden, einem Dienst der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland („Google“). Die Karte wird erst geladen, wenn du auf „Karte laden“ klickst – vorher wird keine Verbindung zu Google aufgebaut."
         ],
@@ -649,7 +666,7 @@
         ]
       },
       {
-        "heading": "9. Keine automatisierte Entscheidungsfindung",
+        "heading": "10. Keine automatisierte Entscheidungsfindung",
         "intro": [
           "Eine automatisierte Entscheidungsfindung einschließlich Profiling (Art. 22 DSGVO) findet nicht statt."
         ],
