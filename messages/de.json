@@ -248,10 +248,10 @@
         "placeholder": "Für kurzfristige Rückfragen",
         "error": "Bitte gib eine gültige Telefonnummer ein."
       },
-      "notesToggle": "Besondere Wünsche?",
       "notes": {
-        "label": "Besondere Wünsche",
-        "placeholder": "z. B. Allergien, Kinderstuhl oder ein besonderer Anlass"
+        "label": "Hinweis (optional)",
+        "placeholder": "z. B. vegan, Allergien, Kinderstuhl oder Geburtstag",
+        "hint": "Wir notieren deinen Hinweis direkt an deinem Tisch."
       },
       "privacyIntro": "Wir nutzen deine Daten nur für die Reservierung.",
       "privacyPrefix": "Mehr dazu in unserer ",
@@ -405,7 +405,7 @@
         "guests": "Personen",
         "date": "Datum",
         "time": "Uhrzeit",
-        "notes": "Deine Wünsche"
+        "notes": "Dein Hinweis"
       },
       "address": "MakiLove · Kurhausstr. 11A · 97688 Bad Kissingen",
       "change": "Pläne geändert? Antworte einfach auf diese E-Mail oder schreib an makilove@hotel-weisses-haus.com.",
@@ -421,7 +421,7 @@
         "name": "Name",
         "email": "E-Mail",
         "phone": "Telefon",
-        "notes": "Wünsche",
+        "notes": "Hinweis",
         "id": "Reservierungs-ID",
         "table": "Tisch"
       }

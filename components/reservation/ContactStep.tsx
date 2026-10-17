@@ -36,7 +36,6 @@ export function ContactStep() {
   const router = useRouter();
   const { visit, contact, hydrated, setContact, confirm } = useReservation();
   const [errors, setErrors] = useState<Errors>({});
-  const [notesOpen, setNotesOpen] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<SubmitError | null>(null);
   const refs = {
@@ -49,10 +48,6 @@ export function ContactStep() {
   useEffect(() => {
     if (hydrated && !visit.time) router.replace("/reservieren");
   }, [hydrated, visit.time, router]);
-
-  useEffect(() => {
-    if (hydrated && contact.notes) setNotesOpen(true);
-  }, [hydrated, contact.notes]);
 
   if (!hydrated || !visit.time) return null;
 
@@ -164,31 +159,21 @@ export function ContactStep() {
         onBlur={() => blur("phone")}
       />
 
-      <div className="flex flex-col gap-3">
-        <button
-          type="button"
-          aria-expanded={notesOpen}
-          aria-controls="contact-notes-panel"
-          onClick={() => setNotesOpen((o) => !o)}
-          className="focus-ring self-start rounded text-sm font-bold leading-5"
-        >
-          {c.notesToggle}
-          <span aria-hidden="true" className="ml-2 inline-block w-3">
-            {notesOpen ? "−" : "+"}
-          </span>
-        </button>
-        <div id="contact-notes-panel" hidden={!notesOpen}>
-          <TextareaField
-            id="contact-notes"
-            name="notes"
-            label={c.notes.label}
-            className="[&>label]:sr-only"
-            placeholder={c.notes.placeholder}
-            maxLength={NOTES_MAX}
-            value={contact.notes}
-            onChange={(e) => update("notes", e.target.value)}
-          />
-        </div>
+      <div className="flex flex-col gap-2">
+        <TextareaField
+          id="contact-notes"
+          name="notes"
+          label={c.notes.label}
+          placeholder={c.notes.placeholder}
+          maxLength={NOTES_MAX}
+          aria-describedby="contact-notes-hint"
+          inputClassName="min-h-[88px]"
+          value={contact.notes}
+          onChange={(e) => update("notes", e.target.value)}
+        />
+        <p id="contact-notes-hint" className="text-xs leading-[18px] text-muted">
+          {c.notes.hint}
+        </p>
       </div>
 
       <p className="flex items-start gap-2 text-xs leading-[19px] text-muted">
