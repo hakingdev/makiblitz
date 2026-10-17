@@ -58,6 +58,8 @@ interface ReservationStore {
   cancel(id: string): Promise<StoredReservation | null>;
   /** Confirmed bookings from `fromDate` on, in order. */
   upcoming(fromDate: string, limit: number): Promise<StoredReservation[]>;
+  /** Replaces the comment of a confirmed booking (null clears it). */
+  setNotes(id: string, notes: string | null): Promise<StoredReservation | null>;
 }
 
 const COLUMNS = "id,visit_date,visit_time,guests,table_ids,source,status,name,email,phone,notes";
@@ -93,7 +95,7 @@ function fromRow(row: Row): StoredReservation {
 }
 
 export function toBooking(r: StoredReservation): Booking {
-  return { id: r.id, time: r.time, guests: r.guests, tables: r.tables, source: r.source, name: r.name };
+  return { id: r.id, time: r.time, guests: r.guests, tables: r.tables, source: r.source, name: r.name, notes: r.notes };
 }
 
 class SupabaseReservationStore implements ReservationStore {
@@ -168,6 +170,18 @@ class SupabaseReservationStore implements ReservationStore {
       .limit(limit);
     if (error) console.error("[reservation] Supabase read failed:", error);
     return ((data as Row[] | null) ?? []).map(fromRow);
+  }
+
+  async setNotes(id: string, notes: string | null): Promise<StoredReservation | null> {
+    const { data, error } = await this.client
+      .from("reservations")
+      .update({ notes })
+      .eq("id", id)
+      .eq("status", "confirmed")
+      .select(COLUMNS)
+      .maybeSingle();
+    if (error) console.error("[reservation] Supabase notes update failed:", error);
+    return data ? fromRow(data as Row) : null;
   }
 }
 
@@ -260,6 +274,16 @@ class LocalReservationStore implements ReservationStore {
       .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
       .slice(0, limit);
   }
+
+  setNotes(id: string, notes: string | null): Promise<StoredReservation | null> {
+    return this.serialized(async (rows) => {
+      const target = rows.find((r) => r.id === id && r.status === "confirmed");
+      if (!target) return null;
+      const next = rows.map((r) => (r.id === id ? { ...r, notes } : r));
+      await writeFile(LOCAL_FILE, JSON.stringify(next, null, 2), "utf8");
+      return { ...target, notes };
+    });
+  }
 }
 
 let store: ReservationStore | undefined;
@@ -285,6 +309,10 @@ export function getReservation(id: string): Promise<StoredReservation | null> {
 
 export function cancelReservation(id: string): Promise<StoredReservation | null> {
   return isUuid(id) ? getStore().cancel(id) : Promise.resolve(null);
+}
+
+export function setReservationNotes(id: string, notes: string | null): Promise<StoredReservation | null> {
+  return isUuid(id) ? getStore().setNotes(id, notes) : Promise.resolve(null);
 }
 
 export function upcomingReservations(fromDate: string, limit = 20) {

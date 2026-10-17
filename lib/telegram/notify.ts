@@ -58,7 +58,10 @@ export async function notifyReservation(r: NewReservation, id: string, tables: n
   ]);
   const keyboard = [
     replyButtons("r", r.email ? id : null, r.phone),
-    [{ text: "❌ Отменить бронь", callback_data: `cx:${id}` }],
+    [
+      { text: "📝 Комментарий", callback_data: `nt:${id}` },
+      { text: "❌ Отменить бронь", callback_data: `cx:${id}` },
+    ],
   ].filter((row) => row.length);
   const sent = await Promise.all(
     telegramChatIds().map((chatId) => sendPlanForWindow(chatId, r.date, r.time, caption, keyboard, id)),
