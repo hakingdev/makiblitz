@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { getMessages } from "@/lib/i18n";
 import { ButtonLink } from "@/components/ui/Button";
+import { Linkified } from "@/components/ui/ContactLinks";
 
 const t = getMessages();
 const r = t.home.restaurant;
@@ -29,7 +30,9 @@ export function RestaurantTeaser() {
               </span>
             ))}
           </h2>
-          <p className="text-base leading-[27px] text-muted lg:max-w-[520px]">{r.body}</p>
+          <p className="text-base leading-[27px] text-muted lg:max-w-[520px]">
+            <Linkified text={r.body} linkClassName="text-ink underline decoration-line underline-offset-4 hover:decoration-ink" />
+          </p>
           <p className="font-script text-xl leading-[38px] text-brand lg:text-[25px] lg:leading-[46px]">
             {r.script}
           </p>

@@ -42,14 +42,25 @@ export function ButtonLink({
   variant = "primary",
   className,
   children,
+  external,
 }: {
   href: string;
   variant?: ButtonVariant;
   className?: string;
   children: ReactNode;
+  /** Opens in a new tab (e.g. Google Maps). */
+  external?: boolean;
 }) {
+  const classes = cn(base, variants[variant], className);
+  if (external) {
+    return (
+      <a href={href} target="_blank" rel="noopener noreferrer" className={classes}>
+        <Content variant={variant}>{children}</Content>
+      </a>
+    );
+  }
   return (
-    <Link href={href} className={cn(base, variants[variant], className)}>
+    <Link href={href} className={classes}>
       <Content variant={variant}>{children}</Content>
     </Link>
   );
