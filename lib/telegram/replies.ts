@@ -2,7 +2,7 @@ import { getMessages } from "@/lib/i18n";
 import { getContactRequest, markContactRequestAnswered } from "@/lib/contact/store";
 import { formatLongDate, formatShortDate } from "@/lib/reservation/dates";
 import { getReservation } from "@/lib/reservation/store";
-import { OWNER_TO, escapeHtml, isMailConfigured, sendMail } from "@/lib/waitlist/mailer";
+import { escapeHtml, isMailConfigured, sendMail } from "@/lib/waitlist/mailer";
 import type { Ref } from "./refs";
 
 const t = getMessages();
@@ -73,7 +73,6 @@ export async function sendReplyMail(recipient: Recipient, answer: string): Promi
   try {
     await sendMail({
       to: recipient.email,
-      replyTo: { email: OWNER_TO(), name: t.brand.name },
       subject: recipient.subject,
       text: [greeting, "", answer, "", ...m.signoff, "", "> " + recipient.quoteLabel, ...recipient.quote.split("\n").map((l) => `> ${l}`), "", "--", ...footer].join("\n"),
       html: `<!doctype html><html lang="de"><body style="margin:0;background:#FFFCF8;font-family:Mulish,Arial,sans-serif;color:#211D1B;">

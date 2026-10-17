@@ -13,7 +13,7 @@
   "contact": {
     "street": "Kurhausstr. 11A",
     "city": "97688 Bad Kissingen",
-    "email": "info@makilove.de",
+    "email": "makilove@hotel-weisses-haus.com",
     "phone": "0971 72730",
     "phoneHref": "+4997172730",
     "mapsTitle": "Route in Google Maps planen"
@@ -174,7 +174,7 @@
       "title": "Danke für deine Nachricht!",
       "body": "Sie ist bei uns angekommen – wir melden uns so schnell wie möglich."
     },
-    "errorGeneric": "Das hat leider nicht geklappt. Bitte versuch es noch einmal oder schreib uns direkt an info@makilove.de.",
+    "errorGeneric": "Das hat leider nicht geklappt. Bitte versuch es noch einmal oder schreib uns direkt an makilove@hotel-weisses-haus.com.",
     "errorRateLimit": "Zu viele Nachrichten in kurzer Zeit. Bitte warte ein paar Minuten.",
     "routeLink": "Route planen",
     "directions": {
@@ -215,8 +215,8 @@
       "timeLabel": "Um wie viel Uhr?",
       "timeHint": "Grau markierte Zeiten sind bereits belegt.",
       "submit": "Weiter zu deinen Daten",
-      "groupNote": "Für mehr als 5 Personen: info@makilove.de",
-      "noDates": "Aktuell sind leider keine Termine online buchbar. Schreib uns gern an info@makilove.de.",
+      "groupNote": "Für mehr als 5 Personen: makilove@hotel-weisses-haus.com",
+      "noDates": "Aktuell sind leider keine Termine online buchbar. Schreib uns gern an makilove@hotel-weisses-haus.com.",
       "overbooked": "Leider sind wir um {time} Uhr für {guests} ausgebucht.",
       "overbookedSuggest": "Versuch es zu einer anderen Uhrzeit, z. B. um {alt} Uhr.",
       "overbookedNoAlt": "An diesem Tag ist für {guests} leider nichts mehr frei – bitte wähle einen anderen Tag.",
@@ -262,7 +262,7 @@
       "submitting": "Wird reserviert…",
       "errorFull": "Gerade wurde dieser Tisch vergeben: Um {time} Uhr ist für {guests} leider nichts mehr frei.",
       "errorFullAction": "Andere Uhrzeit wählen",
-      "errorGeneric": "Das hat leider nicht geklappt. Bitte versuch es noch einmal oder schreib uns an info@makilove.de.",
+      "errorGeneric": "Das hat leider nicht geklappt. Bitte versuch es noch einmal oder schreib uns an makilove@hotel-weisses-haus.com.",
       "errorRateLimit": "Zu viele Versuche in kurzer Zeit. Bitte warte ein paar Minuten."
     },
     "confirmed": {
@@ -281,7 +281,7 @@
       "home": "Zurück zur Startseite",
       "changeNote": [
         "Pläne geändert? Antworte einfach auf deine",
-        "Bestätigungs-E-Mail oder schreib an info@makilove.de."
+        "Bestätigungs-E-Mail oder schreib an makilove@hotel-weisses-haus.com."
       ]
     }
   },
@@ -408,7 +408,7 @@
         "notes": "Deine Wünsche"
       },
       "address": "MakiLove · Kurhausstr. 11A · 97688 Bad Kissingen",
-      "change": "Pläne geändert? Antworte einfach auf diese E-Mail oder schreib an info@makilove.de.",
+      "change": "Pläne geändert? Antworte einfach auf diese E-Mail oder schreib an makilove@hotel-weisses-haus.com.",
       "signoff": "Bis bald – dein MakiLove-Team"
     },
     "reservationOwner": {
@@ -454,7 +454,7 @@
   "footer": {
     "impressum": "Impressum",
     "datenschutz": "Datenschutz",
-    "contactEmail": "info@makilove.de",
+    "contactEmail": "makilove@hotel-weisses-haus.com",
     "instagramLabel": "Instagram",
     "tiktokLabel": "TikTok",
     "tagline": "© MakiLove · Mit Liebe gerollt.",
@@ -486,7 +486,7 @@
       "heading": "Kontakt",
       "lines": [
         "Telefon: 0971 72730",
-        "E-Mail: info@makilove.de"
+        "E-Mail: makilove@hotel-weisses-haus.com"
       ]
     },
     "handelsregister": {
@@ -537,7 +537,7 @@
         "heading": "1. Verantwortlicher",
         "intro": [
           "Verantwortlicher im Sinne der Datenschutz-Grundverordnung (DSGVO) ist:",
-          "Weisses Haus GmbH\nVertreten durch: Mykhailo Barkhan (Geschäftsführer)\nKurhausstr. 11-A\n97688 Bad Kissingen, Deutschland\nTelefon: 0971 72730\nE-Mail: info@makilove.de"
+          "Weisses Haus GmbH\nVertreten durch: Mykhailo Barkhan (Geschäftsführer)\nKurhausstr. 11-A\n97688 Bad Kissingen, Deutschland\nTelefon: 0971 72730\nE-Mail: makilove@hotel-weisses-haus.com"
         ],
         "list": [],
         "outro": []
@@ -573,7 +573,7 @@
           "Zweck: Die Daten nutzen wir ausschließlich, um dich einmalig bzw. gelegentlich über den Start von MakiLove zu benachrichtigen. Deine Postleitzahl hilft uns zu planen, in welchen Gebieten wir zuerst starten.",
           "Rechtsgrundlage: deine Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO. Die Angabe deiner Daten ist freiwillig – ohne die Pflichtangaben können wir dich allerdings nicht benachrichtigen.",
           "Double-Opt-In: Nach dem Absenden des Formulars erhältst du eine Bestätigungs-E-Mail. Erst wenn du den darin enthaltenen Bestätigungslink anklickst, wird deine Anmeldung wirksam; der Link ist 48 Stunden gültig. Zum Nachweis deiner Einwilligung (Art. 7 Abs. 1 DSGVO) protokollieren wir den Zeitpunkt der Anmeldung und der Bestätigung, die Version des Einwilligungstextes, deinen User-Agent sowie deine IP-Adresse – Letztere ausschließlich in pseudonymisierter Form als kryptografischer Hash (HMAC-Verfahren). Deine IP-Adresse wird nicht im Klartext gespeichert.",
-          "Widerruf: Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen (Art. 7 Abs. 3 DSGVO) – über den Abmelde-Link, den jede unserer E-Mails enthält, oder formlos per E-Mail an info@makilove.de. Die Rechtmäßigkeit der bis zum Widerruf erfolgten Verarbeitung bleibt unberührt.",
+          "Widerruf: Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen (Art. 7 Abs. 3 DSGVO) – über den Abmelde-Link, den jede unserer E-Mails enthält, oder formlos per E-Mail an makilove@hotel-weisses-haus.com. Die Rechtmäßigkeit der bis zum Widerruf erfolgten Verarbeitung bleibt unberührt.",
           "Speicherdauer: Nicht bestätigte Anmeldungen werden nach 30 Tagen automatisch gelöscht. Nach einem Widerruf löschen wir deine Daten aus dem Verteiler; den Nachweis deiner zuvor erteilten Einwilligung bewahren wir bis zum Ablauf der gesetzlichen Verjährungsfristen auf (Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO – Nachweis- und Verteidigungsinteresse).",
           "Empfänger: Für den Versand der E-Mails nutzen wir den E-Mail-Dienst „Private Email“ von Namecheap, Inc., 4600 East Washington Street, Suite 300, Phoenix, AZ 85034, USA, als Auftragsverarbeiter (AVV nach Art. 28 DSGVO). Namecheap kann Daten dabei auch in den USA verarbeiten; die Übermittlung ist durch EU-Standardvertragsklauseln (Art. 46 DSGVO) abgesichert."
         ]
@@ -593,7 +593,7 @@
           "Widerruf erteilter Einwilligungen mit Wirkung für die Zukunft (Art. 7 Abs. 3 DSGVO)"
         ],
         "outro": [
-          "Zur Ausübung deiner Rechte genügt eine formlose E-Mail an info@makilove.de."
+          "Zur Ausübung deiner Rechte genügt eine formlose E-Mail an makilove@hotel-weisses-haus.com."
         ]
       },
       {

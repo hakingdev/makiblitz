@@ -38,7 +38,11 @@ export async function sendMail(opts: {
   subject: string;
   text: string;
   html: string;
-  /** Where "Antworten" goes, e.g. the guest who wrote via the contact form. */
+  /**
+   * Where "Antworten" goes, e.g. the guest who wrote via the contact form.
+   * Defaults to the restaurant mailbox (contact.email) — the sender address
+   * stays on the domain authenticated in Brevo.
+   */
   replyTo?: { email: string; name?: string };
 }): Promise<void> {
   const apiKey = process.env.BREVO_API_KEY;
@@ -61,7 +65,7 @@ export async function sendMail(opts: {
         subject: opts.subject,
         htmlContent: opts.html,
         textContent: opts.text,
-        ...(opts.replyTo ? { replyTo: opts.replyTo } : {}),
+        replyTo: opts.replyTo ?? { email: t.contact.email, name: t.brand.name },
       }),
       signal: controller.signal,
     });
@@ -92,7 +96,7 @@ function formatBerlinTime(iso: string): string {
 }
 
 /** Owner notifications always have a working fallback destination. */
-export const OWNER_TO = () => process.env.MAIL_TO || "info@makilove.de";
+export const OWNER_TO = () => process.env.MAIL_TO || "makilove@hotel-weisses-haus.com";
 
 /**
  * § 7 UWG / DSGVO footer for every mail sent TO subscribers:
