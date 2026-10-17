@@ -143,7 +143,14 @@
       "timeLabel": "Um wie viel Uhr?",
       "timeHint": "Grau markierte Zeiten sind bereits belegt.",
       "submit": "Weiter zu deinen Daten",
-      "groupNote": "Für mehr als 5 Personen: info@makilove.de"
+      "groupNote": "Für mehr als 5 Personen: info@makilove.de",
+      "noDates": "Aktuell sind leider keine Termine online buchbar. Schreib uns gern an info@makilove.de.",
+      "overbooked": "Leider sind wir um {time} Uhr für {guests} ausgebucht.",
+      "overbookedSuggest": "Versuch es zu einer anderen Uhrzeit, z. B. um {alt} Uhr.",
+      "overbookedNoAlt": "An diesem Tag ist für {guests} leider nichts mehr frei – bitte wähle einen anderen Tag.",
+      "availabilityError": "Die freien Plätze konnten gerade nicht geladen werden – wir prüfen sie beim Absenden.",
+      "fewSeatsOne": "Um {time} Uhr ist nur noch 1 Platz frei.",
+      "fewSeatsMany": "Um {time} Uhr sind nur noch {n} Plätze frei."
     },
     "contact": {
       "title": [
@@ -179,7 +186,12 @@
       "privacyLink": "Datenschutzerklärung",
       "privacySuffix": ".",
       "submit": "Jetzt verbindlich reservieren",
-      "note": "Du erhältst deine Bestätigung per E-Mail."
+      "note": "Du erhältst deine Bestätigung per E-Mail.",
+      "submitting": "Wird reserviert…",
+      "errorFull": "Gerade wurde dieser Tisch vergeben: Um {time} Uhr ist für {guests} leider nichts mehr frei.",
+      "errorFullAction": "Andere Uhrzeit wählen",
+      "errorGeneric": "Das hat leider nicht geklappt. Bitte versuch es noch einmal oder schreib uns an info@makilove.de.",
+      "errorRateLimit": "Zu viele Versuche in kurzer Zeit. Bitte warte ein paar Minuten."
     },
     "confirmed": {
       "title": [
@@ -311,6 +323,35 @@
       "labels": {
         "email": "E-Mail",
         "unsubscribedAt": "Abgemeldet am"
+      }
+    },
+    "reservationGuest": {
+      "subject": "Dein Tisch bei MakiLove: {date} um {time} Uhr",
+      "greeting": "Hallo {name},",
+      "body": "dein Tisch ist reserviert – wir freuen uns auf dich!",
+      "labels": {
+        "guests": "Personen",
+        "date": "Datum",
+        "time": "Uhrzeit",
+        "notes": "Deine Wünsche"
+      },
+      "address": "MakiLove · Kurhausstr. 11A · 97688 Bad Kissingen",
+      "change": "Pläne geändert? Antworte einfach auf diese E-Mail oder schreib an info@makilove.de.",
+      "signoff": "Bis bald – dein MakiLove-Team"
+    },
+    "reservationOwner": {
+      "subject": "🍣 Neue Reservierung: {date} · {time} Uhr · {guests} Pers.",
+      "heading": "Neue Tischreservierung",
+      "labels": {
+        "date": "Datum",
+        "time": "Uhrzeit",
+        "guests": "Personen",
+        "name": "Name",
+        "email": "E-Mail",
+        "phone": "Telefon",
+        "notes": "Wünsche",
+        "seatsLeft": "Danach noch frei (Plätze)",
+        "id": "Reservierungs-ID"
       }
     }
   },

@@ -1,6 +1,8 @@
 import {
   BOOKING_LEAD_MINUTES,
   BOOKING_WINDOW_DAYS,
+  OPEN_DATES,
+  OPEN_WEEKDAYS,
   RESTAURANT_TIME_ZONE,
   TIME_SLOTS,
 } from "./config";
@@ -52,14 +54,29 @@ export function isSlotAvailable(date: string, time: string, now: RestaurantNow):
   return timeToMinutes(time) >= now.minutes + BOOKING_LEAD_MINUTES;
 }
 
-/** Today if a slot is still bookable, otherwise tomorrow. */
-export function firstBookableDate(now: RestaurantNow): string {
-  const todayOpen = TIME_SLOTS.some((slot) => isSlotAvailable(now.date, slot, now));
-  return todayOpen ? now.date : addDays(now.date, 1);
+export function isOpenDate(iso: string): boolean {
+  if (OPEN_DATES) return OPEN_DATES.includes(iso);
+  return OPEN_WEEKDAYS.includes(toUtcNoon(iso).getUTCDay());
 }
 
-export function lastBookableDate(now: RestaurantNow): string {
-  return addDays(now.date, BOOKING_WINDOW_DAYS);
+/** Open days from today to the end of the booking window that still have a slot left. */
+export function bookableDates(now: RestaurantNow): string[] {
+  const dates: string[] = [];
+  for (let i = 0; i <= BOOKING_WINDOW_DAYS; i++) {
+    const date = addDays(now.date, i);
+    if (isOpenDate(date) && TIME_SLOTS.some((slot) => isSlotAvailable(date, slot, now))) {
+      dates.push(date);
+    }
+  }
+  return dates;
+}
+
+export function isBookable(date: string, time: string, now: RestaurantNow): boolean {
+  return (
+    bookableDates(now).includes(date) &&
+    (TIME_SLOTS as readonly string[]).includes(time) &&
+    isSlotAvailable(date, time, now)
+  );
 }
 
 const longDate = new Intl.DateTimeFormat("de-DE", {

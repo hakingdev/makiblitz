@@ -1,16 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { getMessages } from "@/lib/i18n";
-import { GUEST_OPTIONS, TIME_SLOTS } from "@/lib/reservation/config";
-import {
-  firstBookableDate,
-  formatDayMonth,
-  formatLongDate,
-  isSlotAvailable,
-  lastBookableDate,
-} from "@/lib/reservation/dates";
+import type { SeatsBySlot } from "@/lib/reservation/capacity";
+import { FEW_SEATS_LEFT, GUEST_OPTIONS, TIME_SLOTS } from "@/lib/reservation/config";
+import { formatDayMonth, formatLongDate, isSlotAvailable } from "@/lib/reservation/dates";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Choice } from "@/components/ui/Choice";
@@ -23,40 +18,92 @@ import { useReservation } from "@/components/reservation/ReservationProvider";
 const t = getMessages();
 const v = t.reservation.visit;
 
+function fill(template: string, values: Record<string, string | number>) {
+  return template.replace(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ""));
+}
+
+/** Free seats per slot for the chosen day; null while loading or when the request failed. */
+function useSeats(date: string, enabled: boolean) {
+  const [result, setResult] = useState<{ date: string; seats: SeatsBySlot } | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    if (!enabled || !date) return;
+    let cancelled = false;
+    setFailed(false);
+    fetch(`/api/reservations/availability?date=${date}`, { cache: "no-store" })
+      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
+      .then((data: { date: string; seats: SeatsBySlot }) => {
+        if (!cancelled) setResult({ date: data.date, seats: data.seats });
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [date, enabled]);
+
+  return { seats: result?.date === date ? result.seats : null, failed };
+}
+
 /** Step 1 — guests, day and time (Figma 6:221 mobile · 6:29 desktop). */
 export function VisitStep() {
   const router = useRouter();
-  const { visit, confirmed, hydrated, now, setVisit, reset } = useReservation();
-  const dateInput = useRef<HTMLInputElement>(null);
+  const { visit, confirmed, hydrated, now, dates, setVisit, reset } = useReservation();
+  const { seats, failed } = useSeats(visit.date, hydrated);
 
   // Coming back after a finished booking starts a new one.
   useEffect(() => {
     if (hydrated && confirmed) reset();
   }, [hydrated, confirmed, reset]);
 
-  const minDate = hydrated ? firstBookableDate(now) : undefined;
-  const maxDate = hydrated ? lastBookableDate(now) : undefined;
+  const seatsAt = (slot: string) => (seats ? seats[slot] ?? 0 : Infinity);
+  const timeOpen = (slot: string) => hydrated && Boolean(visit.date) && isSlotAvailable(visit.date, slot, now);
+  const fits = (slot: string) => timeOpen(slot) && seatsAt(slot) >= visit.guests;
 
-  function selectDate(date: string) {
-    if (!date || (minDate && date < minDate) || (maxDate && date > maxDate)) return;
-    const keepTime = visit.time && isSlotAvailable(date, visit.time, now);
-    setVisit({ date, time: keepTime ? visit.time : null });
+  const { time, guests } = visit;
+  const overbooked = Boolean(time && timeOpen(time) && seatsAt(time) < guests);
+  const dayFull = Boolean(seats) && !TIME_SLOTS.some(fits);
+  // The user's example: 18:00 is full → offer a later time first (a table frees up after 2:30 h).
+  const alternative = time
+    ? TIME_SLOTS.find((slot) => slot > time && fits(slot)) ??
+      [...TIME_SLOTS].reverse().find((slot) => slot < time && fits(slot))
+    : undefined;
+  const fewLeft = time && !overbooked && seats ? seatsAt(time) : null;
+
+  let notice: { tone: "error" | "info"; text: string } | null = null;
+  if (overbooked && time) {
+    notice = {
+      tone: "error",
+      text: alternative
+        ? `${fill(v.overbooked, { time, guests: guestsLabel(guests) })} ${fill(v.overbookedSuggest, { alt: alternative })}`
+        : fill(v.overbookedNoAlt, { guests: guestsLabel(guests) }),
+    };
+  } else if (dayFull) {
+    notice = { tone: "error", text: fill(v.overbookedNoAlt, { guests: guestsLabel(guests) }) };
+  } else if (time && fewLeft !== null && fewLeft <= FEW_SEATS_LEFT) {
+    notice = {
+      tone: "info",
+      text: fewLeft === 1 ? fill(v.fewSeatsOne, { time }) : fill(v.fewSeatsMany, { time, n: fewLeft }),
+    };
   }
 
-  function openPicker() {
-    try {
-      dateInput.current?.showPicker();
-    } catch {
-      // Older browsers: the focused native input still opens on tap/keyboard.
-    }
-  }
+  const complete = hydrated && Boolean(visit.date && time) && !overbooked && Boolean(time && timeOpen(time));
 
   function submit(e: FormEvent) {
     e.preventDefault();
-    if (visit.time) router.push("/reservieren/kontakt");
+    if (complete) router.push("/reservieren/kontakt");
   }
 
-  const complete = hydrated && Boolean(visit.date && visit.time);
+  if (hydrated && dates.length === 0) {
+    return (
+      <div className="flex flex-col gap-6">
+        <h2 className={formTitle}>{v.formTitle}</h2>
+        <p className="rounded-lg bg-blush px-4 py-3 text-sm font-bold leading-5 text-brand">{v.noDates}</p>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={submit} className="flex flex-col gap-6">
@@ -71,43 +118,51 @@ export function VisitStep() {
               name="guests"
               value={String(g)}
               label={i === GUEST_OPTIONS.length - 1 ? `${g}+` : String(g)}
-              checked={visit.guests === g}
+              checked={guests === g}
               onSelect={(value) => setVisit({ guests: Number(value) })}
             />
           ))}
         </div>
+        {notice && (
+          <p
+            role={notice.tone === "error" ? "alert" : "status"}
+            className={cn(
+              "mt-1 rounded-lg px-4 py-3 text-xs font-bold leading-[18px] lg:text-sm lg:leading-5",
+              notice.tone === "error" ? "border border-brand bg-white text-brand" : "bg-blush text-brand",
+            )}
+          >
+            {notice.text}
+          </p>
+        )}
       </fieldset>
 
       <div className="flex flex-col gap-2">
         <label htmlFor="visit-date" className={fieldLabel}>
           {v.dateLabel}
         </label>
-        {/* Native picker underneath (best on phones), German long date on top. */}
+        {/* Only open days are offered; a native select keeps the Field look and the phone's own picker. */}
         <div className="relative">
-          <input
-            ref={dateInput}
+          <select
             id="visit-date"
-            type="date"
             value={visit.date}
-            min={minDate}
-            max={maxDate}
             disabled={!hydrated}
-            onChange={(e) => selectDate(e.target.value)}
-            onClick={openPicker}
-            className="peer absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0"
-          />
-          <div
-            aria-hidden="true"
-            className={cn(
-              inputBase,
-              "flex h-14 items-center border-line",
-              "peer-hover:border-ink/30 peer-focus-visible:border-ink/40 peer-focus-visible:ring-2 peer-focus-visible:ring-brand/15",
-            )}
+            onChange={(e) => {
+              const date = e.target.value;
+              setVisit({ date, time: time && isSlotAvailable(date, time, now) ? time : null });
+            }}
+            className={cn(inputBase, "h-14 cursor-pointer appearance-none border-line pr-12")}
           >
-            <span className={visit.date ? "text-ink" : "text-muted"}>
-              {visit.date ? formatLongDate(visit.date) : v.datePlaceholder}
-            </span>
-          </div>
+            {!hydrated && <option value="">{v.datePlaceholder}</option>}
+            {dates.map((date) => (
+              <option key={date} value={date}>
+                {formatLongDate(date)}
+              </option>
+            ))}
+          </select>
+          <span
+            aria-hidden="true"
+            className="pointer-events-none absolute right-5 top-1/2 size-2.5 -translate-y-3/4 rotate-45 border-b-[1.5px] border-r-[1.5px] border-ink"
+          />
         </div>
       </div>
 
@@ -120,23 +175,22 @@ export function VisitStep() {
               name="time"
               value={slot}
               label={slot}
-              checked={visit.time === slot}
-              disabled={hydrated && !isSlotAvailable(visit.date, slot, now)}
-              onSelect={(time) => setVisit({ time })}
+              checked={time === slot}
+              disabled={hydrated && !fits(slot)}
+              onSelect={(value) => setVisit({ time: value })}
             />
           ))}
         </div>
-        <p className="text-xs leading-5 text-muted">{v.timeHint}</p>
+        <p className="text-xs leading-5 text-muted">{failed ? v.availabilityError : v.timeHint}</p>
       </fieldset>
 
-      {complete && (
+      {complete && time && (
         <p
           aria-live="polite"
           className="flex items-start gap-2 rounded-lg bg-blush px-4 py-3 text-xs font-bold leading-[17px] text-brand lg:text-sm lg:leading-5"
         >
           <Icon name="check-18" />
-          {guestsLabel(visit.guests)} · {formatDayMonth(visit.date)} · {visit.time}{" "}
-          {t.reservation.timeSuffix}
+          {guestsLabel(guests)} · {formatDayMonth(visit.date)} · {time} {t.reservation.timeSuffix}
         </p>
       )}
 
@@ -146,7 +200,10 @@ export function VisitStep() {
 
       <p className="text-xs leading-5 text-muted">
         {v.groupNote.split(t.contact.email)[0]}
-        <a href={`mailto:${t.contact.email}`} className="focus-ring rounded underline-offset-2 hover:text-ink hover:underline">
+        <a
+          href={`mailto:${t.contact.email}`}
+          className="focus-ring rounded underline-offset-2 hover:text-ink hover:underline"
+        >
           {t.contact.email}
         </a>
       </p>

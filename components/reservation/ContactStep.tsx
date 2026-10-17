@@ -3,32 +3,33 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
-import { validateEmail } from "@/lib/email/validate-email";
 import { getMessages } from "@/lib/i18n";
+import { contactErrors, normalizeContact, NAME_MAX, NOTES_MAX, type ContactField } from "@/lib/reservation/validate";
 import { Button } from "@/components/ui/Button";
 import { Field, TextareaField } from "@/components/ui/Field";
 import { Icon } from "@/components/ui/Icon";
 import { formTitle } from "@/components/reservation/ReservationChrome";
-import { VisitSummary } from "@/components/reservation/VisitSummary";
+import { VisitSummary, guestsLabel } from "@/components/reservation/VisitSummary";
 import { useReservation, type Contact } from "@/components/reservation/ReservationProvider";
 
 const t = getMessages();
 const c = t.reservation.contact;
 
-type FieldName = "name" | "email" | "phone";
+type FieldName = ContactField;
 type Errors = Partial<Record<FieldName, string>>;
 
-const PHONE_CHARS = /^[+()\d\s/.-]+$/;
+const FIELDS = ["name", "email", "phone"] as const;
 
 function validate(values: Contact): Errors {
-  const errors: Errors = {};
-  if (values.name.trim().length < 2) errors.name = c.name.error;
-  if (!validateEmail(values.email)) errors.email = c.email.error;
-  const phone = values.phone.trim();
-  const digits = phone.replace(/\D/g, "").length;
-  if (phone && (!PHONE_CHARS.test(phone) || digits < 6 || digits > 15)) errors.phone = c.phone.error;
-  return errors;
+  const found = contactErrors(values);
+  return Object.fromEntries(FIELDS.filter((f) => found[f]).map((f) => [f, c[f].error]));
 }
+
+function fill(template: string, values: Record<string, string>) {
+  return template.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? "");
+}
+
+type SubmitError = "full" | "rate" | "generic";
 
 /** Step 2 — contact details (Figma 6:290 mobile · 6:101 desktop). */
 export function ContactStep() {
@@ -36,6 +37,8 @@ export function ContactStep() {
   const { visit, contact, hydrated, setContact, confirm } = useReservation();
   const [errors, setErrors] = useState<Errors>({});
   const [notesOpen, setNotesOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<SubmitError | null>(null);
   const refs = {
     name: useRef<HTMLInputElement>(null),
     email: useRef<HTMLInputElement>(null),
@@ -67,24 +70,42 @@ export function ContactStep() {
     setErrors((e) => ({ ...e, [name]: validate(contact)[name] }));
   }
 
-  function submit(e: FormEvent) {
-    e.preventDefault();
-    const next = validate(contact);
+  function showFieldErrors(next: Errors) {
     setErrors(next);
-    const firstInvalid = (["name", "email", "phone"] as const).find((f) => next[f]);
-    if (firstInvalid) {
-      refs[firstInvalid].current?.focus();
-      return;
+    const firstInvalid = FIELDS.find((f) => next[f]);
+    if (firstInvalid) refs[firstInvalid].current?.focus();
+    return Boolean(firstInvalid);
+  }
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    if (submitting || showFieldErrors(validate(contact))) return;
+
+    const clean = normalizeContact(contact);
+    setContact(clean);
+    setSubmitError(null);
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/reservations", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ ...visit, ...clean }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { id?: string; fields?: FieldName[] };
+      if (res.status === 201 && data.id) {
+        confirm(data.id);
+        router.push("/reservieren/bestaetigt");
+        return;
+      }
+      if (res.status === 400 && data.fields?.length) {
+        showFieldErrors(Object.fromEntries(data.fields.map((f) => [f, c[f].error])));
+      } else {
+        setSubmitError(res.status === 409 ? "full" : res.status === 429 ? "rate" : "generic");
+      }
+    } catch {
+      setSubmitError("generic");
     }
-    setContact({
-      name: contact.name.trim(),
-      email: validateEmail(contact.email) ?? contact.email.trim(),
-      phone: contact.phone.trim(),
-      notes: contact.notes.trim(),
-    });
-    // Frontend-only for now: nothing is sent or stored server-side yet.
-    confirm();
-    router.push("/reservieren/bestaetigt");
+    setSubmitting(false);
   }
 
   return (
@@ -107,6 +128,7 @@ export function ContactStep() {
         label={c.name.label}
         placeholder={c.name.placeholder}
         autoComplete="name"
+        maxLength={NAME_MAX}
         required
         value={contact.name}
         error={errors.name}
@@ -162,7 +184,7 @@ export function ContactStep() {
             label={c.notes.label}
             className="[&>label]:sr-only"
             placeholder={c.notes.placeholder}
-            maxLength={500}
+            maxLength={NOTES_MAX}
             value={contact.notes}
             onChange={(e) => update("notes", e.target.value)}
           />
@@ -186,8 +208,25 @@ export function ContactStep() {
         </span>
       </p>
 
-      <Button type="submit" className="w-full">
-        {c.submit}
+      {submitError && (
+        <div role="alert" className="flex flex-col items-start gap-2 rounded-lg border border-brand bg-white px-4 py-3 text-xs font-bold leading-[18px] text-brand lg:text-sm lg:leading-5">
+          <p>
+            {submitError === "full"
+              ? fill(c.errorFull, { time: visit.time, guests: guestsLabel(visit.guests) })
+              : submitError === "rate"
+                ? c.errorRateLimit
+                : c.errorGeneric}
+          </p>
+          {submitError === "full" && (
+            <Link href="/reservieren" className="focus-ring rounded underline underline-offset-2 hover:text-brand-dark">
+              {c.errorFullAction}
+            </Link>
+          )}
+        </div>
+      )}
+
+      <Button type="submit" disabled={submitting} aria-busy={submitting} className="w-full">
+        {submitting ? c.submitting : c.submit}
       </Button>
 
       <p className="text-xs leading-5 text-muted">{c.note}</p>

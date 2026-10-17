@@ -34,16 +34,28 @@ npm test         # vitest
 | `/impressum`, `/datenschutz` | — | legal pages |
 | `/confirm`, `/abmelden` + `/api/confirm`, `/api/unsubscribe` | — | kept for links in already-sent waitlist mails |
 
-## Reservation flow (current state)
+## Reservations
 
-The three steps share one client-side draft (`components/reservation/ReservationProvider.tsx`,
-persisted in `sessionStorage`). Slots, lead time and booking window live in
-`lib/reservation/config.ts`; dates are computed in `Europe/Berlin`
-(`lib/reservation/dates.ts`).
+Rules live in `lib/reservation/config.ts`:
 
-**Not wired yet:** submitting step 2 does **not** store or send anything —
-persistence in Supabase, confirmation mail and real slot availability are the
-next step.
+- **Open days:** only 30 + 31 October 2026 for now (`OPEN_DATES`); set it to
+  `null` to switch to the regular Friday/Saturday schedule (`OPEN_WEEKDAYS`).
+- **Arrival times:** 17:30 – 20:30 every 30 min (`TIME_SLOTS`).
+- **Capacity:** 32 seats (`SEAT_CAPACITY`, up to 32 inclusive); every booking
+  holds its seats for **2:30 h** (`VISIT_DURATION_MINUTES`) — a full 18:00
+  becomes bookable again at 20:30.
+
+Flow: step 1 loads free seats per slot (`GET /api/reservations/availability`)
+and greys out times that can't fit the group; if the chosen time is overbooked
+it says so and suggests another time, and it warns when only 1–2 seats are
+left. Step 2 posts to `POST /api/reservations` (201 · 409 full · 429 · 503);
+the guest gets a confirmation mail, the owner (`MAIL_TO`) a notification.
+
+Storage: Supabase table `reservations`, written only through the SQL function
+`book_reservation`, which locks the day and re-checks capacity atomically
+(DDL in `supabase/schema.sql` — run the "Table reservations" block once in the
+Supabase SQL editor). Without `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY`
+(local dev) bookings go to `reservations.local.json` instead.
 
 ## Project structure
 

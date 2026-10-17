@@ -11,24 +11,25 @@ import {
 } from "react";
 import { DEFAULT_GUESTS, GUEST_OPTIONS } from "@/lib/reservation/config";
 import {
-  firstBookableDate,
+  bookableDates,
   isSlotAvailable,
-  lastBookableDate,
   restaurantNow,
   type RestaurantNow,
 } from "@/lib/reservation/dates";
 
 export type Visit = { guests: number; date: string; time: string | null };
 export type Contact = { name: string; email: string; phone: string; notes: string };
-type Draft = { visit: Visit; contact: Contact; confirmed: boolean };
+type Draft = { visit: Visit; contact: Contact; confirmed: boolean; reservationId?: string };
 
 type ReservationContextValue = Draft & {
   /** false until the draft has been restored on the client (dates depend on "now"). */
   hydrated: boolean;
   now: RestaurantNow;
+  /** Open days that still have a bookable slot (empty before hydration). */
+  dates: string[];
   setVisit: (patch: Partial<Visit>) => void;
   setContact: (patch: Partial<Contact>) => void;
-  confirm: () => void;
+  confirm: (reservationId: string) => void;
   reset: () => void;
 };
 
@@ -39,7 +40,7 @@ const EMPTY_CONTACT: Contact = { name: "", email: "", phone: "", notes: "" };
 
 function freshDraft(now: RestaurantNow): Draft {
   return {
-    visit: { guests: DEFAULT_GUESTS, date: firstBookableDate(now), time: null },
+    visit: { guests: DEFAULT_GUESTS, date: bookableDates(now)[0] ?? "", time: null },
     contact: EMPTY_CONTACT,
     confirmed: false,
   };
@@ -55,12 +56,10 @@ function restoreDraft(now: RestaurantNow): Draft {
     const visit = { ...fresh.visit, ...stored.visit };
     const contact = { ...EMPTY_CONTACT, ...stored.contact };
     const confirmed = stored.confirmed === true;
-    if (confirmed) return { visit, contact, confirmed };
+    if (confirmed) return { visit, contact, confirmed, reservationId: stored.reservationId };
 
     if (!GUEST_OPTIONS.some((g) => g === visit.guests)) visit.guests = DEFAULT_GUESTS;
-    if (!visit.date || visit.date < fresh.visit.date || visit.date > lastBookableDate(now)) {
-      visit.date = fresh.visit.date;
-    }
+    if (!bookableDates(now).includes(visit.date)) visit.date = fresh.visit.date;
     if (visit.time && !isSlotAvailable(visit.date, visit.time, now)) visit.time = null;
     return { visit, contact, confirmed };
   } catch {
@@ -103,16 +102,21 @@ export function ReservationProvider({ children }: { children: ReactNode }) {
     (patch: Partial<Contact>) => setDraft((d) => ({ ...d, contact: { ...d.contact, ...patch } })),
     [],
   );
-  const confirm = useCallback(() => setDraft((d) => ({ ...d, confirmed: true })), []);
+  const confirm = useCallback(
+    (reservationId: string) => setDraft((d) => ({ ...d, confirmed: true, reservationId })),
+    [],
+  );
   const reset = useCallback(() => {
     const current = restaurantNow();
     setNow(current);
     setDraft(freshDraft(current));
   }, []);
 
+  const dates = useMemo(() => (hydrated ? bookableDates(now) : []), [hydrated, now]);
+
   const value = useMemo(
-    () => ({ ...draft, hydrated, now, setVisit, setContact, confirm, reset }),
-    [draft, hydrated, now, setVisit, setContact, confirm, reset],
+    () => ({ ...draft, hydrated, now, dates, setVisit, setContact, confirm, reset }),
+    [draft, hydrated, now, dates, setVisit, setContact, confirm, reset],
   );
 
   return <ReservationContext.Provider value={value}>{children}</ReservationContext.Provider>;
