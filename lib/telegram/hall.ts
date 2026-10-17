@@ -5,6 +5,7 @@ import {
   busyTables,
   overlapping,
   parseTableKey,
+  seatsOf,
   seatedAt,
   tableKey,
   tableOptions,
@@ -20,6 +21,7 @@ import {
   type StoredReservation,
 } from "@/lib/reservation/store";
 import {
+  callTelegram,
   deleteTelegramMessage,
   sendTelegramMessage,
   sendTelegramPhoto,
@@ -31,9 +33,11 @@ import { renderPlan, type PlanMark } from "./plan-image";
 
 /**
  * Hall management from the Telegram chat (texts in Russian):
- *   🗺 plan now · 🚶 walk-in (guests → table on the plan, Berlin time now)
+ *   🗺 plan now · 🚶 walk-in (guests → table on the plan, Berlin time now;
+ *   🧩 several tables can be joined by hand)
  *   📋 upcoming bookings with ❌ cancel (frees the table for others)
- * Callback data: plan · list · wi · wi:<n> · wt:<n>:<tables> · cx:<id> · cy:<id> · cn
+ * Callback data: plan · list · wi · wi:<n> · wm:<n>[:<tables>] · wt:<n>:<tables>
+ *                · cx:<id> · cy:<id> · cn
  */
 
 export const MENU: InlineButton[][] = [
@@ -135,12 +139,82 @@ export async function sendPlanNow(chatId: string | number) {
 }
 
 export async function startWalkIn(chatId: string | number) {
-  const sizes = [1, 2, 3, 4, 5, 6, 7, 8];
+  const sizes = Array.from({ length: 12 }, (_, i) => i + 1);
   await sendTelegramMessage(chatId, "🚶 <b>Walk-in</b> — сколько гостей?", {
-    inline_keyboard: [sizes.slice(0, 4), sizes.slice(4)].map((row) =>
+    inline_keyboard: [sizes.slice(0, 4), sizes.slice(4, 8), sizes.slice(8)].map((row) =>
       row.map((n) => ({ text: String(n), callback_data: `wi:${n}` })),
     ),
   });
+}
+
+const joinButton = (guests: number): InlineButton[] => [
+  { text: "🧩 Объединить столы вручную", callback_data: `wm:${guests}` },
+];
+
+/**
+ * Manual join: free tables as toggles (☑/☐); the selection travels in the
+ * callback data, so the bot keeps no state. Confirm books them as one walk-in.
+ */
+export async function walkInJoinTables(
+  chatId: string | number,
+  messageId: number | undefined,
+  guests: number,
+  selectionKey: string | undefined,
+) {
+  const now = restaurantNow();
+  const time = hhmm(now.minutes);
+  const busy = busyTables((await bookingsOn(now.date)) ?? [], time);
+  const selected = (selectionKey ? parseTableKey(selectionKey) ?? [] : []).filter((id) => !busy.has(id));
+  const free = TABLES.filter((t) => !busy.has(t.id));
+  if (!free.length) {
+    await sendTelegramMessage(chatId, "😕 Сейчас все столы заняты.");
+    return;
+  }
+
+  const toggle = (id: number) => {
+    const next = selected.includes(id) ? selected.filter((x) => x !== id) : [...selected, id];
+    return `wm:${guests}:${tableKey(next.sort((a, b) => a - b))}`;
+  };
+  const tableButtons = free.map((t) => ({
+    text: `${selected.includes(t.id) ? "☑" : "☐"} ${t.id} · ${t.seats}`,
+    callback_data: toggle(t.id),
+  }));
+  const rows: InlineButton[][] = [];
+  for (let i = 0; i < tableButtons.length; i += 3) rows.push(tableButtons.slice(i, i + 3));
+  if (selected.length) {
+    const seats = seatsOf(selected);
+    rows.push([
+      {
+        text: `✅ Посадить ${people(guests)} за ${tablesLabel(selected)} (${seats} мест)`,
+        callback_data: `wt:${guests}:${tableKey(selected)}`,
+      },
+    ]);
+  }
+  rows.push([{ text: "↩️ Закрыть", callback_data: "cn" }]);
+
+  const text = [
+    `🧩 <b>Объединить столы · ${people(guests)}</b> · сейчас ${time}`,
+    "Отметь столы, которые сдвигаете вместе (свободны до " + until(time) + ").",
+    selected.length
+      ? `Выбрано: <b>${tablesLabel(selected)}</b> · мест по схеме: ${seatsOf(selected)}` +
+        (seatsOf(selected) < guests ? " — с торцами поместятся?" : "")
+      : "",
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  // First open → new message; toggles → just swap the buttons.
+  if (selectionKey === undefined || !messageId) {
+    await sendTelegramMessage(chatId, text, { inline_keyboard: rows });
+  } else {
+    await callTelegram("editMessageText", {
+      chat_id: chatId,
+      message_id: messageId,
+      text,
+      parse_mode: "HTML",
+      reply_markup: { inline_keyboard: rows },
+    });
+  }
 }
 
 /** Step 2: free tables for `guests` from now on, as buttons under the plan. */
@@ -156,8 +230,8 @@ export async function walkInChooseTable(chatId: string | number, messageId: numb
       date: now.date,
       time,
       shown: overlapping(bookings, time),
-      caption: `😕 Сейчас нет свободного стола на <b>${people(guests)}</b> до ${until(time)}.`,
-      keyboard: [[{ text: "🗺 Схема сейчас", callback_data: "plan" }]],
+      caption: `😕 Нет свободного стола или готовой сдвижки на <b>${people(guests)}</b> до ${until(time)}. Можно объединить столы вручную.`,
+      keyboard: [joinButton(guests), [{ text: "🗺 Схема сейчас", callback_data: "plan" }]],
     });
     return;
   }
@@ -167,12 +241,15 @@ export async function walkInChooseTable(chatId: string | number, messageId: numb
     time,
     shown: overlapping(bookings, time),
     caption: `🚶 <b>Walk-in · ${people(guests)}</b> · сейчас ${time}\nВыбери стол (будет занят до ${until(time)}):`,
-    keyboard: options.map((o, i) => [
-      {
-        text: `${i === 0 ? "⭐ " : ""}Стол ${tablesLabel(o.tables)} · ${o.seats} мест`,
-        callback_data: `wt:${guests}:${tableKey(o.tables)}`,
-      },
-    ]),
+    keyboard: [
+      ...options.map((o, i) => [
+        {
+          text: `${i === 0 ? "⭐ " : ""}Стол ${tablesLabel(o.tables)} · ${o.seats} мест`,
+          callback_data: `wt:${guests}:${tableKey(o.tables)}`,
+        },
+      ]),
+      joinButton(guests),
+    ],
   });
 }
 

@@ -61,9 +61,9 @@ alter table public.waitlist_subscribers enable row level security;
 --                           given out twice.
 -- Rule (mirrors lib/reservation/tables.ts): a booking holds its tables from
 -- arrival for p_duration_minutes; among free single tables and free
--- combinations of pushed-together tables, the one with the fewest seats that
--- still fit the group wins (one table beats two on a tie). Tables,
--- combinations and duration come from the app as arguments.
+-- combinations of pushed-together tables (each with its own seat count), the
+-- best fit wins: fewest seats, every extra joined table counting as 2 seats.
+-- Tables, combinations and duration come from the app as arguments.
 -- Safe to run again: everything is create-if-missing / replace.
 
 create table if not exists public.reservations (
@@ -110,7 +110,7 @@ create or replace function public.book_reservation(
   p_guests           integer,
   p_duration_minutes integer,
   p_tables           jsonb,       -- [{"id": 1, "seats": 2}, …]
-  p_combos           jsonb,       -- [[1, 2], [5, 6], …]
+  p_combos           jsonb,       -- [{"tables": [1, 2], "seats": 4}, …]
   p_force_tables     smallint[],  -- walk-in: tables chosen by staff; null = pick
   p_source           text,
   p_name             text,
@@ -150,25 +150,21 @@ begin
     end if;
     v_pick := p_force_tables;
   else
-    -- Fewest seats that still fit the group; on a tie one table beats two.
+    -- Best fit: fewest seats, each extra joined table counting as 2 seats
+    -- (JOIN_PENALTY in tables.ts); on a tie fewer tables win.
     select c.ids
       into v_pick
       from (
         select array[(t ->> 'id')::smallint] as ids, (t ->> 'seats')::int as seats
           from jsonb_array_elements(p_tables) t
         union all
-        select ids,
-               (select coalesce(sum((t ->> 'seats')::int), 0)
-                  from jsonb_array_elements(p_tables) t
-                 where (t ->> 'id')::smallint = any (ids))
-          from (
-            select array(select x::smallint from jsonb_array_elements_text(combo) x) as ids
-              from jsonb_array_elements(p_combos) combo
-          ) combos
+        select array(select x::smallint from jsonb_array_elements_text(combo -> 'tables') x),
+               (combo ->> 'seats')::int
+          from jsonb_array_elements(p_combos) combo
       ) c
      where c.seats >= p_guests
        and not (c.ids && v_busy)
-     order by c.seats, cardinality(c.ids), c.ids[1]
+     order by c.seats + 2 * (cardinality(c.ids) - 1), cardinality(c.ids), c.ids[1]
      limit 1;
 
     if v_pick is null then

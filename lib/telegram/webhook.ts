@@ -9,6 +9,7 @@ import {
   startWalkIn,
   walkInBook,
   walkInChooseTable,
+  walkInJoinTables,
 } from "./hall";
 import { parseRef, parseReplyCallback, refLine } from "./refs";
 import { firstName, loadRecipient, sendReplyMail, whatsappText, type Recipient } from "./replies";
@@ -139,6 +140,7 @@ async function onCallback(query: TgCallbackQuery, chatId: number) {
   else if (action === "list") await sendUpcomingList(chatId);
   else if (action === "wi" && !a) await startWalkIn(chatId);
   else if (action === "wi") await walkInChooseTable(chatId, messageId, Number(a));
+  else if (action === "wm" && a) await walkInJoinTables(chatId, messageId, Number(a), b);
   else if (action === "wt" && a && b) await walkInBook(chatId, messageId, Number(a), b);
   else if (action === "cx" && a) await askCancel(chatId, a);
   else if (action === "cy" && a) await confirmCancel(chatId, messageId, a);
