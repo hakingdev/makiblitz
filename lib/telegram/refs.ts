@@ -19,6 +19,20 @@ export function parseRef(text: string | undefined | null): Ref | null {
   return match ? { kind: match[1]!.toLowerCase() as RefKind, id: match[2]!.toLowerCase() } : null;
 }
 
+/**
+ * The "📝 Комментарий" prompt carries "note: r:<uuid>" instead of a ref line,
+ * so a reply to it edits the booking's comment and never mails the guest.
+ */
+const NOTE = /note:\s*r:([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})/i;
+
+export function noteLine(id: string) {
+  return `<code>note: r:${id}</code>`;
+}
+
+export function parseNoteRef(text: string | undefined | null): string | null {
+  return text?.match(NOTE)?.[1]?.toLowerCase() ?? null;
+}
+
 /** callback_data of the "Ответить" button: "reply:c:<uuid>". */
 export function parseReplyCallback(data: string | undefined): Ref | null {
   return data?.startsWith("reply:") ? parseRef(`ref: ${data.slice("reply:".length)}`) : null;

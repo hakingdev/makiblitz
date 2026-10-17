@@ -2,8 +2,13 @@ import { callTelegram, sendTelegramMessage, telegramChatIds, tgEscape, whatsappL
 import {
   MENU,
   askCancel,
+  askNote,
   confirmCancel,
   dismissCancel,
+  saveNote,
+  sendDayPicker,
+  sendDayPlan,
+  sendNotePicker,
   sendPlanNow,
   sendUpcomingList,
   startWalkIn,
@@ -11,7 +16,7 @@ import {
   walkInChooseTable,
   walkInJoinTables,
 } from "./hall";
-import { parseRef, parseReplyCallback, refLine } from "./refs";
+import { parseNoteRef, parseRef, parseReplyCallback, refLine } from "./refs";
 import { firstName, loadRecipient, sendReplyMail, whatsappText, type Recipient } from "./replies";
 
 /**
@@ -19,7 +24,8 @@ import { firstName, loadRecipient, sendReplyMail, whatsappText, type Recipient }
  *  - "✍️ Ответить" button → prompt with force-reply ("напиши ответ …")
  *  - a reply to that prompt or to the original notification → e-mail to the
  *    guest + a WhatsApp button pre-filled with the same text
- *  - hall: /plan, /walkin, /list, /menu and their buttons (see hall.ts)
+ *  - a reply to a "📝 Комментарий" prompt → saves the booking's comment
+ *  - hall: /plan, /date, /walkin, /list, /menu and their buttons (see hall.ts)
  *  - /start or /id → shows the chat id (needed once for TELEGRAM_CHAT_ID)
  * Messages from any other chat are ignored.
  */
@@ -68,6 +74,11 @@ async function onReplyButton(query: TgCallbackQuery) {
 async function onAnswer(message: TgMessage) {
   const answer = message.text?.trim();
   const original = message.reply_to_message;
+  const noteId = parseNoteRef(original?.text ?? original?.caption);
+  if (noteId) {
+    if (answer) await saveNote(message.chat.id, noteId, answer);
+    return;
+  }
   const ref = parseRef(original?.text ?? original?.caption);
   if (!answer || !ref) return;
 
@@ -120,6 +131,8 @@ export async function handleTelegramUpdate(update: TgUpdate) {
     await sendTelegramMessage(message.chat.id, "🍣 <b>MakiLove</b> — что сделать?", { inline_keyboard: MENU });
   } else if (command === "/plan") {
     await sendPlanNow(message.chat.id);
+  } else if (command === "/date") {
+    await sendDayPicker(message.chat.id);
   } else if (command === "/walkin") {
     await startWalkIn(message.chat.id);
   } else if (command === "/list") {
@@ -139,6 +152,10 @@ async function onCallback(query: TgCallbackQuery, chatId: number) {
   const [action, a, b] = data.split(":");
   if (action === "plan") await sendPlanNow(chatId);
   else if (action === "list") await sendUpcomingList(chatId);
+  else if (action === "pd") await sendDayPicker(chatId);
+  else if (action === "pv") await sendDayPlan(chatId, a, b);
+  else if (action === "nl") await sendNotePicker(chatId, a);
+  else if (action === "nt" && a) await askNote(chatId, a);
   else if (action === "wi" && !a) await startWalkIn(chatId);
   else if (action === "wi") await walkInChooseTable(chatId, messageId, Number(a));
   else if (action === "wm" && a) await walkInJoinTables(chatId, messageId, Number(a), b);

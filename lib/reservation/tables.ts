@@ -72,6 +72,8 @@ export type Booking = {
   tables: number[];
   source?: BookingSource;
   name?: string;
+  /** Guest's wish from the form or a staff comment from the bot ("веган"). */
+  notes?: string | null;
 };
 
 export type TableOption = { tables: number[]; seats: number };

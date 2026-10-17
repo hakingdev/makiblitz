@@ -62,6 +62,7 @@ async function call(method: string, payload: Record<string, unknown> = {}) {
   const commands = await call("setMyCommands", {
     commands: [
       { command: "plan", description: "Схема зала сейчас" },
+      { command: "date", description: "Схема зала на дату" },
       { command: "walkin", description: "Walk-in: посадить гостей" },
       { command: "list", description: "Брони и отмена" },
       { command: "menu", description: "Кнопки бота" },

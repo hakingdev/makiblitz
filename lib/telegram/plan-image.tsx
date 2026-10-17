@@ -4,8 +4,9 @@ import { PLAN_SIZE, TABLES, type TableDef } from "@/lib/reservation/tables";
 /**
  * Floor plan as PNG for Telegram, drawn after the restaurant's own sketch:
  * free tables slate, occupied tables red with guests + arrival time, the
- * booking that triggered the message outlined in white. Text stays Latin/digits
- * (default OG font); the Russian details go into the photo caption.
+ * booking that triggered the message outlined in white, a booking's comment
+ * ("vegan") as a yellow tag under its table. Text stays Latin/digits (default
+ * OG font); the Russian details go into the photo caption.
  */
 
 export type PlanMark = {
@@ -14,6 +15,7 @@ export type PlanMark = {
   time: string;
   walkIn?: boolean;
   highlight?: boolean;
+  note?: string | null;
 };
 
 const SCALE = 2;
@@ -28,9 +30,16 @@ const COLORS = {
   freeChair: "#465063",
   busy: "#D91F2D",
   busyChair: "#8E1220",
+  note: "#F5C542",
+  noteText: "#1A1A1A",
   text: "#FFFFFF",
   muted: "#9AA7A8",
 };
+
+const NOTE_WIDTH = 190;
+const NOTE_CHARS = 26;
+
+const clip = (text: string, max: number) => (text.length > max ? `${text.slice(0, max - 1).trimEnd()}…` : text);
 
 function Chairs({ t, busy }: { t: TableDef; busy: boolean }) {
   const color = busy ? COLORS.busyChair : COLORS.freeChair;
@@ -51,8 +60,14 @@ function Chairs({ t, busy }: { t: TableDef; busy: boolean }) {
   );
 }
 
-function Table({ t, mark }: { t: TableDef; mark?: PlanMark }) {
-  const busy = Boolean(mark);
+function markLabel(mark: PlanMark) {
+  return `${mark.walkIn ? "W · " : ""}${mark.guests}P · ${mark.time}`;
+}
+
+function Table({ t, marks }: { t: TableDef; marks: PlanMark[] }) {
+  const busy = marks.length > 0;
+  const shown = marks.slice(0, 3);
+  const hidden = marks.length - shown.length;
   return (
     <>
       <Chairs t={t} busy={busy} />
@@ -65,7 +80,7 @@ function Table({ t, mark }: { t: TableDef; mark?: PlanMark }) {
           height: t.h * SCALE,
           background: busy ? COLORS.busy : COLORS.free,
           borderRadius: 6,
-          border: mark?.highlight ? "5px solid #FFFFFF" : "none",
+          border: marks.some((m) => m.highlight) ? "5px solid #FFFFFF" : "none",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -73,14 +88,68 @@ function Table({ t, mark }: { t: TableDef; mark?: PlanMark }) {
           color: COLORS.text,
         }}
       >
-        <div style={{ fontSize: 34, fontWeight: 700, lineHeight: 1 }}>{String(t.id)}</div>
-        {mark && (
-          <div style={{ fontSize: mark.walkIn ? 17 : 20, marginTop: 6, lineHeight: 1 }}>
-            {`${mark.walkIn ? "W · " : ""}${mark.guests}P · ${mark.time}`}
-          </div>
+        <div style={{ fontSize: marks.length > 1 ? 26 : 34, fontWeight: 700, lineHeight: 1 }}>{String(t.id)}</div>
+        {marks.length === 1 && (
+          <div style={{ fontSize: marks[0]!.walkIn ? 17 : 20, marginTop: 6, lineHeight: 1 }}>{markLabel(marks[0]!)}</div>
         )}
+        {marks.length > 1 &&
+          shown.map((m, i) => (
+            <div key={i} style={{ fontSize: 16, marginTop: 3, lineHeight: 1 }}>
+              {i === shown.length - 1 && hidden ? `${markLabel(m)} +${hidden}` : markLabel(m)}
+            </div>
+          ))}
       </div>
+      <NoteTag t={t} marks={marks} />
     </>
+  );
+}
+
+/** Joined tables show a booking's comment once, under the lowest of them. */
+function noteAnchor(tables: number[]) {
+  const defs = TABLES.filter((t) => tables.includes(t.id));
+  return defs.reduce((low, t) => (t.y + t.h > low.y + low.h ? t : low), defs[0]!).id;
+}
+
+/** Comments of the table's bookings, as a tag right under the table. */
+function NoteTag({ t, marks }: { t: TableDef; marks: PlanMark[] }) {
+  const notes = [
+    ...new Set(
+      marks
+        .filter((m) => noteAnchor(m.tables) === t.id)
+        .map((m) => m.note?.replace(/\s+/g, " ").trim())
+        .filter(Boolean),
+    ),
+  ];
+  if (!notes.length) return null;
+  const center = t.x + t.w / 2;
+  const left = Math.min(Math.max(center - NOTE_WIDTH / 2, 4), PLAN_SIZE.w - NOTE_WIDTH - 4);
+  const align = left === 4 ? "flex-start" : left === PLAN_SIZE.w - NOTE_WIDTH - 4 ? "flex-end" : "center";
+  const top = t.y + t.h + (t.chairs.bottom ? 7 : 3);
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: left * SCALE,
+        top: top * SCALE,
+        width: NOTE_WIDTH * SCALE,
+        display: "flex",
+        justifyContent: align,
+      }}
+    >
+      <div
+        style={{
+          background: COLORS.note,
+          color: COLORS.noteText,
+          fontSize: 20,
+          fontWeight: 700,
+          lineHeight: 1,
+          padding: "5px 10px",
+          borderRadius: 6,
+        }}
+      >
+        {clip(notes.join(" · "), NOTE_CHARS)}
+      </div>
+    </div>
   );
 }
 
@@ -111,8 +180,9 @@ export async function renderPlan({
   subtitle: string;
   marks: PlanMark[];
 }): Promise<Buffer> {
-  const byTable = new Map<number, PlanMark>();
-  for (const mark of marks) for (const id of mark.tables) byTable.set(id, mark);
+  const byTable = new Map<number, PlanMark[]>();
+  const ordered = [...marks].sort((a, b) => a.time.localeCompare(b.time));
+  for (const mark of ordered) for (const id of mark.tables) byTable.set(id, [...(byTable.get(id) ?? []), mark]);
 
   const image = new ImageResponse(
     (
@@ -123,13 +193,14 @@ export async function renderPlan({
         </div>
         <div style={{ position: "relative", width: WIDTH, height: PLAN_SIZE.h * SCALE, display: "flex" }}>
           {TABLES.map((t) => (
-            <Table key={t.id} t={t} mark={byTable.get(t.id)} />
+            <Table key={t.id} t={t} marks={byTable.get(t.id) ?? []} />
           ))}
         </div>
         <div style={{ height: FOOTER, display: "flex", alignItems: "center", padding: "0 44px" }}>
           <LegendItem color={COLORS.free} label="frei" />
           <LegendItem color={COLORS.busy} label="besetzt" />
           <LegendItem color={COLORS.busy} outline label="neu" />
+          <LegendItem color={COLORS.note} label="Notiz" />
           <div style={{ fontSize: 24, color: COLORS.muted }}>W = Walk-in</div>
         </div>
       </div>
