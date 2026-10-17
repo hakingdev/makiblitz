@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { GUEST_OPTIONS } from "@/lib/reservation/config";
 import { isBookable, restaurantNow } from "@/lib/reservation/dates";
 import { sendReservationMails } from "@/lib/reservation/mail";
+import { notifyReservation } from "@/lib/telegram/notify";
 import { bookReservation, type NewReservation } from "@/lib/reservation/store";
 import { contactErrors, normalizeContact } from "@/lib/reservation/validate";
 import { hashIp } from "@/lib/waitlist/crypto";
@@ -81,6 +82,8 @@ export async function POST(req: NextRequest) {
       : NextResponse.json({ error: "unavailable" }, { status: 503 });
   }
 
-  await sendReservationMails(reservation, result.id, result.seatsLeft);
+  // Telegram is the owner's main channel; e-mail to MAIL_TO only if it fails.
+  const notified = await notifyReservation(reservation, result.id, result.seatsLeft);
+  await sendReservationMails(reservation, result.id, result.seatsLeft, { ownerFallback: !notified });
   return NextResponse.json({ ok: true, id: result.id }, { status: 201 });
 }

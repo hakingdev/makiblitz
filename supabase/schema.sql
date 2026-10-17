@@ -153,3 +153,28 @@ revoke all on function public.book_reservation(date, time, integer, integer, int
   from public, anon, authenticated;
 grant execute on function public.book_reservation(date, time, integer, integer, integer, text, text, text, text, text, text)
   to service_role;
+
+-- ===========================================================================
+-- Table contact_requests (Kontakt form, /kontakt)
+-- ===========================================================================
+-- Stored so the restaurant can answer from the Telegram bot: the bot message
+-- carries the request id, the webhook looks the sender up here and mails the
+-- answer. answered_at/answer document what was sent.
+
+create table if not exists public.contact_requests (
+  id          uuid        primary key default gen_random_uuid(),
+  name        text        not null,
+  email       text        not null,
+  phone       text,
+  message     text        not null,
+  ip_hash     text,       -- HMAC-SHA256 of the IP, never the raw address
+  user_agent  text,
+  created_at  timestamptz not null default now(),
+  answered_at timestamptz,
+  answer      text
+);
+
+create index if not exists contact_requests_created_at_idx
+  on public.contact_requests (created_at desc);
+
+alter table public.contact_requests enable row level security;

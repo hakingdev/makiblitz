@@ -17,7 +17,7 @@ import { Icon } from "@/components/ui/Icon";
 
 const c = getMessages().contactPage;
 
-const FIELDS = ["name", "email", "message"] as const;
+const FIELDS = ["name", "email", "phone", "message"] as const;
 type Errors = Partial<Record<ContactMessageField, string>>;
 
 function validate(values: ContactMessage): Errors {
@@ -25,7 +25,7 @@ function validate(values: ContactMessage): Errors {
   return Object.fromEntries(FIELDS.filter((f) => found[f]).map((f) => [f, c[f].error]));
 }
 
-const EMPTY: ContactMessage = { name: "", email: "", message: "" };
+const EMPTY: ContactMessage = { name: "", email: "", phone: "", message: "" };
 
 /** Contact / Message form (Figma 15:1078 · 15:569) — sends to /api/contact. */
 export function ContactForm() {
@@ -36,6 +36,7 @@ export function ContactForm() {
   const refs = {
     name: useRef<HTMLInputElement>(null),
     email: useRef<HTMLInputElement>(null),
+    phone: useRef<HTMLInputElement>(null),
     message: useRef<HTMLTextAreaElement>(null),
   };
 
@@ -126,6 +127,20 @@ export function ContactForm() {
         error={errors.email}
         onChange={(e) => update("email", e.target.value)}
         onBlur={() => blur("email")}
+      />
+      {/* Not in the Figma frame: lets the restaurant answer via WhatsApp from the Telegram bot. */}
+      <Field
+        ref={refs.phone}
+        id="message-phone"
+        name="phone"
+        type="tel"
+        label={c.phone.label}
+        placeholder={c.phone.placeholder}
+        autoComplete="tel"
+        value={values.phone}
+        error={errors.phone}
+        onChange={(e) => update("phone", e.target.value)}
+        onBlur={() => blur("phone")}
       />
       <TextareaField
         ref={refs.message}

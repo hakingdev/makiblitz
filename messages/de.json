@@ -154,6 +154,11 @@
       "placeholder": "name@beispiel.de",
       "error": "Bitte gib eine gültige E-Mail-Adresse ein."
     },
+    "phone": {
+      "label": "Telefon / WhatsApp (optional)",
+      "placeholder": "Für eine Antwort per WhatsApp",
+      "error": "Bitte gib eine gültige Telefonnummer ein."
+    },
     "message": {
       "label": "Deine Nachricht *",
       "placeholder": "Wie können wir dir helfen?",
@@ -412,9 +417,23 @@
       "labels": {
         "name": "Name",
         "email": "E-Mail",
-        "message": "Nachricht"
+        "message": "Nachricht",
+        "phone": "Telefon"
       },
       "replyHint": "Einfach auf diese E-Mail antworten – die Antwort geht direkt an den Absender."
+    },
+    "reply": {
+      "greeting": "Hallo {name},",
+      "signoff": [
+        "Viele Grüße",
+        "dein MakiLove-Team"
+      ],
+      "contactSubject": "Antwort von MakiLove auf deine Nachricht",
+      "contactQuote": "Deine Nachricht vom {date}:",
+      "reservationSubject": "Deine Reservierung bei MakiLove: {date} um {time} Uhr",
+      "reservationQuote": "Deine Reservierung:",
+      "reservationLine": "{guests} · {date} · {time} Uhr",
+      "whatsappSignoff": "– dein MakiLove-Team"
     }
   },
   "footer": {

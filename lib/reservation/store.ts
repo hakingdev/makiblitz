@@ -1,7 +1,8 @@
 import { readFile, writeFile } from "fs/promises";
 import path from "path";
 import { randomUUID } from "crypto";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { getSupabase, isUuid } from "@/lib/supabase";
 import { SEAT_CAPACITY, VISIT_DURATION_MINUTES } from "./config";
 import { seatsLeftAt, type Booking } from "./capacity";
 
@@ -28,6 +29,17 @@ export type NewReservation = {
   userAgent: string;
 };
 
+export type StoredReservation = {
+  id: string;
+  date: string;
+  time: string;
+  guests: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  notes: string | null;
+};
+
 export type BookResult =
   | { ok: true; id: string; seatsLeft: number }
   | { ok: false; reason: "full"; seatsLeft: number }
@@ -37,6 +49,7 @@ interface ReservationStore {
   /** Confirmed bookings of one day, or null when the store can't be read. */
   bookingsOn(date: string): Promise<Booking[] | null>;
   book(reservation: NewReservation): Promise<BookResult>;
+  byId(id: string): Promise<StoredReservation | null>;
 }
 
 class SupabaseReservationStore implements ReservationStore {
@@ -80,6 +93,26 @@ class SupabaseReservationStore implements ReservationStore {
     return result.ok
       ? { ok: true, id: String(result.id), seatsLeft: result.seats_left }
       : { ok: false, reason: "full", seatsLeft: result.seats_left };
+  }
+
+  async byId(id: string): Promise<StoredReservation | null> {
+    const { data, error } = await this.client
+      .from("reservations")
+      .select("id,visit_date,visit_time,guests,name,email,phone,notes")
+      .eq("id", id)
+      .maybeSingle();
+    if (error) console.error("[reservation] Supabase read failed:", error);
+    if (!data) return null;
+    return {
+      id: String(data.id),
+      date: String(data.visit_date),
+      time: String(data.visit_time).slice(0, 5),
+      guests: Number(data.guests),
+      name: String(data.name),
+      email: String(data.email),
+      phone: data.phone ? String(data.phone) : null,
+      notes: data.notes ? String(data.notes) : null,
+    };
   }
 }
 
@@ -125,20 +158,21 @@ class LocalReservationStore implements ReservationStore {
       return { ok: false, reason: "unavailable" } as const;
     });
   }
+
+  async byId(id: string): Promise<StoredReservation | null> {
+    const row = (await this.rows()).find((r) => r.id === id);
+    return row
+      ? { id: row.id, date: row.date, time: row.time, guests: row.guests, name: row.name, email: row.email, phone: row.phone, notes: row.notes }
+      : null;
+  }
 }
 
 let store: ReservationStore | undefined;
 
 function getStore(): ReservationStore {
   if (store) return store;
-  const url = process.env.SUPABASE_URL;
-  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  store =
-    url && key
-      ? new SupabaseReservationStore(
-          createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } }),
-        )
-      : new LocalReservationStore();
+  const db = getSupabase();
+  store = db ? new SupabaseReservationStore(db) : new LocalReservationStore();
   return store;
 }
 
@@ -148,4 +182,8 @@ export function bookingsOn(date: string) {
 
 export function bookReservation(reservation: NewReservation) {
   return getStore().book(reservation);
+}
+
+export function getReservation(id: string): Promise<StoredReservation | null> {
+  return isUuid(id) ? getStore().byId(id) : Promise.resolve(null);
 }

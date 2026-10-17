@@ -60,6 +60,26 @@ Storage: Supabase table `reservations`, written only through the SQL function
 Supabase SQL editor). Without `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY`
 (local dev) bookings go to `reservations.local.json` instead.
 
+## Telegram bot (@makilovereservbot)
+
+Every booking and every Kontakt request is posted to the Telegram chat(s) in
+`TELEGRAM_CHAT_ID` (currently the group "Sushi Restraurant"): persons, time,
+date, name, e-mail, phone, wishes. Buttons:
+
+- **✍️ Ответить** — the bot asks for the answer (reply to its message); the
+  text is mailed to the guest (Brevo, reply-to `MAIL_TO`) and the bot offers
+  **💬 WhatsApp** with the same text pre-filled (wa.me link — one tap to send).
+- **💬 WhatsApp** — opens a chat with the guest's number (if they gave one).
+
+Replying directly to a booking/request message works too. Mapping back to the
+guest goes through the `ref: c|r:<uuid>` line in each message, so contact
+requests are stored in Supabase (`contact_requests`). If Telegram is down or
+not configured, the owner gets the usual e-mail to `MAIL_TO` instead.
+
+Setup: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_WEBHOOK_SECRET` in
+`.env.local` and Vercel, then `npm run telegram:setup -- https://www.makilove.de`
+(registers `/api/telegram/webhook`). Writing `/id` to the bot shows a chat's id.
+
 ## Project structure
 
 ```

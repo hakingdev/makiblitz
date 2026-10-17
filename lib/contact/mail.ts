@@ -10,6 +10,7 @@ export async function sendContactMail(m: ContactMessage) {
     [o.labels.name, m.name],
     [o.labels.email, m.email],
   ];
+  if (m.phone) rows.push([o.labels.phone, m.phone]);
   await sendMail({
     to: OWNER_TO(),
     replyTo: { email: m.email, name: m.name },

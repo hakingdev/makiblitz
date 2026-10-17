@@ -104,15 +104,22 @@ async function sendOwnerMail(r: NewReservation, id: string, seatsLeft: number) {
 }
 
 /**
- * Sends both mails after a successful booking. Failures are logged, never
- * thrown: the table is booked either way and the owner sees it in Supabase.
+ * Sends the guest confirmation and — only when the Telegram notice didn't go
+ * out — the owner e-mail as fallback. Failures are logged, never thrown: the
+ * table is booked either way.
  */
-export async function sendReservationMails(r: NewReservation, id: string, seatsLeft: number) {
+export async function sendReservationMails(
+  r: NewReservation,
+  id: string,
+  seatsLeft: number,
+  { ownerFallback }: { ownerFallback: boolean },
+) {
   if (!isMailConfigured()) {
     console.info("[reservation] mail not configured — booked", id, r.date, r.time, `${r.guests}p`);
     return;
   }
-  const results = await Promise.allSettled([sendGuestMail(r), sendOwnerMail(r, id, seatsLeft)]);
+  const jobs = [sendGuestMail(r), ...(ownerFallback ? [sendOwnerMail(r, id, seatsLeft)] : [])];
+  const results = await Promise.allSettled(jobs);
   results.forEach((result, i) => {
     if (result.status === "rejected") {
       console.error(`[reservation] ${i === 0 ? "guest" : "owner"} mail failed for ${id}:`, result.reason);

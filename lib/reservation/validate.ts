@@ -10,14 +10,20 @@ export const NOTES_MAX = 500;
 
 const PHONE_CHARS = /^[+()\d\s/.-]+$/;
 
+/** Empty is fine (phone is optional); otherwise 6–15 digits in usual notation. */
+export function isValidPhone(value: string): boolean {
+  const phone = value.trim();
+  if (!phone) return true;
+  const digits = phone.replace(/\D/g, "").length;
+  return PHONE_CHARS.test(phone) && digits >= 6 && digits <= 15;
+}
+
 export function contactErrors(values: ContactInput): Partial<Record<ContactField, true>> {
   const errors: Partial<Record<ContactField, true>> = {};
   const name = values.name.trim();
   if (name.length < 2 || name.length > NAME_MAX) errors.name = true;
   if (!validateEmail(values.email)) errors.email = true;
-  const phone = values.phone.trim();
-  const digits = phone.replace(/\D/g, "").length;
-  if (phone && (!PHONE_CHARS.test(phone) || digits < 6 || digits > 15)) errors.phone = true;
+  if (!isValidPhone(values.phone)) errors.phone = true;
   return errors;
 }
 

@@ -53,3 +53,6 @@ next-env.d.ts
 
 # Local reservation store (dev fallback without Supabase — personal data)
 reservations.local.json
+
+# Local contact-request store (dev fallback without Supabase — personal data)
+contact-requests.local.json

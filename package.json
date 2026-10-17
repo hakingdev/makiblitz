@@ -12,7 +12,8 @@
     "waitlist:cleanup": "tsx scripts/cleanup-pending.ts",
     "waitlist:selftest": "tsx scripts/validate-selftest.ts",
     "waitlist:email-selftest": "tsx scripts/email-selftest.ts",
-    "plz:update": "tsx scripts/generate-plz-data.ts"
+    "plz:update": "tsx scripts/generate-plz-data.ts",
+    "telegram:setup": "tsx scripts/telegram-setup.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
