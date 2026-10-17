@@ -9,7 +9,43 @@ export function isMailConfigured(): boolean {
 }
 
 const BREVO_ENDPOINT = "https://api.brevo.com/v3/smtp/email";
+const BREVO_ACCOUNT = "https://api.brevo.com/v3/account";
 const SEND_TIMEOUT_MS = 10_000;
+const ACCOUNT_TIMEOUT_MS = 5_000;
+
+/** Brevo accepted nothing to send: the account has no e-mail credits left. */
+export class MailQuotaError extends Error {
+  constructor() {
+    super("Brevo account has no e-mail credits left");
+    this.name = "MailQuotaError";
+  }
+}
+
+/**
+ * Brevo answers 201 even when the account has no credits left and then drops
+ * the mail silently ("insufficient credits" shows up only in the event log).
+ * So check the e-mail plans first. Unknown (API down, other plan layout)
+ * counts as "has credits" — the check must never block a mail by itself.
+ */
+async function hasMailCredits(apiKey: string): Promise<boolean> {
+  try {
+    const res = await fetch(BREVO_ACCOUNT, {
+      headers: { "api-key": apiKey, accept: "application/json" },
+      signal: AbortSignal.timeout(ACCOUNT_TIMEOUT_MS),
+      cache: "no-store",
+    });
+    if (!res.ok) return true;
+    const account = (await res.json()) as {
+      plan?: { type?: string; creditsType?: string; credits?: number }[];
+    };
+    const mailPlans = (account.plan ?? []).filter(
+      (p) => p.type !== "sms" && p.creditsType === "sendLimit" && typeof p.credits === "number",
+    );
+    return mailPlans.length === 0 || mailPlans.some((p) => p.credits! > 0);
+  } catch {
+    return true;
+  }
+}
 
 /**
  * Sender for every mail. MAIL_FROM must be a VERIFIED sender (or an
@@ -47,6 +83,7 @@ export async function sendMail(opts: {
 }): Promise<void> {
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) throw new Error("BREVO_API_KEY is not set");
+  if (!(await hasMailCredits(apiKey))) throw new MailQuotaError();
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), SEND_TIMEOUT_MS);
