@@ -5,7 +5,8 @@ const PAGES: { path: string; priority: number }[] = [
   { path: "/", priority: 1 },
   { path: "/reservieren", priority: 0.9 },
   { path: "/speisekarte", priority: 0.8 },
-  { path: "/restaurant", priority: 0.7 },
+  { path: "/galerie", priority: 0.7 },
+  { path: "/kontakt", priority: 0.7 },
   { path: "/impressum", priority: 0.1 },
   { path: "/datenschutz", priority: 0.1 },
 ];

@@ -17,6 +17,7 @@ export const OPEN_WEEKDAYS: readonly number[] = [5, 6];
 
 /** Arrival times (HH:MM, restaurant local time). */
 export const TIME_SLOTS = [
+  "17:00",
   "17:30",
   "18:00",
   "18:30",

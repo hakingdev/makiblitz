@@ -38,6 +38,8 @@ export async function sendMail(opts: {
   subject: string;
   text: string;
   html: string;
+  /** Where "Antworten" goes, e.g. the guest who wrote via the contact form. */
+  replyTo?: { email: string; name?: string };
 }): Promise<void> {
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) throw new Error("BREVO_API_KEY is not set");
@@ -59,6 +61,7 @@ export async function sendMail(opts: {
         subject: opts.subject,
         htmlContent: opts.html,
         textContent: opts.text,
+        ...(opts.replyTo ? { replyTo: opts.replyTo } : {}),
       }),
       signal: controller.signal,
     });

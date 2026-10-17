@@ -25,14 +25,17 @@ npm test         # vitest
 
 | Route | Figma | |
 |---|---|---|
-| `/` | 2:61 · 2:60 | Startseite: hero, promise band, menu teaser, restaurant, CTA |
-| `/speisekarte` | 11:99 | "Unsere Rollen. Schön serviert." — 9 roll photos |
-| `/restaurant` | 12:99 | "Hier wird aus Sushi ein Abend." — original restaurant photos |
+| `/` | 2:61 · 2:60 | Startseite: hero, promise band, gallery teaser, restaurant, CTA |
+| `/galerie` | 15:1103 · 15:594 | the nine roll photos |
+| `/speisekarte` | 15:637 · 15:110 | 51 dishes in 9 categories (`lib/menu.ts`), allergen note |
+| `/kontakt` | 15:1058 · 15:541 | phone, address, message form → `POST /api/contact` (mail to `MAIL_TO`) |
 | `/reservieren` | 6:221 · 6:29 | Step 1 — guests, date, time slot |
 | `/reservieren/kontakt` | 6:290 · 6:101 | Step 2 — name, e-mail, phone, wishes |
 | `/reservieren/bestaetigt` | 6:358 · 6:172 | Step 3 — confirmation + `.ics` calendar entry |
 | `/impressum`, `/datenschutz` | — | legal pages |
 | `/confirm`, `/abmelden` + `/api/confirm`, `/api/unsubscribe` | — | kept for links in already-sent waitlist mails |
+
+Mobile navigation: 15:1144. `/restaurant` redirects to `/galerie`.
 
 ## Reservations
 
@@ -40,7 +43,7 @@ Rules live in `lib/reservation/config.ts`:
 
 - **Open days:** only 30 + 31 October 2026 for now (`OPEN_DATES`); set it to
   `null` to switch to the regular Friday/Saturday schedule (`OPEN_WEEKDAYS`).
-- **Arrival times:** 17:30 – 20:30 every 30 min (`TIME_SLOTS`).
+- **Arrival times:** 17:00 – 20:30 every 30 min (`TIME_SLOTS`).
 - **Capacity:** 32 seats (`SEAT_CAPACITY`, up to 32 inclusive); every booking
   holds its seats for **2:30 h** (`VISIT_DURATION_MINUTES`) — a full 18:00
   becomes bookable again at 20:30.
@@ -63,9 +66,10 @@ Supabase SQL editor). Without `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY`
 app/                      # routes (see table above)
 components/
   ui/                     # Figma components: Button, Field, Choice, Icon, Wordmark
-  site/                   # SiteHeader (mobile menu), SiteFooter, ReservationCta, PageShell
+  site/                   # SiteHeader (+ mobile navigation), SiteFooter/HomeFooter, PageIntro, ReservationCta
   home/                   # Startseite sections
-  gallery/                # photo tiles for /speisekarte and /restaurant
+  menu/                   # Speisekarte category + dish row
+  contact/                # Kontakt message form
   reservation/            # provider, steps, header/footer/progress, summary
   consent/ analytics/     # cookie banner + consent-gated Meta Pixel
 lib/

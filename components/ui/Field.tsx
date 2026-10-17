@@ -43,8 +43,9 @@ export const Field = forwardRef<
 
 export const TextareaField = forwardRef<
   HTMLTextAreaElement,
-  Common & Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "className">
->(function TextareaField({ label, error, className, id, ...props }, ref) {
+  Common & { inputClassName?: string } & Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "className">
+>(function TextareaField({ label, error, className, inputClassName, id, ...props }, ref) {
+  const errorId = error ? `${id}-error` : undefined;
   return (
     <div className={cn("flex flex-col gap-2", className)}>
       <label htmlFor={id} className={fieldLabel}>
@@ -53,9 +54,16 @@ export const TextareaField = forwardRef<
       <textarea
         ref={ref}
         id={id}
-        className={cn(inputBase, "min-h-[112px] resize-y py-[15px]", inputState(Boolean(error)))}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={errorId}
+        className={cn(inputBase, "min-h-[112px] resize-y py-[15px]", inputState(Boolean(error)), inputClassName)}
         {...props}
       />
+      {error && (
+        <p id={errorId} className="text-xs leading-[18px] text-brand">
+          {error}
+        </p>
+      )}
     </div>
   );
 });

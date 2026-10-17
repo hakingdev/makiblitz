@@ -1,40 +1,56 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/site/PageShell";
-import { ReservationCta } from "@/components/site/ReservationCta";
-import { GalleryHeading, GalleryPhoto } from "@/components/gallery/GalleryPhoto";
+import { PageIntro } from "@/components/site/PageIntro";
+import { MenuSection } from "@/components/menu/MenuSection";
 import { getMessages } from "@/lib/i18n";
+import { MENU } from "@/lib/menu";
 
-const t = getMessages();
-const p = t.menuPage;
+const p = getMessages().menuPage;
 
 export const metadata: Metadata = {
   title: p.metaTitle,
-  description: p.body,
+  description: p.metaDescription,
 };
 
-const ROLLS = Array.from({ length: 9 }, (_, i) => String(i + 1).padStart(2, "0"));
+const column = (side: "left" | "right") => MENU.filter((category) => category.column === side);
 
-/** Speisekarte — "Eigene Rollen / Schwarze Keramik" board (Figma 11:99). */
+/**
+ * Speisekarte (Figma 15:637 mobile · 15:110 desktop). One list in menu order
+ * on mobile; on desktop the categories split into two fixed columns, so each
+ * layout is rendered for its own breakpoint.
+ */
 export default function SpeisekartePage() {
   return (
     <PageShell>
-      <section className="page-container flex flex-col gap-6 pb-12 pt-8 lg:pb-16 lg:pt-12">
-        <GalleryHeading title={p.title} body={p.body} />
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {ROLLS.map((n, i) => (
-            <GalleryPhoto
-              key={n}
-              src={`/images/rolle-${n}.png`}
-              alt={p.photoAlt.replace("{n}", n)}
-              caption={p.caption.replace("{n}", n)}
-              aspectClass="aspect-[4/3]"
-              sizes="(min-width: 1024px) 432px, (min-width: 640px) 50vw, 100vw"
-              priority={i < 2}
-            />
+      <PageIntro eyebrow={p.eyebrow} title={p.title}>
+        <p className="text-base leading-[23px] text-muted">{p.body}</p>
+      </PageIntro>
+
+      <div className="page-container pb-12 lg:pb-16">
+        <div className="flex flex-col gap-8 lg:hidden">
+          {MENU.map((category) => (
+            <MenuSection key={category.id} category={category} idPrefix="menu" />
           ))}
         </div>
+        <div className="hidden gap-16 lg:flex">
+          {(["left", "right"] as const).map((side) => (
+            <div key={side} className="flex min-w-0 flex-1 flex-col gap-8">
+              {column(side).map((category) => (
+                <MenuSection key={category.id} category={category} idPrefix="menu-lg" />
+              ))}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <section className="bg-blush">
+        <div className="page-container flex flex-col gap-4 py-8">
+          <h2 className="text-[21px] font-bold leading-[29px] lg:text-[28px] lg:leading-[38px]">
+            {p.allergens.title}
+          </h2>
+          <p className="text-sm leading-[23px] text-muted">{p.allergens.body}</p>
+        </div>
       </section>
-      <ReservationCta />
     </PageShell>
   );
 }

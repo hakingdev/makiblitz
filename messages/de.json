@@ -13,13 +13,16 @@
   "contact": {
     "street": "Kurhausstr. 11A",
     "city": "97688 Bad Kissingen",
-    "email": "info@makilove.de"
+    "email": "info@makilove.de",
+    "phone": "0971 72730",
+    "phoneHref": "+4997172730"
   },
   "nav": {
+    "start": "Startseite",
+    "gallery": "Galerie",
     "menu": "Speisekarte",
-    "restaurant": "Unser Restaurant",
+    "reserve": "Tischreservierung",
     "contact": "Kontakt",
-    "reserve": "Tisch reservieren",
     "openMenu": "Menü öffnen",
     "closeMenu": "Menü schließen",
     "home": "Zur Startseite"
@@ -58,31 +61,31 @@
         "desktop": "GEMEINSAM GENIESSEN"
       }
     ],
-    "menu": {
-      "eyebrow": "DIE SPEISEKARTE",
+    "gallery": {
+      "eyebrow": "GALERIE",
       "title": [
-        "Liebe auf den",
-        "ersten Biss."
+        "Unsere Rollen.",
+        "Mit Liebe gerollt."
       ],
       "body": [
-        "Klassiker oder neue Lieblingsrolle?",
-        "Bei uns kommt beides auf den Tisch."
+        "Ein kleiner Einblick in unsere Küche.",
+        "Die Auswahl mit Preisen steht in der Speisekarte."
       ],
-      "categories": [
+      "items": [
         {
-          "title": "Die Klassiker",
-          "text": "Maki, Nigiri & Sashimi. Einfach gut.",
+          "title": "Von Hand gerollt",
+          "text": "Einblicke in unsere Küche.",
           "image": "/images/rolle-01.png",
           "alt": "Lachs-Maki auf schwarzer Keramik"
         },
         {
-          "title": "Unsere Lieblingsrollen",
-          "text": "Kreativ gerollt. Zum Teilen gemacht.",
+          "title": "Mit Liebe serviert",
+          "text": "So sieht Genuss bei MakiLove aus.",
           "image": "/images/rolle-09.png",
           "alt": "Rollen mit rotem Tobiko auf schwarzer Keramik"
         }
       ],
-      "cta": "Zur gesamten Speisekarte"
+      "cta": "Alle Bilder ansehen"
     },
     "restaurant": {
       "eyebrow": "GUT ESSEN. GERN BLEIBEN.",
@@ -107,17 +110,66 @@
   },
   "menuPage": {
     "metaTitle": "Speisekarte",
-    "title": "Unsere Rollen. Schön serviert.",
-    "body": "Klassiker oder neue Lieblingsrolle? Bei uns kommt beides auf den Tisch.",
-    "caption": "{n} / MakiLove",
-    "photoAlt": "MakiLove-Rolle {n} auf schwarzer Keramik"
+    "metaDescription": "Die Speisekarte von MakiLove in Bad Kissingen: Maki, Nigiri, Philadelphia, California, Special Rolls, Hot Rolls und Sushi Burger.",
+    "eyebrow": "DIE SPEISEKARTE",
+    "title": [
+      "Frisch gerollt.",
+      "Für jeden Geschmack."
+    ],
+    "body": "Unsere Auswahl · Alle Preise in Euro",
+    "allergens": {
+      "title": "Allergisch? Sag uns gern Bescheid.",
+      "body": "Bei Fragen zu Allergenen helfen wir dir gerne persönlich weiter."
+    }
   },
-  "restaurantPage": {
-    "metaTitle": "Unser Restaurant",
-    "title": "Hier wird aus Sushi ein Abend.",
-    "body": "Unser Restaurant · Kurhausstr. 11A, 97688 Bad Kissingen",
-    "caption": "{n} / Unser Restaurant",
-    "photoAlt": "Unser Restaurant – Foto {n}"
+  "galleryPage": {
+    "metaTitle": "Galerie",
+    "eyebrow": "GALERIE",
+    "title": [
+      "Unsere Rollen.",
+      "Mit Liebe gerollt."
+    ],
+    "body": "Ein kleiner Einblick in unsere Küche. Die Gerichte mit Preisen findest du in der Speisekarte.",
+    "photoAlt": "MakiLove-Rolle {n} auf schwarzer Keramik",
+    "cta": "Speisekarte ansehen"
+  },
+  "contactPage": {
+    "metaTitle": "Kontakt",
+    "eyebrow": "KONTAKT",
+    "title": [
+      "Schreib uns.",
+      "Oder ruf an."
+    ],
+    "body": "Fragen zum Restaurant, zu unseren Speisen oder einem besonderen Anlass? Wir sind für dich da.",
+    "phoneLabel": "RUF UNS AN",
+    "addressLabel": "DU FINDEST UNS HIER",
+    "formTitle": "Deine Nachricht an uns",
+    "name": {
+      "label": "Dein Name *",
+      "placeholder": "Vor- und Nachname",
+      "error": "Bitte gib deinen Namen ein."
+    },
+    "email": {
+      "label": "E-Mail-Adresse *",
+      "placeholder": "name@beispiel.de",
+      "error": "Bitte gib eine gültige E-Mail-Adresse ein."
+    },
+    "message": {
+      "label": "Deine Nachricht *",
+      "placeholder": "Wie können wir dir helfen?",
+      "error": "Bitte schreib uns eine kurze Nachricht."
+    },
+    "privacyPrefix": "Wir verwenden deine Angaben nur, um deine Anfrage zu beantworten. Hinweise findest du im ",
+    "privacyLink": "Datenschutz",
+    "privacySuffix": ".",
+    "submit": "Nachricht senden",
+    "submitting": "Wird gesendet…",
+    "success": {
+      "title": "Danke für deine Nachricht!",
+      "body": "Sie ist bei uns angekommen – wir melden uns so schnell wie möglich."
+    },
+    "errorGeneric": "Das hat leider nicht geklappt. Bitte versuch es noch einmal oder schreib uns direkt an info@makilove.de.",
+    "errorRateLimit": "Zu viele Nachrichten in kurzer Zeit. Bitte warte ein paar Minuten."
   },
   "reservation": {
     "metaTitle": "Tisch reservieren",
@@ -158,7 +210,7 @@
         "Wir freuen uns."
       ],
       "body": "Noch kurz deine Kontaktdaten – damit wir dir deine Reservierung bestätigen können.",
-      "formTitle": "Deine Kontaktdaten",
+      "formTitle": "Angaben zur Tischreservierung",
       "summaryTitle": "DEIN BESUCH",
       "change": "Besuch ändern",
       "name": {
@@ -353,6 +405,16 @@
         "seatsLeft": "Danach noch frei (Plätze)",
         "id": "Reservierungs-ID"
       }
+    },
+    "contactOwner": {
+      "subject": "✉️ Neue Nachricht über makilove.de: {name}",
+      "heading": "Neue Nachricht über das Kontaktformular",
+      "labels": {
+        "name": "Name",
+        "email": "E-Mail",
+        "message": "Nachricht"
+      },
+      "replyHint": "Einfach auf diese E-Mail antworten – die Antwort geht direkt an den Absender."
     }
   },
   "footer": {
@@ -362,7 +424,8 @@
     "instagramLabel": "Instagram",
     "tiktokLabel": "TikTok",
     "tagline": "© MakiLove · Mit Liebe gerollt.",
-    "copyright": "© MakiLove"
+    "copyright": "© MakiLove",
+    "address": "MakiLove · Kurhausstr. 11A, 97688 Bad Kissingen"
   },
   "legal": {
     "backToHome": "Zurück zur Startseite",

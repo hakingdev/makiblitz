@@ -1,50 +1,47 @@
 import Link from "next/link";
 import { getMessages } from "@/lib/i18n";
-import { INSTAGRAM_URL } from "@/lib/site";
 import { CookieSettingsButton } from "@/components/consent/CookieSettingsButton";
-import { Wordmark } from "@/components/ui/Wordmark";
 
 const t = getMessages();
 
-const legalLink = "focus-ring rounded transition-colors hover:text-ink";
+const link = "focus-ring rounded transition-colors hover:text-ink";
 
-/** 07 / Footer — brand & contact, divider, legal row. Anchor target of "Kontakt". */
+/** Site / Footer — compact footer of Galerie, Speisekarte, Kontakt and the text pages. */
 export function SiteFooter() {
   return (
-    <footer id="kontakt" className="scroll-mt-24 bg-paper">
-      <div className="page-container flex flex-col gap-6 py-8 lg:py-12">
-        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-          <Wordmark />
-          <address className="text-[13px] not-italic leading-[19px] text-muted lg:w-[650px] lg:text-[15px] lg:leading-[22px]">
-            <span className="block lg:inline">{t.contact.street}</span>
-            <span className="hidden lg:inline">, </span>
-            <span className="block lg:inline">{t.contact.city}</span>
-            <span className="hidden lg:inline"> · </span>
-            <a href={`mailto:${t.contact.email}`} className={`${legalLink} block lg:inline`}>
-              {t.contact.email}
-            </a>
-          </address>
-        </div>
-
-        <div className="h-px bg-line" />
-
-        <div className="flex flex-col gap-3 text-xs leading-[17px] text-muted lg:flex-row lg:justify-between">
-          <p>{t.footer.tagline}</p>
-          <nav aria-label="Rechtliches" className="flex flex-wrap gap-x-6 gap-y-2">
-            <Link href="/impressum" className={legalLink}>
+    <footer className="bg-paper">
+      <div className="page-container flex flex-col items-start gap-4 py-8">
+        <div className="h-px w-full bg-line" />
+        <p className="text-xs leading-[22px] text-muted lg:text-sm">{t.footer.address}</p>
+        <p className="text-xs font-semibold leading-[17px] text-ink lg:text-sm lg:leading-5">
+          <a href={`tel:${t.contact.phoneHref}`} className={link}>
+            {t.contact.phone}
+          </a>
+          {" · "}
+          <a href={`mailto:${t.contact.email}`} className={link}>
+            {t.contact.email}
+          </a>
+        </p>
+        <nav
+          aria-label="Rechtliches"
+          className="flex flex-col items-start gap-1 text-[11px] leading-4 text-muted sm:flex-row sm:items-center sm:gap-3"
+        >
+          <span className="flex items-center gap-3">
+            <span>{t.footer.copyright}</span>
+            <span aria-hidden="true">·</span>
+            <Link href="/impressum" className={link}>
               {t.footer.impressum}
             </Link>
-            <Link href="/datenschutz" className={legalLink}>
+            <span aria-hidden="true">·</span>
+            <Link href="/datenschutz" className={link}>
               {t.footer.datenschutz}
             </Link>
-            {INSTAGRAM_URL && (
-              <a href={INSTAGRAM_URL} target="_blank" rel="noopener noreferrer" className={legalLink}>
-                {t.footer.instagramLabel}
-              </a>
-            )}
-            <CookieSettingsButton className={legalLink} />
-          </nav>
-        </div>
+          </span>
+          <span aria-hidden="true" className="hidden sm:inline">
+            ·
+          </span>
+          <CookieSettingsButton className={link} />
+        </nav>
       </div>
     </footer>
   );

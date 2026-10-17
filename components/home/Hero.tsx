@@ -33,7 +33,7 @@ export function Hero() {
             {h.cta}
           </ButtonLink>
           <Link
-            href="#speisekarte"
+            href="/speisekarte"
             className="focus-ring rounded text-[15px] font-bold leading-[22px] transition-colors hover:text-brand"
           >
             {h.menuLink}

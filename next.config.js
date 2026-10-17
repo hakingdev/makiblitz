@@ -32,6 +32,10 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  async redirects() {
+    // The former photo page is now part of /galerie.
+    return [{ source: "/restaurant", destination: "/galerie", permanent: true }];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },
