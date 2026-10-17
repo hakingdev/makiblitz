@@ -621,10 +621,10 @@
           "Auf Grundlage deiner Einwilligung setzen wir das „Meta Pixel“ (auch „Facebook Pixel“) ein, einen Dienst der Meta Platforms Ireland Limited, Merrion Road, Dublin 4, Irland („Meta“). Der Pixel wird erst geladen, nachdem du im Cookie-Banner „Alle akzeptieren“ ausgewählt hast."
         ],
         "list": [
-          "Zweck: Messung und Optimierung unserer Werbekampagnen (Conversion-Tracking) – insbesondere um zu erkennen, welche Anzeigen zu einer Anmeldung führen.",
-          "Verarbeitete Daten: Cookie-IDs, die von dir besuchten Seiten (u. a. die Bestätigung deiner Anmeldung) sowie Geräte- und Browserdaten.",
+          "Zweck: Messung und Optimierung unserer Werbekampagnen (Conversion-Tracking) – insbesondere um zu erkennen, welche Anzeigen zu einer Tischreservierung oder Anmeldung führen.",
+          "Verarbeitete Daten: Cookie-IDs, die von dir besuchten Seiten (u. a. die Bestätigung deiner Tischreservierung oder Anmeldung) sowie Geräte- und Browserdaten.",
           "Rechtsgrundlage: deine Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO in Verbindung mit § 25 Abs. 1 TDDDG.",
-          "Kein Klartext deiner Kontaktdaten: Wir übergeben dem Pixel keine E-Mail-Adresse, Telefonnummer oder Postleitzahl. „Advanced Matching“ ist deaktiviert."
+          "Kein Klartext deiner Kontaktdaten: Wir übergeben dem Pixel weder deinen Namen noch E-Mail-Adresse, Telefonnummer, Postleitzahl oder Reservierungsdetails. „Advanced Matching“ ist deaktiviert."
         ],
         "outro": [
           "Übermittlung in die USA: Meta kann Daten auch in den USA verarbeiten. Die Übermittlung ist durch die Zertifizierung von Meta nach dem EU-U.S. Data Privacy Framework sowie durch EU-Standardvertragsklauseln (Art. 46 DSGVO) abgesichert.",
