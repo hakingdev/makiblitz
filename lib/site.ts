@@ -14,7 +14,23 @@ export function getBaseUrl(devOrigin?: string): string {
 /** Instagram profile for the footer link — the link stays hidden while empty. */
 export const INSTAGRAM_URL = "";
 
-const ADDRESS_QUERY = "Kurhausstr. 11A, 97688 Bad Kissingen";
+const ADDRESS_QUERY = "Kurhausstraße 11A, 97688 Bad Kissingen";
 
-/** Google Maps with directions to the restaurant (opens the Maps app on phones). */
-export const MAPS_URL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(ADDRESS_QUERY)}`;
+export type TravelMode = "driving" | "walking" | "transit";
+
+/** Google Maps directions to the restaurant (opens the Maps app on phones). */
+export function routeUrl(mode?: TravelMode): string {
+  const params = new URLSearchParams({ api: "1", destination: ADDRESS_QUERY });
+  if (mode) params.set("travelmode", mode);
+  return `https://www.google.com/maps/dir/?${params.toString()}`;
+}
+
+export const MAPS_URL = routeUrl();
+
+/**
+ * Keyless Google Maps embed (the target of maps.google.com/…&output=embed —
+ * linked directly to skip the redirect). Loaded only after the visitor's
+ * click, see components/contact/DirectionsMap.tsx; allowed by frame-src.
+ */
+export const MAPS_EMBED_URL =
+  "https://www.google.com/maps/embed?origin=mfe&pb=!1m3!2m1!1sKurhausstra%C3%9Fe+11A,+97688+Bad+Kissingen!6i17!3m1!1sde!5m1!1sde";

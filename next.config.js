@@ -10,6 +10,8 @@ const contentSecurityPolicy = [
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https://www.facebook.com",
   "font-src 'self'",
+  // Google Maps on /kontakt — only injected after the visitor clicks "Karte laden".
+  "frame-src https://www.google.com https://maps.google.com",
   "connect-src 'self' https://www.facebook.com https://connect.facebook.net",
   "object-src 'none'",
   "base-uri 'self'",

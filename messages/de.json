@@ -176,7 +176,20 @@
     },
     "errorGeneric": "Das hat leider nicht geklappt. Bitte versuch es noch einmal oder schreib uns direkt an info@makilove.de.",
     "errorRateLimit": "Zu viele Nachrichten in kurzer Zeit. Bitte warte ein paar Minuten.",
-    "routeLink": "Route planen"
+    "routeLink": "Route planen",
+    "directions": {
+      "eyebrow": "ANFAHRT",
+      "title": "So findest du zu uns.",
+      "address": "Kurhausstraße 11A, 97688 Bad Kissingen",
+      "driving": "Route mit dem Auto",
+      "walking": "Zu Fuß",
+      "transit": "ÖPNV",
+      "mapTitle": "MakiLove – Kurhausstraße 11A, Bad Kissingen",
+      "consent": "Mit Klick auf „Karte laden“ wird Google Maps eingebunden. Dabei werden Daten wie deine IP-Adresse an Google übertragen. Mehr dazu in der ",
+      "consentLink": "Datenschutzerklärung",
+      "loadMap": "Karte laden",
+      "hideMap": "Karte wieder ausblenden"
+    }
   },
   "reservation": {
     "metaTitle": "Tisch reservieren",
@@ -620,7 +633,23 @@
         ]
       },
       {
-        "heading": "8. Keine automatisierte Entscheidungsfindung",
+        "heading": "8. Google Maps (Anfahrtskarte)",
+        "intro": [
+          "Auf unserer Kontaktseite kannst du eine Karte von Google Maps laden, einem Dienst der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland („Google“). Die Karte wird erst geladen, wenn du auf „Karte laden“ klickst – vorher wird keine Verbindung zu Google aufgebaut."
+        ],
+        "list": [
+          "Zweck: Anzeige unseres Standorts und Routenplanung.",
+          "Verarbeitete Daten: u. a. deine IP-Adresse, Datum und Uhrzeit, Browser- und Geräteinformationen; Google kann Cookies setzen.",
+          "Rechtsgrundlage: deine Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO in Verbindung mit § 25 Abs. 1 TDDDG."
+        ],
+        "outro": [
+          "Deine Entscheidung merken wir uns nur lokal in deinem Browser (localStorage). Du kannst sie jederzeit mit Wirkung für die Zukunft widerrufen – über den Link „Karte wieder ausblenden“ unter der Karte.",
+          "Übermittlung in die USA: Google kann Daten auch in den USA verarbeiten. Die Übermittlung ist durch die Zertifizierung von Google nach dem EU-U.S. Data Privacy Framework sowie durch EU-Standardvertragsklauseln (Art. 46 DSGVO) abgesichert.",
+          "Weitere Informationen findest du in der Datenschutzerklärung von Google unter https://policies.google.com/privacy."
+        ]
+      },
+      {
+        "heading": "9. Keine automatisierte Entscheidungsfindung",
         "intro": [
           "Eine automatisierte Entscheidungsfindung einschließlich Profiling (Art. 22 DSGVO) findet nicht statt."
         ],
@@ -628,6 +657,6 @@
         "outro": []
       }
     ],
-    "stand": "Stand: 13. Juli 2026"
+    "stand": "Stand: 17. Oktober 2026"
   }
 }

@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/site/PageShell";
 import { ContactForm } from "@/components/contact/ContactForm";
+import { DirectionsMap } from "@/components/contact/DirectionsMap";
+import { ButtonLink } from "@/components/ui/Button";
 import { MapsLink } from "@/components/ui/ContactLinks";
 import { Icon } from "@/components/ui/Icon";
 import { getMessages } from "@/lib/i18n";
+import { routeUrl } from "@/lib/site";
 
 const t = getMessages();
 const c = t.contactPage;
+const d = c.directions;
 
 export const metadata: Metadata = {
   title: c.metaTitle,
@@ -77,6 +81,32 @@ export default function KontaktPage() {
           <ContactForm />
         </section>
       </div>
+
+      {/* Anfahrt — map loads only on click; the route buttons are plain links. */}
+      <section aria-labelledby="directions-title" className="page-container flex flex-col gap-6 pb-12 lg:pb-16">
+        <div className="flex flex-col gap-3">
+          <p className="text-[11px] font-bold leading-4 text-brand">{d.eyebrow}</p>
+          <h2
+            id="directions-title"
+            className="text-[28px] font-extrabold leading-[36px] lg:text-[40px] lg:leading-[48px]"
+          >
+            {d.title}
+          </h2>
+          <p className="text-base leading-[26px] text-muted">{d.address}</p>
+        </div>
+        <DirectionsMap />
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <ButtonLink href={routeUrl("driving")} external className="w-full sm:w-auto">
+            {d.driving}
+          </ButtonLink>
+          <ButtonLink href={routeUrl("walking")} external variant="secondary" className="w-full sm:w-auto">
+            {d.walking}
+          </ButtonLink>
+          <ButtonLink href={routeUrl("transit")} external variant="secondary" className="w-full sm:w-auto">
+            {d.transit}
+          </ButtonLink>
+        </div>
+      </section>
     </PageShell>
   );
 }
