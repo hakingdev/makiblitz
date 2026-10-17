@@ -13,3 +13,8 @@ export function getBaseUrl(devOrigin?: string): string {
 
 /** Instagram profile for the footer link — the link stays hidden while empty. */
 export const INSTAGRAM_URL = "";
+
+const ADDRESS_QUERY = "Kurhausstr. 11A, 97688 Bad Kissingen";
+
+/** Google Maps with directions to the restaurant (opens the Maps app on phones). */
+export const MAPS_URL = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(ADDRESS_QUERY)}`;

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { getMessages } from "@/lib/i18n";
 import { cn } from "@/lib/utils";
 import { Icon } from "@/components/ui/Icon";
+import { MapsLink } from "@/components/ui/ContactLinks";
 import { Wordmark } from "@/components/ui/Wordmark";
 
 const t = getMessages();
@@ -125,7 +126,9 @@ export function SiteHeader() {
             <a href={`tel:${t.contact.phoneHref}`} className="focus-ring block w-fit rounded hover:text-ink">
               {t.contact.phone}
             </a>
-            {t.contact.street}, {t.contact.city}
+            <MapsLink className="hover:text-ink">
+              {t.contact.street}, {t.contact.city}
+            </MapsLink>
           </p>
         </div>
       </div>

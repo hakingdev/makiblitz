@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LegalPageShell } from "@/components/legal/LegalPageShell";
 import { getMessages } from "@/lib/i18n";
+import { Linkified } from "@/components/ui/ContactLinks";
 
 const t = getMessages();
 const im = t.impressum;
@@ -20,7 +21,9 @@ function Section({
   return (
     <section>
       <h2>{heading}</h2>
-      <p className="mt-3 whitespace-pre-line">{lines.join("\n")}</p>
+      <p className="mt-3 whitespace-pre-line">
+        <Linkified text={lines.join("\n")} linkClassName="text-ink underline decoration-line" />
+      </p>
     </section>
   );
 }

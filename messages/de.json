@@ -15,7 +15,8 @@
     "city": "97688 Bad Kissingen",
     "email": "info@makilove.de",
     "phone": "0971 72730",
-    "phoneHref": "+4997172730"
+    "phoneHref": "+4997172730",
+    "mapsTitle": "Route in Google Maps planen"
   },
   "nav": {
     "start": "Startseite",
@@ -174,7 +175,8 @@
       "body": "Sie ist bei uns angekommen – wir melden uns so schnell wie möglich."
     },
     "errorGeneric": "Das hat leider nicht geklappt. Bitte versuch es noch einmal oder schreib uns direkt an info@makilove.de.",
-    "errorRateLimit": "Zu viele Nachrichten in kurzer Zeit. Bitte warte ein paar Minuten."
+    "errorRateLimit": "Zu viele Nachrichten in kurzer Zeit. Bitte warte ein paar Minuten.",
+    "routeLink": "Route planen"
   },
   "reservation": {
     "metaTitle": "Tisch reservieren",

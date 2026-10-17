@@ -1,5 +1,6 @@
 import { getMessages } from "@/lib/i18n";
 import { OWNER_TO, escapeHtml, isMailConfigured, sendMail } from "@/lib/waitlist/mailer";
+import { MAPS_URL } from "@/lib/site";
 import { formatLongDate, formatShortDate } from "./dates";
 import { tablesLabel } from "./tables";
 import type { NewReservation } from "./store";
@@ -52,6 +53,7 @@ async function sendGuestMail(r: NewReservation & { email: string }) {
     ...rows.map(([label, value]) => `${label}: ${value}`),
     "",
     g.address,
+    MAPS_URL,
     "",
     g.change,
     "",
@@ -67,7 +69,7 @@ async function sendGuestMail(r: NewReservation & { email: string }) {
 <div style="background:#F9EBE7;border-radius:16px;padding:16px 20px;margin:0 0 20px;">
 <table role="presentation" style="border-collapse:collapse;font-size:15px;">${rowsHtml(rows)}</table>
 </div>
-<p style="margin:0 0 16px;font-size:14px;line-height:22px;color:#706864;">${escapeHtml(g.address)}</p>
+<p style="margin:0 0 16px;font-size:14px;line-height:22px;color:#706864;"><a href="${MAPS_URL}" style="color:#706864;">${escapeHtml(g.address)}</a></p>
 <p style="margin:0 0 16px;font-size:14px;line-height:22px;color:#706864;">${escapeHtml(g.change)}</p>
 <p style="margin:0;font-size:16px;line-height:26px;">${escapeHtml(g.signoff)}</p>
 <hr style="margin:28px 0 16px;border:none;border-top:1px solid #E7DED8;"/>

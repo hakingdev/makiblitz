@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getMessages } from "@/lib/i18n";
 import { CookieSettingsButton } from "@/components/consent/CookieSettingsButton";
+import { MapsLink } from "@/components/ui/ContactLinks";
 
 const t = getMessages();
 
@@ -12,7 +13,9 @@ export function SiteFooter() {
     <footer className="bg-paper">
       <div className="page-container flex flex-col items-start gap-4 py-8">
         <div className="h-px w-full bg-line" />
-        <p className="text-xs leading-[22px] text-muted lg:text-sm">{t.footer.address}</p>
+        <p className="text-xs leading-[22px] text-muted lg:text-sm">
+          <MapsLink className="hover:text-ink">{t.footer.address}</MapsLink>
+        </p>
         <p className="text-xs font-semibold leading-[17px] text-ink lg:text-sm lg:leading-5">
           <a href={`tel:${t.contact.phoneHref}`} className={link}>
             {t.contact.phone}

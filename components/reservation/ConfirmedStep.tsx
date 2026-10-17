@@ -6,6 +6,7 @@ import { getMessages } from "@/lib/i18n";
 import { buildIcs, downloadIcs } from "@/lib/reservation/ics";
 import { Button, ButtonLink } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
+import { MapsLink } from "@/components/ui/ContactLinks";
 import { VisitSummary, guestsLabel } from "@/components/reservation/VisitSummary";
 import { useReservation } from "@/components/reservation/ReservationProvider";
 
@@ -66,9 +67,11 @@ export function ConfirmedStep() {
         <div className="flex flex-col items-center gap-2">
           <p className="text-lg font-bold leading-[26px]">{c.venueTitle}</p>
           <p className="text-sm leading-[22px] text-muted">
-            <span className="block lg:inline">{t.contact.street}</span>
-            <span className="hidden lg:inline">, </span>
-            <span className="block lg:inline">{t.contact.city}</span>
+            <MapsLink className="block hover:text-ink lg:inline">
+              <span className="block lg:inline">{t.contact.street}</span>
+              <span className="hidden lg:inline">, </span>
+              <span className="block lg:inline">{t.contact.city}</span>
+            </MapsLink>
             <span className="block">{c.venueNote}</span>
           </p>
         </div>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { PageShell } from "@/components/site/PageShell";
 import { ContactForm } from "@/components/contact/ContactForm";
+import { MapsLink } from "@/components/ui/ContactLinks";
+import { Icon } from "@/components/ui/Icon";
 import { getMessages } from "@/lib/i18n";
 
 const t = getMessages();
@@ -38,10 +40,19 @@ export default function KontaktPage() {
 
           <div className="flex flex-col gap-2">
             <p className={label}>{c.addressLabel}</p>
-            <address className="text-lg font-bold not-italic leading-7 text-ink">
-              {t.contact.street}
-              <br />
-              {t.contact.city}
+            <address className="not-italic">
+              <MapsLink className="group flex flex-col items-start gap-2 hover:no-underline">
+                <span className="text-lg font-bold leading-7 text-ink group-hover:underline">
+                  {t.contact.street}
+                  <br />
+                  {t.contact.city}
+                </span>
+                <span className="flex items-center gap-1.5 text-sm font-bold leading-5 text-brand">
+                  <Icon name="pin" />
+                  {c.routeLink}
+                  <span aria-hidden="true">→</span>
+                </span>
+              </MapsLink>
             </address>
           </div>
 
