@@ -79,11 +79,12 @@ async function onAnswer(message: TgMessage) {
 
   const mailed = await sendReplyMail(recipient, answer);
   const wa = recipient.phone ? whatsappLink(recipient.phone, whatsappText(recipient, answer)) : null;
+  const why = mailed === "no_credits" ? " В Brevo закончился лимит писем — нужно пополнить тариф." : "";
   await sendTelegramMessage(
     message.chat.id,
-    mailed
+    mailed === "sent"
       ? `✅ Ответ отправлен на ${tgEscape(recipient.email)}`
-      : `⚠️ Письмо на ${tgEscape(recipient.email)} не ушло.${wa ? " Можно отправить в WhatsApp:" : ""}`,
+      : `⚠️ Письмо на ${tgEscape(recipient.email)} не ушло.${why}${wa ? " Можно отправить в WhatsApp:" : ""}`,
     wa ? { inline_keyboard: [[{ text: "💬 Отправить этот текст в WhatsApp", url: wa }]] } : undefined,
   );
 }

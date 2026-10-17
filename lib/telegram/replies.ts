@@ -2,7 +2,7 @@ import { getMessages } from "@/lib/i18n";
 import { getContactRequest, markContactRequestAnswered } from "@/lib/contact/store";
 import { formatLongDate, formatShortDate } from "@/lib/reservation/dates";
 import { getReservation } from "@/lib/reservation/store";
-import { escapeHtml, isMailConfigured, sendMail } from "@/lib/waitlist/mailer";
+import { MailQuotaError, escapeHtml, isMailConfigured, sendMail } from "@/lib/waitlist/mailer";
 import type { Ref } from "./refs";
 
 const t = getMessages();
@@ -63,10 +63,12 @@ export function whatsappText(recipient: Recipient, answer: string) {
 }
 
 /** Sends the owner's answer to the guest by e-mail; replies from the guest go to MAIL_TO. */
-export async function sendReplyMail(recipient: Recipient, answer: string): Promise<boolean> {
+export type ReplyMailResult = "sent" | "no_credits" | "failed";
+
+export async function sendReplyMail(recipient: Recipient, answer: string): Promise<ReplyMailResult> {
   if (!isMailConfigured()) {
     console.info("[telegram] mail not configured — reply to", recipient.email, `(${answer.length} chars)`);
-    return false;
+    return "failed";
   }
   const greeting = fill(m.greeting, { name: firstName(recipient.name) });
   const footer = [t.emails.footer.sender, ...t.emails.footer.senderLines];
@@ -90,9 +92,9 @@ export async function sendReplyMail(recipient: Recipient, answer: string): Promi
 </div></body></html>`,
     });
     if (recipient.ref.kind === "c") await markContactRequestAnswered(recipient.ref.id, answer);
-    return true;
+    return "sent";
   } catch (error) {
     console.error("[telegram] reply mail failed:", error);
-    return false;
+    return error instanceof MailQuotaError ? "no_credits" : "failed";
   }
 }
