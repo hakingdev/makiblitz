@@ -52,24 +52,29 @@ alter table public.waitlist_events      enable row level security;
 alter table public.waitlist_subscribers enable row level security;
 
 -- ===========================================================================
--- Table reservations (website booking form, /reservieren)
+-- Table reservations (website booking form, Telegram walk-ins)
 -- ===========================================================================
---   reservations          — one row per booking.
---   book_reservation(...) — the only write path: locks the day, re-checks the
---                           seat capacity and inserts atomically, so two guests
---                           can never both take the last seats.
--- Capacity rule (mirrors lib/reservation/capacity.ts): a booking occupies its
--- seats from arrival for p_duration_minutes; a new booking fits when the
--- busiest moment of its own stay still has room for the whole group.
--- Capacity and duration come from lib/reservation/config.ts as arguments.
+--   reservations          — one row per booking, with the tables it holds.
+--   book_reservation(...) — the only write path: locks the day, picks free
+--                           tables (or checks the staff's pick for walk-ins)
+--                           and inserts atomically, so a table is never
+--                           given out twice.
+-- Rule (mirrors lib/reservation/tables.ts): a booking holds its tables from
+-- arrival for p_duration_minutes; among free single tables and free
+-- combinations of pushed-together tables, the one with the fewest seats that
+-- still fit the group wins (one table beats two on a tie). Tables,
+-- combinations and duration come from the app as arguments.
+-- Safe to run again: everything is create-if-missing / replace.
 
 create table if not exists public.reservations (
   id           uuid        primary key default gen_random_uuid(),
   visit_date   date        not null,
   visit_time   time        not null,
   guests       smallint    not null check (guests between 1 and 50),
+  table_ids    smallint[],
+  source       text        not null default 'online',
   name         text        not null,
-  email        text        not null,
+  email        text,                  -- empty for walk-ins
   phone        text,
   notes        text,
   status       text        not null default 'confirmed'
@@ -80,18 +85,34 @@ create table if not exists public.reservations (
   cancelled_at timestamptz
 );
 
+-- Upgrades for a table created by an earlier version of this file.
+alter table public.reservations add column if not exists table_ids smallint[];
+alter table public.reservations add column if not exists source text not null default 'online';
+alter table public.reservations alter column email drop not null;
+do $$ begin
+  alter table public.reservations
+    add constraint reservations_source_check check (source in ('online', 'walk_in', 'phone'));
+exception when duplicate_object then null;
+end $$;
+
 create index if not exists reservations_visit_date_idx
   on public.reservations (visit_date)
   where status = 'confirmed';
 
 alter table public.reservations enable row level security;
 
+-- Older signature (seat pool instead of tables).
+drop function if exists public.book_reservation(date, time, integer, integer, integer, text, text, text, text, text, text);
+
 create or replace function public.book_reservation(
   p_date             date,
   p_time             time,
   p_guests           integer,
-  p_capacity         integer,
   p_duration_minutes integer,
+  p_tables           jsonb,       -- [{"id": 1, "seats": 2}, …]
+  p_combos           jsonb,       -- [[1, 2], [5, 6], …]
+  p_force_tables     smallint[],  -- walk-in: tables chosen by staff; null = pick
+  p_source           text,
   p_name             text,
   p_email            text,
   p_phone            text,
@@ -103,55 +124,72 @@ language plpgsql
 set search_path = public
 as $$
 declare
-  v_stay  interval := make_interval(mins => p_duration_minutes);
-  v_peak  integer  := 0;
-  v_load  integer;
-  v_point time;
+  -- Minutes since midnight: no wrap-around for late walk-ins (22:00 + 2:30).
+  v_start integer := extract(hour from p_time)::int * 60 + extract(minute from p_time)::int;
+  v_busy  smallint[];
+  v_pick  smallint[];
   v_id    uuid;
 begin
   -- One booking per day at a time: concurrent requests queue here.
   perform pg_advisory_xact_lock(hashtext('reservations:' || p_date::text));
 
-  -- Occupancy only rises when another booking starts, so check the arrival
-  -- time and every later start inside the new stay.
-  for v_point in
-    select p_time
-    union
-    select r.visit_time
-      from reservations r
-     where r.visit_date = p_date
-       and r.status = 'confirmed'
-       and r.visit_time > p_time
-       and r.visit_time < p_time + v_stay
-  loop
-    select coalesce(sum(r.guests), 0)
-      into v_load
-      from reservations r
-     where r.visit_date = p_date
-       and r.status = 'confirmed'
-       and r.visit_time <= v_point
-       and r.visit_time + v_stay > v_point;
-    v_peak := greatest(v_peak, v_load);
-  end loop;
+  select coalesce(array_agg(distinct t), '{}')
+    into v_busy
+    from reservations r
+    cross join lateral unnest(coalesce(r.table_ids, '{}'::smallint[])) as t
+   where r.visit_date = p_date
+     and r.status = 'confirmed'
+     and extract(hour from r.visit_time)::int * 60 + extract(minute from r.visit_time)::int
+         < v_start + p_duration_minutes
+     and extract(hour from r.visit_time)::int * 60 + extract(minute from r.visit_time)::int
+         + p_duration_minutes > v_start;
 
-  if v_peak + p_guests > p_capacity then
-    return jsonb_build_object('ok', false, 'seats_left', greatest(p_capacity - v_peak, 0));
+  if p_force_tables is not null then
+    if p_force_tables && v_busy then
+      return jsonb_build_object('ok', false, 'reason', 'taken');
+    end if;
+    v_pick := p_force_tables;
+  else
+    -- Fewest seats that still fit the group; on a tie one table beats two.
+    select c.ids
+      into v_pick
+      from (
+        select array[(t ->> 'id')::smallint] as ids, (t ->> 'seats')::int as seats
+          from jsonb_array_elements(p_tables) t
+        union all
+        select ids,
+               (select coalesce(sum((t ->> 'seats')::int), 0)
+                  from jsonb_array_elements(p_tables) t
+                 where (t ->> 'id')::smallint = any (ids))
+          from (
+            select array(select x::smallint from jsonb_array_elements_text(combo) x) as ids
+              from jsonb_array_elements(p_combos) combo
+          ) combos
+      ) c
+     where c.seats >= p_guests
+       and not (c.ids && v_busy)
+     order by c.seats, cardinality(c.ids), c.ids[1]
+     limit 1;
+
+    if v_pick is null then
+      return jsonb_build_object('ok', false, 'reason', 'full');
+    end if;
   end if;
 
   insert into reservations
-    (visit_date, visit_time, guests, name, email, phone, notes, ip_hash, user_agent)
+    (visit_date, visit_time, guests, table_ids, source, name, email, phone, notes, ip_hash, user_agent)
   values
-    (p_date, p_time, p_guests, p_name, p_email, p_phone, p_notes, p_ip_hash, p_user_agent)
+    (p_date, p_time, p_guests, v_pick, p_source, p_name, p_email, p_phone, p_notes, p_ip_hash, p_user_agent)
   returning id into v_id;
 
-  return jsonb_build_object('ok', true, 'id', v_id, 'seats_left', p_capacity - v_peak - p_guests);
+  return jsonb_build_object('ok', true, 'id', v_id, 'tables', to_jsonb(v_pick));
 end;
 $$;
 
 -- Server only (service_role); Supabase grants new functions to anon by default.
-revoke all on function public.book_reservation(date, time, integer, integer, integer, text, text, text, text, text, text)
+revoke all on function public.book_reservation(date, time, integer, integer, jsonb, jsonb, smallint[], text, text, text, text, text, text, text)
   from public, anon, authenticated;
-grant execute on function public.book_reservation(date, time, integer, integer, integer, text, text, text, text, text, text)
+grant execute on function public.book_reservation(date, time, integer, integer, jsonb, jsonb, smallint[], text, text, text, text, text, text, text)
   to service_role;
 
 -- ===========================================================================

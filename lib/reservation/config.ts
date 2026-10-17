@@ -27,13 +27,10 @@ export const TIME_SLOTS = [
   "20:30",
 ] as const;
 
-/** Seats at full capacity; a booking may fill it up to exactly this number. */
-export const SEAT_CAPACITY = 32;
-
-/** A table stays occupied this long — a full 18:00 frees up again at 20:30. */
+/** A table stays occupied this long — a table booked for 18:00 is free again at 20:30. */
 export const VISIT_DURATION_MINUTES = 150;
 
-/** From this many free seats down, the form says "nur noch N Plätze frei". */
+/** From this many free seats down, the form says "nur noch N Plätze frei". Tables: tables.ts. */
 export const FEW_SEATS_LEFT = 2;
 
 /** Online group sizes; the last one is labelled "5+" — larger groups go by e-mail. */

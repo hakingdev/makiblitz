@@ -59,6 +59,17 @@ async function call(method: string, payload: Record<string, unknown> = {}) {
     console.log("setWebhook", url, "→", set.ok ? "ok" : set.description);
   }
 
+  const commands = await call("setMyCommands", {
+    commands: [
+      { command: "plan", description: "Схема зала сейчас" },
+      { command: "walkin", description: "Walk-in: посадить гостей" },
+      { command: "list", description: "Брони и отмена" },
+      { command: "menu", description: "Кнопки бота" },
+      { command: "id", description: "Chat-ID этого чата" },
+    ],
+  });
+  console.log("Befehle:", commands.ok ? "ok" : commands.description);
+
   const info = await call("getWebhookInfo");
   const w = info.result ?? {};
   console.log("Webhook:", w.url || "(keiner)");

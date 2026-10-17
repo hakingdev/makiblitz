@@ -1,6 +1,7 @@
 import { getMessages } from "@/lib/i18n";
 import { OWNER_TO, escapeHtml, isMailConfigured, sendMail } from "@/lib/waitlist/mailer";
 import { formatLongDate, formatShortDate } from "./dates";
+import { tablesLabel } from "./tables";
 import type { NewReservation } from "./store";
 
 const t = getMessages();
@@ -33,7 +34,7 @@ ${inner}
 }
 
 /** Confirmation to the guest — transactional, no marketing content. */
-async function sendGuestMail(r: NewReservation) {
+async function sendGuestMail(r: NewReservation & { email: string }) {
   const firstName = r.name.split(/\s+/)[0] ?? r.name;
   const rows: [string, string][] = [
     [g.labels.date, formatLongDate(r.date)],
@@ -81,16 +82,16 @@ async function sendGuestMail(r: NewReservation) {
 }
 
 /** Internal notice to the restaurant with everything needed to prepare the table. */
-async function sendOwnerMail(r: NewReservation, id: string, seatsLeft: number) {
+async function sendOwnerMail(r: NewReservation, id: string, tables: number[]) {
   const rows: [string, string][] = [
     [o.labels.date, formatLongDate(r.date)],
     [o.labels.time, `${r.time} Uhr`],
     [o.labels.guests, String(r.guests)],
     [o.labels.name, r.name],
-    [o.labels.email, r.email],
+    [o.labels.email, r.email || "–"],
     [o.labels.phone, r.phone || "–"],
     [o.labels.notes, r.notes || "–"],
-    [o.labels.seatsLeft, String(seatsLeft)],
+    [o.labels.table, tablesLabel(tables)],
     [o.labels.id, id],
   ];
   await sendMail({
@@ -111,14 +112,15 @@ async function sendOwnerMail(r: NewReservation, id: string, seatsLeft: number) {
 export async function sendReservationMails(
   r: NewReservation,
   id: string,
-  seatsLeft: number,
+  tables: number[],
   { ownerFallback }: { ownerFallback: boolean },
 ) {
   if (!isMailConfigured()) {
     console.info("[reservation] mail not configured — booked", id, r.date, r.time, `${r.guests}p`);
     return;
   }
-  const jobs = [sendGuestMail(r), ...(ownerFallback ? [sendOwnerMail(r, id, seatsLeft)] : [])];
+  const email = r.email;
+  const jobs = [...(email ? [sendGuestMail({ ...r, email })] : []), ...(ownerFallback ? [sendOwnerMail(r, id, tables)] : [])];
   const results = await Promise.allSettled(jobs);
   results.forEach((result, i) => {
     if (result.status === "rejected") {

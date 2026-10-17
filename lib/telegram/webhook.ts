@@ -1,4 +1,15 @@
 import { callTelegram, sendTelegramMessage, telegramChatIds, tgEscape, whatsappLink } from "./api";
+import {
+  MENU,
+  askCancel,
+  confirmCancel,
+  dismissCancel,
+  sendPlanNow,
+  sendUpcomingList,
+  startWalkIn,
+  walkInBook,
+  walkInChooseTable,
+} from "./hall";
 import { parseRef, parseReplyCallback, refLine } from "./refs";
 import { firstName, loadRecipient, sendReplyMail, whatsappText, type Recipient } from "./replies";
 
@@ -7,6 +18,7 @@ import { firstName, loadRecipient, sendReplyMail, whatsappText, type Recipient }
  *  - "✍️ Ответить" button → prompt with force-reply ("напиши ответ …")
  *  - a reply to that prompt or to the original notification → e-mail to the
  *    guest + a WhatsApp button pre-filled with the same text
+ *  - hall: /plan, /walkin, /list, /menu and their buttons (see hall.ts)
  *  - /start or /id → shows the chat id (needed once for TELEGRAM_CHAT_ID)
  * Messages from any other chat are ignored.
  */
@@ -18,6 +30,7 @@ type TgMessage = {
   chat: TgChat;
   from?: TgUser;
   text?: string;
+  caption?: string;
   reply_to_message?: TgMessage;
 };
 type TgCallbackQuery = { id: string; data?: string; message?: TgMessage };
@@ -53,7 +66,8 @@ async function onReplyButton(query: TgCallbackQuery) {
 
 async function onAnswer(message: TgMessage) {
   const answer = message.text?.trim();
-  const ref = parseRef(message.reply_to_message?.text);
+  const original = message.reply_to_message;
+  const ref = parseRef(original?.text ?? original?.caption);
   if (!answer || !ref) return;
 
   const recipient = await loadRecipient(ref);
@@ -83,18 +97,50 @@ export async function handleTelegramUpdate(update: TgUpdate) {
     await sendTelegramMessage(
       message.chat.id,
       known
-        ? "👋 MakiLove: сюда приходят брони и запросы с сайта."
+        ? "👋 <b>MakiLove</b>: сюда приходят брони и запросы с сайта."
         : `Chat-ID: <code>${message.chat.id}</code>\nДобавь его в TELEGRAM_CHAT_ID, чтобы получать брони и запросы сюда.`,
+      known ? { inline_keyboard: MENU } : undefined,
     );
     return;
   }
 
   if (update.callback_query) {
-    if (isOwnerChat(update.callback_query.message?.chat.id)) await onReplyButton(update.callback_query);
+    const query = update.callback_query;
+    const chatId = query.message?.chat.id;
+    if (!isOwnerChat(chatId) || !chatId) return;
+    await onCallback(query, chatId);
     return;
   }
 
-  if (message?.reply_to_message?.from?.is_bot && isOwnerChat(message.chat.id)) {
+  if (!message || !isOwnerChat(message.chat.id)) return;
+
+  if (command === "/menu") {
+    await sendTelegramMessage(message.chat.id, "🍣 <b>MakiLove</b> — что сделать?", { inline_keyboard: MENU });
+  } else if (command === "/plan") {
+    await sendPlanNow(message.chat.id);
+  } else if (command === "/walkin") {
+    await startWalkIn(message.chat.id);
+  } else if (command === "/list") {
+    await sendUpcomingList(message.chat.id);
+  } else if (message.reply_to_message?.from?.is_bot) {
     await onAnswer(message);
   }
+}
+
+async function onCallback(query: TgCallbackQuery, chatId: number) {
+  const data = query.data ?? "";
+  const messageId = query.message?.message_id;
+  if (data.startsWith("reply:")) return onReplyButton(query);
+
+  // Acknowledge first so the button stops spinning; the work may take a moment.
+  await callTelegram("answerCallbackQuery", { callback_query_id: query.id });
+  const [action, a, b] = data.split(":");
+  if (action === "plan") await sendPlanNow(chatId);
+  else if (action === "list") await sendUpcomingList(chatId);
+  else if (action === "wi" && !a) await startWalkIn(chatId);
+  else if (action === "wi") await walkInChooseTable(chatId, messageId, Number(a));
+  else if (action === "wt" && a && b) await walkInBook(chatId, messageId, Number(a), b);
+  else if (action === "cx" && a) await askCancel(chatId, a);
+  else if (action === "cy" && a) await confirmCancel(chatId, messageId, a);
+  else if (action === "cn") await dismissCancel(chatId, messageId);
 }

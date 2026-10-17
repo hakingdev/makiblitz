@@ -39,23 +39,25 @@ Mobile navigation: 15:1144. `/restaurant` redirects to `/galerie`.
 
 ## Reservations
 
-Rules live in `lib/reservation/config.ts`:
+Rules live in `lib/reservation/config.ts` and `lib/reservation/tables.ts`:
 
 - **Open days:** only 30 + 31 October 2026 for now (`OPEN_DATES`); set it to
   `null` to switch to the regular Friday/Saturday schedule (`OPEN_WEEKDAYS`).
 - **Arrival times:** 17:00 – 20:30 every 30 min (`TIME_SLOTS`).
-- **Capacity:** 32 seats (`SEAT_CAPACITY`, up to 32 inclusive); every booking
-  holds its seats for **2:30 h** (`VISIT_DURATION_MINUTES`) — a full 18:00
-  becomes bookable again at 20:30.
+- **Tables:** 11 tables / 30 seats as on the restaurant's floor plan (`TABLES`,
+  with plan coordinates), pushable pairs in `TABLE_COMBOS`. Every booking gets
+  concrete tables for **2:30 h** (`VISIT_DURATION_MINUTES`): the free table or
+  combination with the fewest seats that fit the group.
 
-Flow: step 1 loads free seats per slot (`GET /api/reservations/availability`)
-and greys out times that can't fit the group; if the chosen time is overbooked
+Flow: step 1 loads per slot the largest group that still gets a table
+(`GET /api/reservations/availability`) and greys out times that can't fit it; if the chosen time is overbooked
 it says so and suggests another time, and it warns when only 1–2 seats are
 left. Step 2 posts to `POST /api/reservations` (201 · 409 full · 429 · 503);
 the guest gets a confirmation mail, the owner (`MAIL_TO`) a notification.
 
-Storage: Supabase table `reservations`, written only through the SQL function
-`book_reservation`, which locks the day and re-checks capacity atomically
+Storage: Supabase table `reservations` (with `table_ids`, `source` online /
+walk_in), written only through the SQL function `book_reservation`, which
+locks the day and picks the tables atomically
 (DDL in `supabase/schema.sql` — run the "Table reservations" block once in the
 Supabase SQL editor). Without `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY`
 (local dev) bookings go to `reservations.local.json` instead.
@@ -76,9 +78,18 @@ guest goes through the `ref: c|r:<uuid>` line in each message, so contact
 requests are stored in Supabase (`contact_requests`). If Telegram is down or
 not configured, the owner gets the usual e-mail to `MAIL_TO` instead.
 
+Hall (texts in Russian): `/plan` or 🗺 — floor plan **now** as image, occupied
+tables red with guests + arrival time; `/walkin` or 🚶 — guests → pick a free
+table on the plan → seated at the current Berlin time; `/list` or 📋 — upcoming
+bookings, ❌ cancels one after confirmation and frees its table (no-shows,
+cancellations). New bookings arrive as the plan for their time window with the
+assigned table outlined.
+
 Setup: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_WEBHOOK_SECRET` in
 `.env.local` and Vercel, then `npm run telegram:setup -- https://www.makilove.de`
-(registers `/api/telegram/webhook`). Writing `/id` to the bot shows a chat's id.
+(registers `/api/telegram/webhook` and the bot commands). Writing `/id` to the
+bot shows a chat's id. Local testing without a public URL: `npm run dev` +
+`npm run telegram:poll` (only while no webhook is set).
 
 ## Project structure
 

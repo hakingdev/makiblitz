@@ -31,7 +31,7 @@ const str = (value: unknown) => (typeof value === "string" ? value : "");
 
 /**
  * POST /api/reservations — books a table.
- * 201 { ok, id } · 400 invalid input · 409 { error: "full", seatsLeft }
+ * 201 { ok, id } · 400 invalid input · 409 { error: "full" } (no table left)
  * · 429 rate limited · 503 storage down.
  * The capacity check that counts is the one inside the store (atomic).
  */
@@ -73,17 +73,18 @@ export async function POST(req: NextRequest) {
     notes: clean.notes || null,
     ipHash: safeIpHash(ip),
     userAgent: req.headers.get("user-agent") ?? "unknown",
+    source: "online",
   };
 
   const result = await bookReservation(reservation);
   if (!result.ok) {
-    return result.reason === "full"
-      ? NextResponse.json({ error: "full", seatsLeft: result.seatsLeft }, { status: 409 })
-      : NextResponse.json({ error: "unavailable" }, { status: 503 });
+    return result.reason === "unavailable"
+      ? NextResponse.json({ error: "unavailable" }, { status: 503 })
+      : NextResponse.json({ error: "full" }, { status: 409 });
   }
 
   // Telegram is the owner's main channel; e-mail to MAIL_TO only if it fails.
-  const notified = await notifyReservation(reservation, result.id, result.seatsLeft);
-  await sendReservationMails(reservation, result.id, result.seatsLeft, { ownerFallback: !notified });
+  const notified = await notifyReservation(reservation, result.id, result.tables);
+  await sendReservationMails(reservation, result.id, result.tables, { ownerFallback: !notified });
   return NextResponse.json({ ok: true, id: result.id }, { status: 201 });
 }

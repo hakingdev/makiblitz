@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent } from "react";
 import { getMessages } from "@/lib/i18n";
-import type { SeatsBySlot } from "@/lib/reservation/capacity";
+import type { AvailabilityBySlot } from "@/lib/reservation/tables";
 import { FEW_SEATS_LEFT, GUEST_OPTIONS, TIME_SLOTS } from "@/lib/reservation/config";
 import { formatDayMonth, formatLongDate, isSlotAvailable } from "@/lib/reservation/dates";
 import { cn } from "@/lib/utils";
@@ -22,9 +22,9 @@ function fill(template: string, values: Record<string, string | number>) {
   return template.replace(/\{(\w+)\}/g, (_, key: string) => String(values[key] ?? ""));
 }
 
-/** Free seats per slot for the chosen day; null while loading or when the request failed. */
-function useSeats(date: string, enabled: boolean) {
-  const [result, setResult] = useState<{ date: string; seats: SeatsBySlot } | null>(null);
+/** Table availability per slot for the chosen day; null while loading or when the request failed. */
+function useAvailability(date: string, enabled: boolean) {
+  const [result, setResult] = useState<{ date: string; slots: AvailabilityBySlot } | null>(null);
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
@@ -33,8 +33,8 @@ function useSeats(date: string, enabled: boolean) {
     setFailed(false);
     fetch(`/api/reservations/availability?date=${date}`, { cache: "no-store" })
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error(String(res.status)))))
-      .then((data: { date: string; seats: SeatsBySlot }) => {
-        if (!cancelled) setResult({ date: data.date, seats: data.seats });
+      .then((data: { date: string; slots: AvailabilityBySlot }) => {
+        if (!cancelled) setResult({ date: data.date, slots: data.slots });
       })
       .catch(() => {
         if (!cancelled) setFailed(true);
@@ -44,33 +44,35 @@ function useSeats(date: string, enabled: boolean) {
     };
   }, [date, enabled]);
 
-  return { seats: result?.date === date ? result.seats : null, failed };
+  return { slots: result?.date === date ? result.slots : null, failed };
 }
 
 /** Step 1 — guests, day and time (Figma 6:221 mobile · 6:29 desktop). */
 export function VisitStep() {
   const router = useRouter();
   const { visit, confirmed, hydrated, now, dates, setVisit, reset } = useReservation();
-  const { seats, failed } = useSeats(visit.date, hydrated);
+  const { slots, failed } = useAvailability(visit.date, hydrated);
 
   // Coming back after a finished booking starts a new one.
   useEffect(() => {
     if (hydrated && confirmed) reset();
   }, [hydrated, confirmed, reset]);
 
-  const seatsAt = (slot: string) => (seats ? seats[slot] ?? 0 : Infinity);
+  // Unknown availability (loading/failed) never blocks — the server decides on submit.
+  const maxPartyAt = (slot: string) => (slots ? slots[slot]?.maxParty ?? 0 : Infinity);
+  const freeSeatsAt = (slot: string) => (slots ? slots[slot]?.freeSeats ?? 0 : Infinity);
   const timeOpen = (slot: string) => hydrated && Boolean(visit.date) && isSlotAvailable(visit.date, slot, now);
-  const fits = (slot: string) => timeOpen(slot) && seatsAt(slot) >= visit.guests;
+  const fits = (slot: string) => timeOpen(slot) && maxPartyAt(slot) >= visit.guests;
 
   const { time, guests } = visit;
-  const overbooked = Boolean(time && timeOpen(time) && seatsAt(time) < guests);
-  const dayFull = Boolean(seats) && !TIME_SLOTS.some(fits);
+  const overbooked = Boolean(time && timeOpen(time) && maxPartyAt(time) < guests);
+  const dayFull = Boolean(slots) && !TIME_SLOTS.some(fits);
   // The user's example: 18:00 is full → offer a later time first (a table frees up after 2:30 h).
   const alternative = time
     ? TIME_SLOTS.find((slot) => slot > time && fits(slot)) ??
       [...TIME_SLOTS].reverse().find((slot) => slot < time && fits(slot))
     : undefined;
-  const fewLeft = time && !overbooked && seats ? seatsAt(time) : null;
+  const fewLeft = time && !overbooked && slots ? freeSeatsAt(time) : null;
 
   let notice: { tone: "error" | "info"; text: string } | null = null;
   if (overbooked && time) {

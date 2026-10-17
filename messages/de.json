@@ -407,8 +407,8 @@
         "email": "E-Mail",
         "phone": "Telefon",
         "notes": "Wünsche",
-        "seatsLeft": "Danach noch frei (Plätze)",
-        "id": "Reservierungs-ID"
+        "id": "Reservierungs-ID",
+        "table": "Tisch"
       }
     },
     "contactOwner": {

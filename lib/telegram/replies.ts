@@ -40,7 +40,7 @@ export async function loadRecipient(ref: Ref): Promise<Recipient | null> {
     };
   }
   const res = await getReservation(ref.id);
-  if (!res) return null;
+  if (!res?.email) return null; // walk-ins have no address
   const guests = `${res.guests} ${res.guests === 1 ? t.reservation.person : t.reservation.persons}`;
   return {
     ref,

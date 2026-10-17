@@ -28,8 +28,11 @@ export function isTelegramConfigured(): boolean {
   return Boolean(process.env.TELEGRAM_BOT_TOKEN && telegramChatIds().length);
 }
 
-/** Calls a Bot API method; returns `result` or null (never throws). */
-export async function callTelegram<T = unknown>(method: string, payload: Record<string, unknown>): Promise<T | null> {
+/** Calls a Bot API method (JSON or multipart); returns `result` or null (never throws). */
+export async function callTelegram<T = unknown>(
+  method: string,
+  payload: Record<string, unknown> | FormData,
+): Promise<T | null> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   if (!token) {
     console.info(`[telegram] not configured — skipped ${method}`);
@@ -38,10 +41,11 @@ export async function callTelegram<T = unknown>(method: string, payload: Record<
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
   try {
+    const multipart = payload instanceof FormData;
     const res = await fetch(`https://api.telegram.org/bot${token}/${method}`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify(payload),
+      headers: multipart ? undefined : { "content-type": "application/json" },
+      body: multipart ? payload : JSON.stringify(payload),
       signal: controller.signal,
     });
     const data = (await res.json().catch(() => null)) as { ok?: boolean; result?: T; description?: string } | null;
@@ -66,6 +70,30 @@ export function sendTelegramMessage(chatId: string | number, html: string, reply
     link_preview_options: { is_disabled: true },
     ...(replyMarkup ? { reply_markup: replyMarkup } : {}),
   });
+}
+
+/** Photo upload (the floor plan); caption max 1024 chars, HTML. */
+export function sendTelegramPhoto(chatId: string | number, png: Buffer, caption: string, replyMarkup?: ReplyMarkup) {
+  const form = new FormData();
+  form.append("chat_id", String(chatId));
+  form.append("photo", new Blob([new Uint8Array(png)], { type: "image/png" }), "zal.png");
+  form.append("caption", caption.slice(0, 1024));
+  form.append("parse_mode", "HTML");
+  if (replyMarkup) form.append("reply_markup", JSON.stringify(replyMarkup));
+  return callTelegram<{ message_id: number }>("sendPhoto", form);
+}
+
+/** Removes (or replaces) the buttons under a message, e.g. after a walk-in was booked. */
+export function setTelegramButtons(chatId: string | number, messageId: number, keyboard: InlineButton[][] = []) {
+  return callTelegram("editMessageReplyMarkup", {
+    chat_id: chatId,
+    message_id: messageId,
+    reply_markup: { inline_keyboard: keyboard },
+  });
+}
+
+export function deleteTelegramMessage(chatId: string | number, messageId: number) {
+  return callTelegram("deleteMessage", { chat_id: chatId, message_id: messageId });
 }
 
 /** Escapes user input for parse_mode=HTML. */

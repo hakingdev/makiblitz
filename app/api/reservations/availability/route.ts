@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { seatsBySlot } from "@/lib/reservation/capacity";
+import { availabilityBySlot } from "@/lib/reservation/tables";
 import { bookableDates, restaurantNow } from "@/lib/reservation/dates";
 import { bookingsOn } from "@/lib/reservation/store";
 
@@ -8,8 +8,9 @@ export const dynamic = "force-dynamic";
 
 /**
  * GET /api/reservations/availability?date=YYYY-MM-DD
- * → { date, seats: { "17:30": 32, "18:00": 28, … } } — free seats per arrival
- * time. Aggregates only; no guest data leaves the server.
+ * → { date, slots: { "18:00": { maxParty: 8, freeSeats: 22 }, … } } — largest
+ * group that still gets a table, and free seats, per arrival time.
+ * Aggregates only; no guest data leaves the server.
  */
 export async function GET(req: NextRequest) {
   const date = req.nextUrl.searchParams.get("date") ?? "";
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json(
-    { date, seats: seatsBySlot(bookings) },
+    { date, slots: availabilityBySlot(bookings) },
     { headers: { "Cache-Control": "no-store" } },
   );
 }
