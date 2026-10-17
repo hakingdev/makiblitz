@@ -1,10 +1,11 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { getMessages } from "@/lib/i18n";
-import { SiteFooter } from "@/components/legal/SiteFooter";
+import { PageShell } from "@/components/site/PageShell";
 
 const t = getMessages();
 
+/** Text pages (Impressum, Datenschutz, opt-out/confirm results) in the site frame. */
 export function LegalPageShell({
   title,
   children,
@@ -13,34 +14,23 @@ export function LegalPageShell({
   children: ReactNode;
 }) {
   return (
-    <div className="flex min-h-dvh flex-col bg-ink-gradient">
-      <main className="mx-auto w-full max-w-2xl flex-1 px-5 py-12 sm:px-8">
-        <p className="font-display text-lg text-white">
+    <PageShell>
+      <div className="page-container pb-16 pt-8 lg:pt-12">
+        <div className="max-w-3xl">
+          <h1 className="text-[32px] font-extrabold leading-[40px] md:text-[40px] md:leading-[52px]">
+            {title}
+          </h1>
+          <div className="mt-8 space-y-8 text-[15px] leading-[26px] text-muted md:text-base [&_h2]:text-lg [&_h2]:font-bold [&_h2]:text-ink">
+            {children}
+          </div>
           <Link
             href="/"
-            className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
+            className="focus-ring mt-12 inline-block rounded text-sm font-bold text-brand hover:underline"
           >
-            {t.comingSoon.brand.slice(0, 4)}
-            <span className="text-brand">{t.comingSoon.brand.slice(4)}</span>
+            ← {t.legal.backToHome}
           </Link>
-        </p>
-
-        <h1 className="mt-10 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-          {title}
-        </h1>
-
-        <div className="mt-8 space-y-8 text-sm leading-relaxed text-white/75 sm:text-base">
-          {children}
         </div>
-
-        <Link
-          href="/"
-          className="mt-12 inline-block rounded text-sm font-semibold text-brand-light transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
-        >
-          ← {t.legal.backToHome}
-        </Link>
-      </main>
-      <SiteFooter />
-    </div>
+      </div>
+    </PageShell>
   );
 }

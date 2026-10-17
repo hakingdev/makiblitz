@@ -1,10 +1,13 @@
 import type { Metadata, Viewport } from "next";
 import { Mulish, Rock_Salt } from "next/font/google";
 import "./globals.css";
-import { CartProvider } from "@/lib/cart/CartContext";
 import { ConsentProvider } from "@/lib/consent";
 import { ConsentBanner } from "@/components/consent/ConsentBanner";
 import { FacebookPixel } from "@/components/analytics/FacebookPixel";
+import { getMessages } from "@/lib/i18n";
+import { SITE_URL } from "@/lib/site";
+
+const t = getMessages();
 
 const mulish = Mulish({
   subsets: ["latin"],
@@ -21,15 +24,23 @@ const rockSalt = Rock_Salt({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://www.makilove.de"),
-  title: "MakiLove — Fresh Sushi Delivery",
-  description:
-    "Authentic sushi made by master chefs. Quick delivery or easy pickup across the city.",
-  keywords: ["sushi", "delivery", "sashimi", "maki", "nigiri", "Lieferung"],
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: t.meta.title,
+    template: `%s – ${t.brand.name}`,
+  },
+  description: t.meta.description,
+  keywords: ["Sushi", "Restaurant", "Bad Kissingen", "Tisch reservieren", "Maki", "Nigiri", "Sashimi"],
+  openGraph: {
+    title: t.meta.ogTitle,
+    description: t.meta.ogDescription,
+    locale: "de_DE",
+    type: "website",
+  },
 };
 
 export const viewport: Viewport = {
-  themeColor: "#16171A",
+  themeColor: "#FFFCF8",
   width: "device-width",
   initialScale: 1,
 };
@@ -42,13 +53,11 @@ export default function RootLayout({
   return (
     <html lang="de" className={`${mulish.variable} ${rockSalt.variable}`}>
       <body>
-        <CartProvider>
-          <ConsentProvider>
-            {children}
-            <ConsentBanner />
-            <FacebookPixel />
-          </ConsentProvider>
-        </CartProvider>
+        <ConsentProvider>
+          {children}
+          <ConsentBanner />
+          <FacebookPixel />
+        </ConsentProvider>
       </body>
     </html>
   );

@@ -6,7 +6,7 @@ const t = getMessages();
 const ds = t.datenschutz;
 
 export const metadata: Metadata = {
-  title: `${t.legal.datenschutzTitle} – ${t.comingSoon.brand}`,
+  title: t.legal.datenschutzTitle,
   robots: { index: false, follow: false },
 };
 
@@ -23,7 +23,7 @@ export default function DatenschutzPage() {
 
       {ds.sections.map((section) => (
         <section key={section.heading}>
-          <h2 className="text-lg font-bold text-white">{section.heading}</h2>
+          <h2>{section.heading}</h2>
           {section.intro.map((paragraph) => (
             <p key={paragraph} className="mt-3 whitespace-pre-line">
               {paragraph}
@@ -44,7 +44,7 @@ export default function DatenschutzPage() {
         </section>
       ))}
 
-      <p className="text-white/50">{ds.stand}</p>
+      <p className="text-sm">{ds.stand}</p>
     </LegalPageShell>
   );
 }

@@ -8,7 +8,7 @@ const contentSecurityPolicy = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline' https://connect.facebook.net${isDev ? " 'unsafe-eval'" : ""}`,
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://images.unsplash.com https://*.figma.com https://www.facebook.com",
+  "img-src 'self' data: blob: https://www.facebook.com",
   "font-src 'self'",
   "connect-src 'self' https://www.facebook.com https://connect.facebook.net",
   "object-src 'none'",
@@ -32,11 +32,9 @@ const securityHeaders = [
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  images: {
-    remotePatterns: [
-      { protocol: "https", hostname: "images.unsplash.com" },
-      { protocol: "https", hostname: "**.figma.com" },
-    ],
+  async redirects() {
+    // The former photo page is now part of /galerie.
+    return [{ source: "/restaurant", destination: "/galerie", permanent: true }];
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

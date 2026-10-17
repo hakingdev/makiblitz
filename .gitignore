@@ -50,3 +50,9 @@ next-env.d.ts
 
 # Local design references
 .figma-ref/
+
+# Local reservation store (dev fallback without Supabase — personal data)
+reservations.local.json
+
+# Local contact-request store (dev fallback without Supabase — personal data)
+contact-requests.local.json

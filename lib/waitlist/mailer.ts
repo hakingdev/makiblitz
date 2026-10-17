@@ -33,11 +33,13 @@ function sender(): { email: string; name?: string } {
  * Chosen over SMTP because Vercel serverless functions have no stable
  * outbound IP and SMTP sockets are unreliable there; a plain POST is not.
  */
-async function sendMail(opts: {
+export async function sendMail(opts: {
   to: string;
   subject: string;
   text: string;
   html: string;
+  /** Where "Antworten" goes, e.g. the guest who wrote via the contact form. */
+  replyTo?: { email: string; name?: string };
 }): Promise<void> {
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) throw new Error("BREVO_API_KEY is not set");
@@ -59,6 +61,7 @@ async function sendMail(opts: {
         subject: opts.subject,
         htmlContent: opts.html,
         textContent: opts.text,
+        ...(opts.replyTo ? { replyTo: opts.replyTo } : {}),
       }),
       signal: controller.signal,
     });
@@ -72,7 +75,7 @@ async function sendMail(opts: {
   }
 }
 
-function escapeHtml(value: string): string {
+export function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -89,7 +92,7 @@ function formatBerlinTime(iso: string): string {
 }
 
 /** Owner notifications always have a working fallback destination. */
-const OWNER_TO = () => process.env.MAIL_TO || "info@makilove.de";
+export const OWNER_TO = () => process.env.MAIL_TO || "info@makilove.de";
 
 /**
  * § 7 UWG / DSGVO footer for every mail sent TO subscribers:

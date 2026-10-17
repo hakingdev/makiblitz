@@ -1,99 +1,118 @@
 # MakiLove 🍣
 
-Sushi delivery storefront. Frontend built from the Figma "Sushi Resto Mobile
-Apps UI Kit", adapted to a fully responsive **mobile · tablet · desktop** web
-app. Business logic (cart, checkout, orders, integrations) is being ported from
-the `dumbospizza` engine — see [`BASE_PROJECT_REFERENCE.md`](./BASE_PROJECT_REFERENCE.md).
+Website + table reservation for the MakiLove sushi restaurant
+(Kurhausstr. 11A, 97688 Bad Kissingen). Built mobile-first from the Figma file
+**"MakiLove — Sushi Restaurant · Tischreservierung"** (mobile 390 · desktop 1440).
 
 ## Stack
 
 - **Next.js 14** (App Router) · React 18 · TypeScript (strict)
-- **Tailwind CSS 3** — design tokens in `tailwind.config.ts`
-- Fonts: **Mulish** (UI) + **Rock Salt** (display) via `next/font`
-- `lucide-react`, `framer-motion`, `clsx` + `tailwind-merge`
+- **Tailwind CSS 3** — design tokens in `tailwind.config.ts` (paper/ink/red palette)
+- Fonts: **Mulish** (UI) + **Rock Salt** (script accents) via `next/font`
+- **Supabase** — same project/tables as before (`supabase/schema.sql`)
+- Mail via **Brevo** HTTP API (`lib/waitlist/mailer.ts`)
 
 ## Getting started
 
 ```bash
 npm install
 npm run dev      # http://localhost:3000
-npm run build    # production build (static export of all routes)
+npm run build
+npm test         # vitest
 ```
 
-## Coming-soon mode (current phase)
+## Pages
 
-The unfinished shop is hidden behind a German waitlist landing page
-(`app/coming-soon/`). `middleware.ts` rewrites **every** route to it while
-`COMING_SOON_MODE` is on; only `/impressum`, `/datenschutz`, `/confirm`,
-`/abmelden`, the waitlist API routes and static assets pass through.
-Fail-safe: the stub also shows when the variable is missing — set
-`COMING_SOON_MODE=false` (and restart/redeploy) to bring the shop back.
-No shop code was removed.
+| Route | Figma | |
+|---|---|---|
+| `/` | 2:61 · 2:60 | Startseite: hero, promise band, gallery teaser, restaurant, CTA |
+| `/galerie` | 15:1103 · 15:594 | the nine roll photos |
+| `/speisekarte` | 15:637 · 15:110 | 51 dishes in 9 categories (`lib/menu.ts`), allergen note |
+| `/kontakt` | 15:1058 · 15:541 | phone, address, message form → `POST /api/contact` (mail to `MAIL_TO`) |
+| `/reservieren` | 6:221 · 6:29 | Step 1 — guests, date, time slot |
+| `/reservieren/kontakt` | 6:290 · 6:101 | Step 2 — name, e-mail, phone, wishes |
+| `/reservieren/bestaetigt` | 6:358 · 6:172 | Step 3 — confirmation + `.ics` calendar entry |
+| `/impressum`, `/datenschutz` | — | legal pages |
+| `/confirm`, `/abmelden` + `/api/confirm`, `/api/unsubscribe` | — | kept for links in already-sent waitlist mails |
 
-### Waitlist with double-opt-in (§ 7 UWG / DSGVO)
+Mobile navigation: 15:1144. `/restaurant` redirects to `/galerie`.
 
-Signup flow — the owner is notified **only after** the subscriber confirms:
+## Reservations
 
-1. `POST /api/subscribe` — validates the form (consent checkbox is enforced
-   server-side), appends a `"pending"` record to
-   `waitlist-submissions.jsonl` including the consent evidence required by
-   Art. 7 Abs. 1 DSGVO (`consentAt`, `consentTextVersion`, `ipHash`,
-   `userAgent` — IPs are stored **only** as HMAC-SHA256 hashes, never raw)
-   and sends a neutral confirmation mail. Without SMTP configured the
-   confirm URL is printed to the server console instead (dev mode).
-2. `GET /api/confirm?token=…` — stateless HMAC-signed token (48 h expiry,
-   `TOKEN_SECRET`). On success: `"confirmed"` record + owner notification to
-   `MAIL_TO` + redirect to `/confirm?state=success|invalid|expired`.
-3. `GET /api/unsubscribe?token=…` — opt-out link (no expiry) embedded in the
-   footer of every subscriber mail: `"unsubscribed"` record + owner mail +
-   `/abmelden` page.
+Rules live in `lib/reservation/config.ts` and `lib/reservation/tables.ts`:
 
-Copy `.env.example` to `.env.local` and fill in `SMTP_*`/`MAIL_*` plus the
-two secrets (`TOKEN_SECRET`, `IP_HASH_SECRET` — `openssl rand -base64 32`).
-Spam protection: honeypot field + in-memory rate limit (5 requests / 10 min
-per hashed IP). UI strings live in `messages/de.json` (add `en.json`
-alongside it for English later).
+- **Open days:** only 30 + 31 October 2026 for now (`OPEN_DATES`); set it to
+  `null` to switch to the regular Friday/Saturday schedule (`OPEN_WEEKDAYS`).
+- **Arrival times:** 17:00 – 20:30 every 30 min (`TIME_SLOTS`).
+- **Tables:** 11 tables / 30 seats as on the restaurant's floor plan (`TABLES`,
+  with plan coordinates), pushable pairs in `TABLE_COMBOS`. Every booking gets
+  concrete tables for **2:30 h** (`VISIT_DURATION_MINUTES`): the free table or
+  combination with the fewest seats that fit the group.
 
-**Housekeeping:** `npm run waitlist:cleanup` (add `-- --dry` for a preview)
-deletes unconfirmed `"pending"` records older than 30 days, as promised in
-the Datenschutzerklärung — run it manually or via cron. Confirmed/opt-out
-records and the pending records of confirmed addresses are kept as consent
-evidence.
+Flow: step 1 loads per slot the largest group that still gets a table
+(`GET /api/reservations/availability`) and greys out times that can't fit it; if the chosen time is overbooked
+it says so and suggests another time, and it warns when only 1–2 seats are
+left. Step 2 posts to `POST /api/reservations` (201 · 409 full · 429 · 503);
+the guest gets a confirmation mail, the owner (`MAIL_TO`) a notification.
 
-**Legal pages:** `/impressum` (§ 5 DDG) and `/datenschutz` (Art. 13 DSGVO)
-are fully structured; every missing business detail is marked `[TODO: …]`
-in `messages/de.json` — replace before launch. Security headers (HSTS,
-nosniff, Referrer-Policy, CSP, …) are set in `next.config.js`; fonts are
-self-hosted via `next/font`; no cookies/trackers, hence no consent banner.
+Storage: Supabase table `reservations` (with `table_ids`, `source` online /
+walk_in), written only through the SQL function `book_reservation`, which
+locks the day and picks the tables atomically
+(DDL in `supabase/schema.sql` — run the "Table reservations" block once in the
+Supabase SQL editor). Without `SUPABASE_URL`/`SUPABASE_SERVICE_ROLE_KEY`
+(local dev) bookings go to `reservations.local.json` instead.
+
+## Telegram bot (@makilovereservbot)
+
+Every booking and every Kontakt request is posted to the Telegram chat(s) in
+`TELEGRAM_CHAT_ID` (currently the group "Sushi Restraurant"): persons, time,
+date, name, e-mail, phone, wishes. Buttons:
+
+- **✍️ Ответить** — the bot asks for the answer (reply to its message); the
+  text is mailed to the guest (Brevo, reply-to `MAIL_TO`) and the bot offers
+  **💬 WhatsApp** with the same text pre-filled (wa.me link — one tap to send).
+- **💬 WhatsApp** — opens a chat with the guest's number (if they gave one).
+
+Replying directly to a booking/request message works too. Mapping back to the
+guest goes through the `ref: c|r:<uuid>` line in each message, so contact
+requests are stored in Supabase (`contact_requests`). If Telegram is down or
+not configured, the owner gets the usual e-mail to `MAIL_TO` instead.
+
+Hall (texts in Russian): `/plan` or 🗺 — floor plan **now** as image, occupied
+tables red with guests + arrival time; `/walkin` or 🚶 — guests → pick a free
+table on the plan → seated at the current Berlin time; `/list` or 📋 — upcoming
+bookings, ❌ cancels one after confirmation and frees its table (no-shows,
+cancellations). New bookings arrive as the plan for their time window with the
+assigned table outlined.
+
+Setup: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `TELEGRAM_WEBHOOK_SECRET` in
+`.env.local` and Vercel, then `npm run telegram:setup -- https://www.makilove.de`
+(registers `/api/telegram/webhook` and the bot commands). Writing `/id` to the
+bot shows a chat's id. Local testing without a public URL: `npm run dev` +
+`npm run telegram:poll` (only while no webhook is set).
 
 ## Project structure
 
 ```
-app/
-  layout.tsx              # fonts + CartProvider
-  page.tsx                # Home (hero, categories, chef's picks, popular)
-  menu/                   # /menu (all) + /menu/[slug] (category)
-  product/[slug]/         # dish detail (spice, add-ons, quantity)
-  cart/  profile/         # cart + profile
+app/                      # routes (see table above)
 components/
-  ui/                     # design-system primitives (Button, Chip, QtyStepper, …)
-  layout/                 # Shell, Header (top nav), BottomNav (mobile tabs)
-  home/ menu/ cart/       # feature components
+  ui/                     # Figma components: Button, Field, Choice, Icon, Wordmark
+  site/                   # SiteHeader (+ mobile navigation), SiteFooter/HomeFooter, PageIntro, ReservationCta
+  home/                   # Startseite sections
+  menu/                   # Speisekarte category + dish row
+  contact/                # Kontakt message form
+  reservation/            # provider, steps, header/footer/progress, summary
+  consent/ analytics/     # cookie banner + consent-gated Meta Pixel
 lib/
-  data/menu.ts            # MOCK catalogue (replaced by API/Mongo later)
-  cart/CartContext.tsx    # cart state (localStorage `makiblitz-cart`)
-  utils.ts                # cn() + EUR price formatting
+  reservation/            # slot config, Berlin-time date helpers, .ics builder
+  waitlist/  email/       # Supabase store, Brevo mailer, e-mail validation (reused)
+messages/de.json          # all UI copy
+public/images, public/icons  # photos + SVG icons exported from Figma
 ```
 
-## Responsive behaviour
+## Notes
 
-- **Mobile** (`< md`): single column, sticky bottom tab bar, phone-style header.
-- **Tablet/Desktop** (`≥ md`): top navigation, multi-column grids, 2-column
-  product detail, centered `max-w-shell` container.
-
-## Status
-
-Frontend on mock data. **Next:** port the dumbospizza backend (MongoDB models,
-`/api/orders`, Stripe, Telegram/WhatsApp, loyalty), real dish photography,
-DE/RU localisation, conversion tracking, fill in the `[TODO: …]` company
-data in `messages/de.json` (Impressum/Datenschutz) before launch.
+- All UI copy is in `messages/de.json`; contact data under `contact`.
+- Instagram link in the footer appears once `INSTAGRAM_URL` in `lib/site.ts` is set.
+- Meta Pixel loads only after "Alle akzeptieren" and only when
+  `NEXT_PUBLIC_FB_PIXEL_ID` is set at build time.

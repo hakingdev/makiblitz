@@ -36,13 +36,13 @@ export function ConsentBanner() {
         aria-modal="false"
         aria-label={c.ariaLabel}
         tabIndex={-1}
-        className="mx-auto flex max-w-shell flex-col gap-4 rounded-card border border-white/15 bg-ink-800/95 p-5 shadow-card outline-none backdrop-blur focus-visible:ring-2 focus-visible:ring-brand/60 sm:flex-row sm:items-center sm:gap-6 sm:p-6"
+        className="mx-auto flex max-w-page flex-col gap-4 rounded-2xl border border-line bg-white p-5 shadow-[0_18px_40px_-20px_rgba(33,29,27,0.35)] outline-none focus-visible:ring-2 focus-visible:ring-brand/40 sm:flex-row sm:items-center sm:gap-6 sm:p-6"
       >
-        <p className="flex-1 text-sm leading-relaxed text-white/85">
+        <p className="flex-1 text-sm leading-relaxed text-muted">
           {c.textPrefix}
           <Link
             href="/datenschutz"
-            className="rounded font-semibold text-brand-light underline transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
+            className="focus-ring rounded font-semibold text-brand underline underline-offset-2 hover:text-brand-dark"
           >
             {c.privacyLink}
           </Link>
@@ -54,14 +54,14 @@ export function ConsentBanner() {
           <button
             type="button"
             onClick={() => accept("necessary")}
-            className="inline-flex h-11 items-center justify-center rounded-pill bg-white px-6 text-sm font-bold text-ink-900 transition-colors hover:bg-cream focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
+            className="focus-ring inline-flex h-12 items-center justify-center rounded-full bg-ink px-6 text-sm font-bold text-white transition-colors hover:bg-ink/85"
           >
             {c.necessaryOnly}
           </button>
           <button
             type="button"
             onClick={() => accept("all")}
-            className="inline-flex h-11 items-center justify-center rounded-pill bg-brand-gradient px-6 text-sm font-bold text-white shadow-brand transition-all hover:brightness-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/60"
+            className="focus-ring inline-flex h-12 items-center justify-center rounded-full bg-brand px-6 text-sm font-bold text-white transition-colors hover:bg-brand-dark"
           >
             {c.acceptAll}
           </button>

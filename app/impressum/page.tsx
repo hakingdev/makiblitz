@@ -6,7 +6,7 @@ const t = getMessages();
 const im = t.impressum;
 
 export const metadata: Metadata = {
-  title: `${t.legal.impressumTitle} – ${t.comingSoon.brand}`,
+  title: t.legal.impressumTitle,
   robots: { index: false, follow: false },
 };
 
@@ -19,7 +19,7 @@ function Section({
 }) {
   return (
     <section>
-      <h2 className="text-lg font-bold text-white">{heading}</h2>
+      <h2>{heading}</h2>
       <p className="mt-3 whitespace-pre-line">{lines.join("\n")}</p>
     </section>
   );
@@ -50,7 +50,7 @@ export default function ImpressumPage() {
       */}
 
       <section>
-        <h2 className="text-lg font-bold text-white">
+        <h2>
           {im.streitschlichtung.heading}
         </h2>
         <p className="mt-3">{im.streitschlichtung.odrNote}</p>
