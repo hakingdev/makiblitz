@@ -7,11 +7,9 @@ export const alt = de.meta.ogTitle;
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
-/**
- * Placeholder OG image, rendered on the fly — replace with a real
- * photo asset (public/og.png + metadata) once brand visuals exist.
- */
+/** Social preview in the site's paper/red palette, rendered on the fly. */
 export default function OpengraphImage() {
+  const h = de.home.hero;
   return new ImageResponse(
     (
       <div
@@ -22,67 +20,27 @@ export default function OpengraphImage() {
           flexDirection: "column",
           justifyContent: "center",
           padding: "80px",
-          background: "linear-gradient(156deg, #2A2C31 28%, #16171A 100%)",
-          color: "#ffffff",
+          background: "#FFFCF8",
+          color: "#211D1B",
         }}
       >
-        <div
-          style={{
-            display: "flex",
-            fontSize: 30,
-            fontWeight: 700,
-            letterSpacing: "0.22em",
-            color: "#E63A41",
-          }}
-        >
-          {de.comingSoon.eyebrow}
+        <div style={{ fontSize: 24, fontWeight: 700, letterSpacing: 3, color: "#D91F2D" }}>
+          {h.eyebrow}
         </div>
         <div
           style={{
             display: "flex",
-            marginTop: 32,
-            fontSize: 84,
-            fontWeight: 800,
-            lineHeight: 1.1,
-            maxWidth: 900,
-          }}
-        >
-          {de.comingSoon.h1}
-        </div>
-        <div
-          style={{
-            display: "flex",
+            flexDirection: "column",
             marginTop: 28,
-            fontSize: 34,
-            color: "rgba(255,255,255,0.72)",
+            fontSize: 104,
+            fontWeight: 800,
+            lineHeight: 1.08,
           }}
         >
-          {de.meta.ogDescription}
+          <span>{h.headline[0]}</span>
+          <span style={{ color: "#D91F2D" }}>{h.headline[1]}</span>
         </div>
-        <div
-          style={{
-            position: "absolute",
-            right: 64,
-            top: 56,
-            width: 220,
-            height: 220,
-            borderRadius: 9999,
-            background: "rgba(212,32,40,0.35)",
-            filter: "blur(60px)",
-          }}
-        />
-        <div
-          style={{
-            position: "absolute",
-            left: -60,
-            bottom: -80,
-            width: 260,
-            height: 260,
-            borderRadius: 9999,
-            background: "rgba(119,1,16,0.55)",
-            filter: "blur(70px)",
-          }}
-        />
+        <div style={{ marginTop: 36, fontSize: 32, color: "#706864" }}>{de.meta.ogDescription}</div>
       </div>
     ),
     size,

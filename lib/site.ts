@@ -10,3 +10,6 @@ export function getBaseUrl(devOrigin?: string): string {
   if (process.env.NODE_ENV === "development" && devOrigin) return devOrigin;
   return SITE_URL;
 }
+
+/** Instagram profile for the footer link — the link stays hidden while empty. */
+export const INSTAGRAM_URL = "";

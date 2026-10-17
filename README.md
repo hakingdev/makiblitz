@@ -1,99 +1,71 @@
 # MakiLove 🍣
 
-Sushi delivery storefront. Frontend built from the Figma "Sushi Resto Mobile
-Apps UI Kit", adapted to a fully responsive **mobile · tablet · desktop** web
-app. Business logic (cart, checkout, orders, integrations) is being ported from
-the `dumbospizza` engine — see [`BASE_PROJECT_REFERENCE.md`](./BASE_PROJECT_REFERENCE.md).
+Website + table reservation for the MakiLove sushi restaurant
+(Kurhausstr. 11A, 97688 Bad Kissingen). Built mobile-first from the Figma file
+**"MakiLove — Sushi Restaurant · Tischreservierung"** (mobile 390 · desktop 1440).
 
 ## Stack
 
 - **Next.js 14** (App Router) · React 18 · TypeScript (strict)
-- **Tailwind CSS 3** — design tokens in `tailwind.config.ts`
-- Fonts: **Mulish** (UI) + **Rock Salt** (display) via `next/font`
-- `lucide-react`, `framer-motion`, `clsx` + `tailwind-merge`
+- **Tailwind CSS 3** — design tokens in `tailwind.config.ts` (paper/ink/red palette)
+- Fonts: **Mulish** (UI) + **Rock Salt** (script accents) via `next/font`
+- **Supabase** — same project/tables as before (`supabase/schema.sql`)
+- Mail via **Brevo** HTTP API (`lib/waitlist/mailer.ts`)
 
 ## Getting started
 
 ```bash
 npm install
 npm run dev      # http://localhost:3000
-npm run build    # production build (static export of all routes)
+npm run build
+npm test         # vitest
 ```
 
-## Coming-soon mode (current phase)
+## Pages
 
-The unfinished shop is hidden behind a German waitlist landing page
-(`app/coming-soon/`). `middleware.ts` rewrites **every** route to it while
-`COMING_SOON_MODE` is on; only `/impressum`, `/datenschutz`, `/confirm`,
-`/abmelden`, the waitlist API routes and static assets pass through.
-Fail-safe: the stub also shows when the variable is missing — set
-`COMING_SOON_MODE=false` (and restart/redeploy) to bring the shop back.
-No shop code was removed.
+| Route | Figma | |
+|---|---|---|
+| `/` | 2:61 · 2:60 | Startseite: hero, promise band, menu teaser, restaurant, CTA |
+| `/speisekarte` | 11:99 | "Unsere Rollen. Schön serviert." — 9 roll photos |
+| `/restaurant` | 12:99 | "Hier wird aus Sushi ein Abend." — original restaurant photos |
+| `/reservieren` | 6:221 · 6:29 | Step 1 — guests, date, time slot |
+| `/reservieren/kontakt` | 6:290 · 6:101 | Step 2 — name, e-mail, phone, wishes |
+| `/reservieren/bestaetigt` | 6:358 · 6:172 | Step 3 — confirmation + `.ics` calendar entry |
+| `/impressum`, `/datenschutz` | — | legal pages |
+| `/confirm`, `/abmelden` + `/api/confirm`, `/api/unsubscribe` | — | kept for links in already-sent waitlist mails |
 
-### Waitlist with double-opt-in (§ 7 UWG / DSGVO)
+## Reservation flow (current state)
 
-Signup flow — the owner is notified **only after** the subscriber confirms:
+The three steps share one client-side draft (`components/reservation/ReservationProvider.tsx`,
+persisted in `sessionStorage`). Slots, lead time and booking window live in
+`lib/reservation/config.ts`; dates are computed in `Europe/Berlin`
+(`lib/reservation/dates.ts`).
 
-1. `POST /api/subscribe` — validates the form (consent checkbox is enforced
-   server-side), appends a `"pending"` record to
-   `waitlist-submissions.jsonl` including the consent evidence required by
-   Art. 7 Abs. 1 DSGVO (`consentAt`, `consentTextVersion`, `ipHash`,
-   `userAgent` — IPs are stored **only** as HMAC-SHA256 hashes, never raw)
-   and sends a neutral confirmation mail. Without SMTP configured the
-   confirm URL is printed to the server console instead (dev mode).
-2. `GET /api/confirm?token=…` — stateless HMAC-signed token (48 h expiry,
-   `TOKEN_SECRET`). On success: `"confirmed"` record + owner notification to
-   `MAIL_TO` + redirect to `/confirm?state=success|invalid|expired`.
-3. `GET /api/unsubscribe?token=…` — opt-out link (no expiry) embedded in the
-   footer of every subscriber mail: `"unsubscribed"` record + owner mail +
-   `/abmelden` page.
-
-Copy `.env.example` to `.env.local` and fill in `SMTP_*`/`MAIL_*` plus the
-two secrets (`TOKEN_SECRET`, `IP_HASH_SECRET` — `openssl rand -base64 32`).
-Spam protection: honeypot field + in-memory rate limit (5 requests / 10 min
-per hashed IP). UI strings live in `messages/de.json` (add `en.json`
-alongside it for English later).
-
-**Housekeeping:** `npm run waitlist:cleanup` (add `-- --dry` for a preview)
-deletes unconfirmed `"pending"` records older than 30 days, as promised in
-the Datenschutzerklärung — run it manually or via cron. Confirmed/opt-out
-records and the pending records of confirmed addresses are kept as consent
-evidence.
-
-**Legal pages:** `/impressum` (§ 5 DDG) and `/datenschutz` (Art. 13 DSGVO)
-are fully structured; every missing business detail is marked `[TODO: …]`
-in `messages/de.json` — replace before launch. Security headers (HSTS,
-nosniff, Referrer-Policy, CSP, …) are set in `next.config.js`; fonts are
-self-hosted via `next/font`; no cookies/trackers, hence no consent banner.
+**Not wired yet:** submitting step 2 does **not** store or send anything —
+persistence in Supabase, confirmation mail and real slot availability are the
+next step.
 
 ## Project structure
 
 ```
-app/
-  layout.tsx              # fonts + CartProvider
-  page.tsx                # Home (hero, categories, chef's picks, popular)
-  menu/                   # /menu (all) + /menu/[slug] (category)
-  product/[slug]/         # dish detail (spice, add-ons, quantity)
-  cart/  profile/         # cart + profile
+app/                      # routes (see table above)
 components/
-  ui/                     # design-system primitives (Button, Chip, QtyStepper, …)
-  layout/                 # Shell, Header (top nav), BottomNav (mobile tabs)
-  home/ menu/ cart/       # feature components
+  ui/                     # Figma components: Button, Field, Choice, Icon, Wordmark
+  site/                   # SiteHeader (mobile menu), SiteFooter, ReservationCta, PageShell
+  home/                   # Startseite sections
+  gallery/                # photo tiles for /speisekarte and /restaurant
+  reservation/            # provider, steps, header/footer/progress, summary
+  consent/ analytics/     # cookie banner + consent-gated Meta Pixel
 lib/
-  data/menu.ts            # MOCK catalogue (replaced by API/Mongo later)
-  cart/CartContext.tsx    # cart state (localStorage `makiblitz-cart`)
-  utils.ts                # cn() + EUR price formatting
+  reservation/            # slot config, Berlin-time date helpers, .ics builder
+  waitlist/  email/       # Supabase store, Brevo mailer, e-mail validation (reused)
+messages/de.json          # all UI copy
+public/images, public/icons  # photos + SVG icons exported from Figma
 ```
 
-## Responsive behaviour
+## Notes
 
-- **Mobile** (`< md`): single column, sticky bottom tab bar, phone-style header.
-- **Tablet/Desktop** (`≥ md`): top navigation, multi-column grids, 2-column
-  product detail, centered `max-w-shell` container.
-
-## Status
-
-Frontend on mock data. **Next:** port the dumbospizza backend (MongoDB models,
-`/api/orders`, Stripe, Telegram/WhatsApp, loyalty), real dish photography,
-DE/RU localisation, conversion tracking, fill in the `[TODO: …]` company
-data in `messages/de.json` (Impressum/Datenschutz) before launch.
+- All UI copy is in `messages/de.json`; contact data under `contact`.
+- Instagram link in the footer appears once `INSTAGRAM_URL` in `lib/site.ts` is set.
+- Meta Pixel loads only after "Alle akzeptieren" and only when
+  `NEXT_PUBLIC_FB_PIXEL_ID` is set at build time.

@@ -1,19 +1,22 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/Button";
+import { getMessages } from "@/lib/i18n";
+import { PageShell } from "@/components/site/PageShell";
+import { ButtonLink } from "@/components/ui/Button";
+
+const t = getMessages();
 
 export default function NotFound() {
   return (
-    <div className="grid min-h-dvh place-items-center bg-ink-gradient px-6 text-center">
-      <div>
-        <span className="text-6xl">🍱</span>
-        <h1 className="mt-4 font-display text-3xl text-white">Page not found</h1>
-        <p className="mt-2 text-sm text-white/60">
-          This dish isn&apos;t on the menu.
-        </p>
-        <Link href="/" className="mt-6 inline-block">
-          <Button>Back home</Button>
-        </Link>
+    <PageShell>
+      <div className="page-container flex flex-col items-center gap-6 py-20 text-center lg:py-32">
+        <p className="font-script text-2xl text-brand">404</p>
+        <h1 className="text-[34px] font-extrabold leading-[41px] lg:text-[52px] lg:leading-[60px]">
+          {t.notFound.title}
+        </h1>
+        <p className="text-base leading-[26px] text-muted">{t.notFound.body}</p>
+        <ButtonLink href="/" className="w-full max-w-[342px]">
+          {t.notFound.cta}
+        </ButtonLink>
       </div>
-    </div>
+    </PageShell>
   );
 }

@@ -1,21 +1,210 @@
 {
   "meta": {
-    "title": "MakiLove – Frisches Sushi in bester Qualität. Bald bei dir!",
-    "description": "MakiLove startet bald: frisches Sushi, mit Sorgfalt aus besten Zutaten zubereitet. Trag dich auf die Warteliste ein und erfahre als Erste:r, wann wir bei dir öffnen.",
-    "ogTitle": "MakiLove kommt bald zu dir 🍣",
-    "ogDescription": "Sichere dir deinen Platz auf der Warteliste."
+    "title": "MakiLove – Sushi-Restaurant in Bad Kissingen",
+    "description": "Frisches Sushi, von Hand gerollt. Reserviere deinen Tisch bei MakiLove in der Kurhausstr. 11A, 97688 Bad Kissingen.",
+    "ogTitle": "MakiLove – Kleine Rollen. Große Liebe.",
+    "ogDescription": "Frisches Sushi, von Hand gerollt. Dein Tisch ist nur ein paar Klicks entfernt."
   },
-  "comingSoon": {
-    "brand": "MakiLove",
-    "eyebrow": "DEMNÄCHST · BALD BEI DIR",
-    "h1": "MakiLove kommt bald zu dir.",
-    "subline": "Frisches Sushi. Willst du es als Erste:r probieren? Trag dich ein – wir sagen dir Bescheid, sobald wir bei dir öffnen.",
-    "sublineShort": "Frisches Sushi. Handgemacht. Bald bei dir. Sei von Anfang an dabei.",
-    "trust": [
-      "👨‍🍳 Handgemacht",
-      "🍣 Immer frisch",
-      "📍 Bald in Bad Kissingen"
-    ]
+  "brand": {
+    "name": "MakiLove",
+    "first": "Maki",
+    "second": "Love"
+  },
+  "contact": {
+    "street": "Kurhausstr. 11A",
+    "city": "97688 Bad Kissingen",
+    "email": "info@makilove.de"
+  },
+  "nav": {
+    "menu": "Speisekarte",
+    "restaurant": "Unser Restaurant",
+    "contact": "Kontakt",
+    "reserve": "Tisch reservieren",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen",
+    "home": "Zur Startseite"
+  },
+  "home": {
+    "hero": {
+      "eyebrow": "SUSHI. MIT LIEBE. IN BAD KISSINGEN.",
+      "headline": [
+        "Kleine Rollen.",
+        "Große Liebe."
+      ],
+      "body": [
+        "Frisches Sushi, von Hand gerollt.",
+        "Für gute Gespräche und noch bessere Abende."
+      ],
+      "cta": "Tisch reservieren",
+      "menuLink": "Speisekarte entdecken",
+      "note": "Dein Tisch ist nur ein paar Klicks entfernt.",
+      "seal": [
+        "Mit Liebe",
+        "gerollt."
+      ],
+      "photoAlt": "Lachs-Rollen auf schwarzer Keramik"
+    },
+    "promise": [
+      {
+        "mobile": "HANDGEMACHT",
+        "desktop": "VON HAND GEROLLT"
+      },
+      {
+        "mobile": "IMMER FRISCH",
+        "desktop": "IMMER FRISCH"
+      },
+      {
+        "mobile": null,
+        "desktop": "GEMEINSAM GENIESSEN"
+      }
+    ],
+    "menu": {
+      "eyebrow": "DIE SPEISEKARTE",
+      "title": [
+        "Liebe auf den",
+        "ersten Biss."
+      ],
+      "body": [
+        "Klassiker oder neue Lieblingsrolle?",
+        "Bei uns kommt beides auf den Tisch."
+      ],
+      "categories": [
+        {
+          "title": "Die Klassiker",
+          "text": "Maki, Nigiri & Sashimi. Einfach gut.",
+          "image": "/images/rolle-01.png",
+          "alt": "Lachs-Maki auf schwarzer Keramik"
+        },
+        {
+          "title": "Unsere Lieblingsrollen",
+          "text": "Kreativ gerollt. Zum Teilen gemacht.",
+          "image": "/images/rolle-09.png",
+          "alt": "Rollen mit rotem Tobiko auf schwarzer Keramik"
+        }
+      ],
+      "cta": "Zur gesamten Speisekarte"
+    },
+    "restaurant": {
+      "eyebrow": "GUT ESSEN. GERN BLEIBEN.",
+      "title": [
+        "Dein nächstes",
+        "Sushi-Date?"
+      ],
+      "body": "Mit Freunden teilen. Zu zweit genießen. Oder einfach nur, weil heute ein guter Tag für Sushi ist. Du findest uns in der Kurhausstr. 11A, 97688 Bad Kissingen.",
+      "script": "Wir rollen. Du genießt.",
+      "cta": "Tisch reservieren",
+      "photoAlt": "Gedeckte Tische im MakiLove-Restaurant"
+    },
+    "cta": {
+      "eyebrow": "DEIN ABEND BEI MAKILOVE",
+      "title": [
+        "Gute Gesellschaft.",
+        "Gutes Sushi."
+      ],
+      "body": "Such dir deinen Lieblingsmenschen. Wir kümmern uns um den Tisch.",
+      "button": "Jetzt Tisch reservieren"
+    }
+  },
+  "menuPage": {
+    "metaTitle": "Speisekarte",
+    "title": "Unsere Rollen. Schön serviert.",
+    "body": "Klassiker oder neue Lieblingsrolle? Bei uns kommt beides auf den Tisch.",
+    "caption": "{n} / MakiLove",
+    "photoAlt": "MakiLove-Rolle {n} auf schwarzer Keramik"
+  },
+  "restaurantPage": {
+    "metaTitle": "Unser Restaurant",
+    "title": "Hier wird aus Sushi ein Abend.",
+    "body": "Unser Restaurant · Kurhausstr. 11A, 97688 Bad Kissingen",
+    "caption": "{n} / Unser Restaurant",
+    "photoAlt": "Unser Restaurant – Foto {n}"
+  },
+  "reservation": {
+    "metaTitle": "Tisch reservieren",
+    "steps": [
+      "Dein Besuch",
+      "Deine Daten"
+    ],
+    "aside": "Gute Abende beginnen mit Sushi.",
+    "asidePhotoAlt": "Sesam-Rollen auf schwarzer Keramik",
+    "person": "Person",
+    "persons": "Personen",
+    "timeSuffix": "Uhr",
+    "visit": {
+      "title": [
+        "Ein Tisch.",
+        "Für deinen Abend."
+      ],
+      "body": "Wähle, wann und mit wem du vorbeikommst. Den Rest übernehmen wir.",
+      "formTitle": "Dein Besuch",
+      "guestsLabel": "Wie viele seid ihr?",
+      "dateLabel": "An welchem Tag?",
+      "datePlaceholder": "Datum wählen",
+      "timeLabel": "Um wie viel Uhr?",
+      "timeHint": "Grau markierte Zeiten sind bereits belegt.",
+      "submit": "Weiter zu deinen Daten",
+      "groupNote": "Für mehr als 5 Personen: info@makilove.de"
+    },
+    "contact": {
+      "title": [
+        "Fast geschafft.",
+        "Wir freuen uns."
+      ],
+      "body": "Noch kurz deine Kontaktdaten – damit wir dir deine Reservierung bestätigen können.",
+      "formTitle": "Deine Kontaktdaten",
+      "summaryTitle": "DEIN BESUCH",
+      "change": "Besuch ändern",
+      "name": {
+        "label": "Dein Name *",
+        "placeholder": "Vor- und Nachname",
+        "error": "Bitte gib deinen Namen ein."
+      },
+      "email": {
+        "label": "E-Mail-Adresse *",
+        "placeholder": "name@beispiel.de",
+        "error": "Bitte gib eine gültige E-Mail-Adresse ein."
+      },
+      "phone": {
+        "label": "Telefon (optional)",
+        "placeholder": "Für kurzfristige Rückfragen",
+        "error": "Bitte gib eine gültige Telefonnummer ein."
+      },
+      "notesToggle": "Besondere Wünsche?",
+      "notes": {
+        "label": "Besondere Wünsche",
+        "placeholder": "z. B. Allergien, Kinderstuhl oder ein besonderer Anlass"
+      },
+      "privacyIntro": "Wir nutzen deine Daten nur für die Reservierung.",
+      "privacyPrefix": "Mehr dazu in unserer ",
+      "privacyLink": "Datenschutzerklärung",
+      "privacySuffix": ".",
+      "submit": "Jetzt verbindlich reservieren",
+      "note": "Du erhältst deine Bestätigung per E-Mail."
+    },
+    "confirmed": {
+      "title": [
+        "Dein Tisch",
+        "wartet auf dich."
+      ],
+      "body": [
+        "Danke, {name}! Wir haben deine Reservierung",
+        "bestätigt und dir eine E-Mail geschickt."
+      ],
+      "venueTitle": "MakiLove · Bad Kissingen",
+      "venueNote": "Wir freuen uns auf deinen Besuch.",
+      "calendar": "Zum Kalender hinzufügen",
+      "calendarTitle": "Tisch bei MakiLove",
+      "home": "Zurück zur Startseite",
+      "changeNote": [
+        "Pläne geändert? Antworte einfach auf deine",
+        "Bestätigungs-E-Mail oder schreib an info@makilove.de."
+      ]
+    }
+  },
+  "notFound": {
+    "title": "Diese Seite gibt es nicht.",
+    "body": "Aber dein Tisch wartet trotzdem auf dich.",
+    "cta": "Zur Startseite"
   },
   "form": {
     "title": "Sei dabei, wenn wir starten",
@@ -40,15 +229,6 @@
     "submitting": "Wird gesendet…",
     "microcopy": "Kein Spam – versprochen. Wir melden uns nur, wenn MakiLove bei dir an den Start geht. Du kannst dich jederzeit mit einem Klick abmelden."
   },
-  "status": {
-    "successTitle": "Fast geschafft! 📬",
-    "successBody": "Wir haben dir eine E-Mail geschickt – bitte bestätige deine Anmeldung. Nichts angekommen? Schau kurz in deinen Spam-Ordner.",
-    "errorGeneric": "Ups, das hat nicht geklappt. Bitte prüf deine Eingaben und versuch es noch einmal.",
-    "already": "Du bist schon auf der Liste – wir freuen uns auf dich! 🍣",
-    "errorEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
-    "errorPhone": "Bitte gib eine gültige deutsche Telefonnummer ein (z. B. +49 171 2345678).",
-    "errorPlz": "Bitte gib eine gültige deutsche Postleitzahl ein."
-  },
   "confirmPage": {
     "metaTitle": "Anmeldung bestätigen",
     "success": {
@@ -67,36 +247,7 @@
       "title": "Dieser Link ist leider ungültig.",
       "body": "Der Bestätigungslink ist ungültig oder unvollständig. Kein Problem: Trag dich einfach noch einmal in die Warteliste ein."
     },
-    "cta": "Zur Warteliste"
-  },
-  "danke": {
-    "metaTitle": "Fast geschafft",
-    "h1": "Fast geschafft! 📬",
-    "subline": "Wir haben dir eine E-Mail geschickt. Klick auf den Bestätigungslink, dann bist du offiziell auf der MakiLove-Warteliste.",
-    "stepsHeading": "So geht's weiter",
-    "steps": [
-      {
-        "title": "Postfach öffnen",
-        "body": "Schau in dein E-Mail-Postfach – und zur Sicherheit auch in den Spam-Ordner."
-      },
-      {
-        "title": "Anmeldung bestätigen",
-        "body": "Klick auf den Button in unserer E-Mail. Das dauert nur einen Moment."
-      },
-      {
-        "title": "Vorfreude genießen",
-        "body": "Wir melden uns, sobald MakiLove bei dir startet. 🍣"
-      }
-    ],
-    "hinweis": "Keine E-Mail bekommen? Prüf deinen Spam-Ordner oder trag dich einfach noch einmal ein.",
-    "backLink": "Zurück zur Startseite"
-  },
-  "conversion": {
-    "trust": [
-      "👨‍🍳 Handgemacht",
-      "🍣 Immer frisch",
-      "📍 Bald in deiner Stadt"
-    ]
+    "cta": "Zur Startseite"
   },
   "consent": {
     "ariaLabel": "Cookie-Einstellungen",
@@ -168,7 +319,9 @@
     "datenschutz": "Datenschutz",
     "contactEmail": "info@makilove.de",
     "instagramLabel": "Instagram",
-    "tiktokLabel": "TikTok"
+    "tiktokLabel": "TikTok",
+    "tagline": "© MakiLove · Mit Liebe gerollt.",
+    "copyright": "© MakiLove"
   },
   "legal": {
     "backToHome": "Zurück zur Startseite",

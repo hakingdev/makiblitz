@@ -3,7 +3,11 @@
 @tailwind utilities;
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 html,
@@ -13,22 +17,23 @@ body {
 }
 
 body {
-  @apply bg-ink-900 text-white font-sans antialiased;
+  @apply bg-paper font-sans text-ink antialiased;
   min-height: 100dvh;
 }
 
-/* Hide scrollbars on horizontal scrollers (category rows, etc.) */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+@layer components {
+  /* Full-bleed sections share one content width: 390 → 24px gutters, 1440 → 80px. */
+  .page-container {
+    @apply mx-auto w-full max-w-page px-6 md:px-10 xl:px-20;
+  }
+
+  .focus-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-2 focus-visible:ring-offset-paper;
+  }
 }
 
-@layer components {
-  /* Frosted product image placeholder used until real photos are wired in */
-  .img-placeholder {
-    @apply bg-gradient-to-br from-ink-600 to-ink-800;
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
