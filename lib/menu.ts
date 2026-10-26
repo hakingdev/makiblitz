@@ -1,6 +1,7 @@
 /**
  * Speisekarte — 57 dishes as printed on the restaurant menu
- * (maki_love_menu.pdf, Oct 2026). Codes are the printed codes. Prices in euro.
+ * ("Wir rollen. Wir liefern. Du genießt" PDF, Oct 2026). Codes are the printed
+ * codes. Prices in euro.
  *
  * `column` places a category in the two-column desktop layout (as on the
  * printed sheets); the array order is the single-column (mobile) order.
@@ -29,7 +30,7 @@ export const MENU: MenuCategory[] = [
     dishes: [
       { code: "A1", name: "Crispy Vegan Spring Roll", ingredients: "7 Stk. · Sweet Chili", price: 7.9 },
       { code: "A2", name: "Crispy Vegetarian Spring Roll", ingredients: "7 Stk. · Sweet Chili Mayo", price: 9.9 },
-      { code: "A3", name: "Sushi Balls Lachs Panko", ingredients: "Chuka · Gurke · Goma Dare · Sesam", price: 9.9 },
+      { code: "A3", name: "Sushi Balls Lachs Panko", ingredients: "Lachs · Frischkäse · Tempura · Panko", price: 9.9 },
       { code: "A4", name: "Chuka", ingredients: "Chuka · Gurke · Goma Dare · Sesam", price: 11.9 },
       { code: "A5", name: "Bonito Salat mit Thunfisch", ingredients: "Thunfisch · Salat · Gurke · Bonito", price: 13.9 },
       { code: "A6", name: "Frischer vegetarischer Salat", ingredients: "Salat · Avocado · Gurke", price: 6.9 },
