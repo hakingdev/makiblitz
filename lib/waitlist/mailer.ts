@@ -1,11 +1,40 @@
+import nodemailer, { type Transporter } from "nodemailer";
 import { getMessages } from "@/lib/i18n";
 import type { WaitlistRecord } from "@/lib/waitlist/store";
 
 const t = getMessages();
 
-/** True once we have a Brevo API key to send through. */
+/**
+ * Two transports: SMTP of the restaurant mailbox (Namecheap Private Email —
+ * the domains' SPF only allows privateemail servers) when SMTP_* is set,
+ * otherwise Brevo's HTTP API. SMTP wins so mail keeps flowing without Brevo.
+ */
+type SmtpConfig = { host: string; port: number; user: string; pass: string };
+
+function smtpConfig(): SmtpConfig | null {
+  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS } = process.env;
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) return null;
+  return { host: SMTP_HOST, port: Number(SMTP_PORT) || 465, user: SMTP_USER, pass: SMTP_PASS };
+}
+
+/** True once there is a transport to send through. */
 export function isMailConfigured(): boolean {
-  return Boolean(process.env.BREVO_API_KEY);
+  return Boolean(smtpConfig() || process.env.BREVO_API_KEY);
+}
+
+let transporter: Transporter | undefined;
+
+function smtpTransport(config: SmtpConfig): Transporter {
+  transporter ??= nodemailer.createTransport({
+    host: config.host,
+    port: config.port,
+    secure: config.port === 465,
+    auth: { user: config.user, pass: config.pass },
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000,
+  });
+  return transporter;
 }
 
 const BREVO_ENDPOINT = "https://api.brevo.com/v3/smtp/email";
@@ -65,9 +94,9 @@ function sender(): { email: string; name?: string } {
 }
 
 /**
- * Transport for all outgoing mail: Brevo's transactional API over HTTPS.
- * Chosen over SMTP because Vercel serverless functions have no stable
- * outbound IP and SMTP sockets are unreliable there; a plain POST is not.
+ * Sends one mail through SMTP (Private Email) or, without SMTP config, through
+ * Brevo's transactional API. Over SMTP the sender is the mailbox itself
+ * (SMTP_USER) — Private Email only relays mail from its own addresses.
  */
 export async function sendMail(opts: {
   to: string;
@@ -76,11 +105,24 @@ export async function sendMail(opts: {
   html: string;
   /**
    * Where "Antworten" goes, e.g. the guest who wrote via the contact form.
-   * Defaults to the restaurant mailbox (contact.email) — the sender address
-   * stays on the domain authenticated in Brevo.
+   * Defaults to the restaurant mailbox (contact.email).
    */
   replyTo?: { email: string; name?: string };
 }): Promise<void> {
+  const replyTo = opts.replyTo ?? { email: t.contact.email, name: t.brand.name };
+  const smtp = smtpConfig();
+  if (smtp) {
+    await smtpTransport(smtp).sendMail({
+      from: { name: process.env.MAIL_FROM_NAME?.trim() || t.brand.name, address: smtp.user },
+      to: opts.to,
+      replyTo: replyTo.name ? { name: replyTo.name, address: replyTo.email } : replyTo.email,
+      subject: opts.subject,
+      text: opts.text,
+      html: opts.html,
+    });
+    return;
+  }
+
   const apiKey = process.env.BREVO_API_KEY;
   if (!apiKey) throw new Error("BREVO_API_KEY is not set");
   if (!(await hasMailCredits(apiKey))) throw new MailQuotaError();
@@ -102,7 +144,7 @@ export async function sendMail(opts: {
         subject: opts.subject,
         htmlContent: opts.html,
         textContent: opts.text,
-        replyTo: opts.replyTo ?? { email: t.contact.email, name: t.brand.name },
+        replyTo,
       }),
       signal: controller.signal,
     });
