@@ -150,6 +150,40 @@ export async function notifyGuestWhatsApp(msg: {
   return sent.some(Boolean);
 }
 
+/** A guest wrote to the restaurant mailbox: forward the new text with "✍️ Ответить" (answer goes by e-mail). */
+export async function notifyGuestEmail(mail: {
+  id: string;
+  fromEmail: string;
+  fromName: string;
+  subject: string;
+  text: string;
+  attachments: number;
+  reservation: StoredReservation | null;
+}) {
+  if (!isTelegramConfigured()) return false;
+  const r = mail.reservation;
+  const upcoming = r && r.status === "confirmed" && minutesUntilVisit(r) > 0;
+  const text = lines([
+    "📧 <b>Письмо на почту</b>",
+    "",
+    `👤 ${tgEscape(mail.fromName || r?.name || "—")} · ✉️ ${tgEscape(mail.fromEmail)}`,
+    r && `📅 ${tgEscape(formatRuDate(r.date))} · ${tgEscape(r.time)} · стол ${tablesLabel(r.tables)} · ${r.guests} чел.${r.status === "cancelled" ? " · отменена" : ""}`,
+    `📝 <b>${tgEscape(mail.subject.slice(0, 200) || "(без темы)")}</b>`,
+    "",
+    mail.text ? `<blockquote>${tgEscape(mail.text)}</blockquote>` : "(пустое письмо)",
+    mail.attachments > 0 && `📎 Вложений: ${mail.attachments} — смотри в почте.`,
+    refLine("e", mail.id),
+  ]);
+  const keyboard: InlineButton[][] = [
+    [{ text: "✍️ Ответить", callback_data: `reply:e:${mail.id}` }],
+    ...(upcoming ? [[{ text: "❌ Отменить бронь", callback_data: `cx:${r.id}` }]] : []),
+  ];
+  const sent = await Promise.all(
+    telegramChatIds().map((chatId) => sendTelegramMessage(chatId, text, { inline_keyboard: keyboard })),
+  );
+  return sent.some(Boolean);
+}
+
 /** WhatsApp and the SMS fallback both failed (or a reply didn't arrive): call the guest. */
 export async function notifyUndeliverable(phone: string, reservation: StoredReservation | null, what: string) {
   if (!isTelegramConfigured()) return false;

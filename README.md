@@ -74,9 +74,20 @@ date, name, e-mail, phone, wishes. Buttons:
 - **💬 WhatsApp** — opens a chat with the guest's number (if they gave one).
 
 Replying directly to a booking/request message works too. Mapping back to the
-guest goes through the `ref: c|r:<uuid>` line in each message, so contact
+guest goes through the `ref: c|r|e:<uuid>` line in each message, so contact
 requests are stored in Supabase (`contact_requests`). If Telegram is down or
 not configured, the owner gets the usual e-mail to `MAIL_TO` instead.
+
+E-mails to the restaurant mailbox (`SMTP_USER`) arrive as **📧 Письмо на почту**:
+every 2 minutes pg_cron calls `/api/cron/mailbox` (`supabase/cron.sql`), which
+reads new INBOX mail over IMAP with the SMTP login (`IMAP_HOST` defaults to
+`SMTP_HOST`, port 993; read-only, mails stay unread). Mail from the site itself,
+auto-replies, bounces, newsletters and provider notices are skipped; quoted
+history and signatures are cut. **✍️ Ответить** answers by e-mail as
+`Re: <subject>` in the guest's thread. Stored: sender, subject, Message-ID, date
+and the short text (`inbound_emails`, deleted after 90 days by the reminder
+job); read position in `mailbox_state`. The first run only remembers where the
+mailbox stands — older mail is not posted.
 
 Hall (texts in Russian): `/plan` or 🗺 — floor plan **now** as image, occupied
 tables red with guests + arrival time; `/walkin` or 🚶 — guests → pick a free

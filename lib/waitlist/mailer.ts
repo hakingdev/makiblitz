@@ -93,6 +93,11 @@ function sender(): { email: string; name?: string } {
   return name ? { name, email: raw } : { email: raw };
 }
 
+/** Addresses the site sends from — mail from them in the mailbox is our own. */
+export function senderAddresses(): string[] {
+  return [smtpConfig()?.user, sender().email].filter((a): a is string => Boolean(a)).map((a) => a.toLowerCase());
+}
+
 /**
  * Sends one mail through SMTP (Private Email) or, without SMTP config, through
  * Brevo's transactional API. Over SMTP the sender is the mailbox itself
@@ -108,6 +113,12 @@ export async function sendMail(opts: {
    * Defaults to the restaurant mailbox (contact.email).
    */
   replyTo?: { email: string; name?: string };
+  /**
+   * Message-ID of the guest's mail this answers: sets In-Reply-To and
+   * References so the answer lands in the guest's thread. SMTP only — the
+   * Brevo fallback sends it unthreaded (same "Re:" subject).
+   */
+  inReplyTo?: string;
 }): Promise<void> {
   const replyTo = opts.replyTo ?? { email: t.contact.email, name: t.brand.name };
   const smtp = smtpConfig();
@@ -119,6 +130,7 @@ export async function sendMail(opts: {
       subject: opts.subject,
       text: opts.text,
       html: opts.html,
+      ...(opts.inReplyTo ? { inReplyTo: opts.inReplyTo, references: opts.inReplyTo } : {}),
     });
     return;
   }

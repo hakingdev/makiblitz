@@ -276,3 +276,36 @@ create index if not exists contact_requests_created_at_idx
   on public.contact_requests (created_at desc);
 
 alter table public.contact_requests enable row level security;
+
+-- ===========================================================================
+-- E-mails to the restaurant mailbox (forwarded to the Telegram bot)
+-- ===========================================================================
+--   inbound_emails — one row per guest e-mail posted to Telegram, only what an
+--                    answer from the bot needs. message_id is unique, so a
+--                    mail is posted once (also when it arrives twice, To + Cc).
+--                    Deleted 90 days after it arrived (reminder job).
+--   mailbox_state  — how far the job has read INBOX (UIDVALIDITY + last UID).
+create table if not exists public.inbound_emails (
+  id          uuid        primary key default gen_random_uuid(),
+  message_id  text        unique,          -- Message-ID header, for In-Reply-To
+  from_email  text        not null,
+  from_name   text,
+  subject     text,
+  excerpt     text,                        -- new text only, max. 1000 characters
+  received_at timestamptz,
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists inbound_emails_created_at_idx
+  on public.inbound_emails (created_at);
+
+alter table public.inbound_emails enable row level security;
+
+create table if not exists public.mailbox_state (
+  mailbox      text        primary key,    -- 'INBOX'
+  uid_validity bigint      not null,
+  last_uid     bigint      not null,
+  updated_at   timestamptz not null default now()
+);
+
+alter table public.mailbox_state enable row level security;
