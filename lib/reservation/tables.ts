@@ -74,6 +74,10 @@ export type Booking = {
   name?: string;
   /** Guest's wish from the form or a staff comment from the bot ("веган"). */
   notes?: string | null;
+  /** Guest confirmed via the link (online bookings). */
+  confirmed?: boolean;
+  /** Guest gets WhatsApp/SMS reminders, so "not confirmed yet" is meaningful. */
+  messaging?: boolean;
 };
 
 export type TableOption = { tables: number[]; seats: number };

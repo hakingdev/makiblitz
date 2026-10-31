@@ -244,9 +244,10 @@
         "error": "Bitte gib eine gültige E-Mail-Adresse ein."
       },
       "phone": {
-        "label": "Telefon (optional)",
-        "placeholder": "Für kurzfristige Rückfragen",
-        "error": "Bitte gib eine gültige Telefonnummer ein."
+        "label": "Handy (WhatsApp) *",
+        "placeholder": "z. B. 0171 2345678",
+        "hint": "Wir senden dir Bestätigung und Erinnerungen per WhatsApp (oder SMS) an diese Nummer.",
+        "error": "Bitte gib eine gültige Handynummer ein, z. B. 0171 2345678."
       },
       "notes": {
         "label": "Hinweis (optional)",
@@ -284,6 +285,34 @@
         "Bestätigungs-E-Mail oder schreib an makilove@hotel-weisses-haus.com."
       ]
     }
+  },
+  "managePage": {
+    "metaTitle": "Deine Reservierung",
+    "eyebrow": "DEINE RESERVIERUNG",
+    "pending": {
+      "title": ["Kommst du", "wie geplant?"],
+      "body": "Hallo {name}, bitte bestätige kurz deinen Besuch – oder sag ab, falls etwas dazwischenkommt. Wir schätzen deine Zeit und möchten keinen Tisch unnötig blockieren."
+    },
+    "confirmed": {
+      "title": ["Danke,", "bis bald!"],
+      "body": "Hallo {name}, dein Besuch ist bestätigt. Wir freuen uns auf dich."
+    },
+    "cancelled": {
+      "title": ["Reservierung", "abgesagt."],
+      "body": "Schade, dass es diesmal nicht klappt. Der Tisch ist wieder frei – du bist jederzeit willkommen."
+    },
+    "past": {
+      "title": ["Dieser Besuch", "liegt hinter uns."],
+      "body": "Diese Reservierung kann nicht mehr geändert werden. Bis zum nächsten Mal!"
+    },
+    "confirm": "Ja, wir kommen",
+    "cancel": "Leider absagen",
+    "cancelLater": "Doch verhindert? Reservierung absagen",
+    "cancelAsk": "Reservierung wirklich absagen? Der Tisch wird dann für andere Gäste frei.",
+    "cancelYes": "Ja, absagen",
+    "cancelNo": "Zurück",
+    "newBooking": "Neuen Tisch reservieren",
+    "error": "Das hat leider nicht geklappt. Bitte versuch es noch einmal oder ruf uns an: 0971 72730."
   },
   "notFound": {
     "title": "Diese Seite gibt es nicht.",
@@ -408,6 +437,8 @@
         "notes": "Dein Hinweis"
       },
       "address": "MakiLove · Kurhausstr. 11A · 97688 Bad Kissingen",
+      "manage": "Kommt ihr wie geplant? Über diesen Link kannst du deine Reservierung bestätigen oder absagen:",
+      "manageButton": "Reservierung bestätigen oder absagen",
       "change": "Pläne geändert? Antworte einfach auf diese E-Mail oder schreib an makilove@hotel-weisses-haus.com.",
       "signoff": "Bis bald – dein MakiLove-Team"
     },
@@ -579,7 +610,23 @@
         ]
       },
       {
-        "heading": "4. Deine Rechte (Betroffenenrechte)",
+        "heading": "4. Tischreservierung",
+        "intro": [
+          "Wenn du über unsere Website einen Tisch reservierst, verarbeiten wir die Angaben, die wir für deine Reservierung brauchen."
+        ],
+        "list": [
+          "Verarbeitete Daten: Name, E-Mail-Adresse, Handynummer, Datum, Uhrzeit, Personenzahl, dein optionaler Hinweis sowie, ob du deinen Besuch bestätigt oder abgesagt hast.",
+          "Zweck: Durchführung deiner Reservierung – Tischplanung, Bestätigung per E-Mail und ein Link, über den du deinen Besuch bestätigen oder absagen kannst, damit wir keinen Tisch unnötig blockieren.",
+          "Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO (Vertrag bzw. vorvertragliche Maßnahmen).",
+          "Interne Benachrichtigung: Neue Reservierungen, Absagen und Hinweise meldet unser System unserem Team über den Messenger Telegram (Telegram FZ-LLC, Dubai, Vereinigte Arabische Emirate). Dabei werden Name, Kontaktdaten und Reservierungsdetails übermittelt; Telegram verarbeitet Daten auch außerhalb der EU.",
+          "Speicherdauer: 90 Tage nach deinem Besuch löschen wir Name, E-Mail-Adresse, Handynummer und Hinweis automatisch. Übrig bleiben nur anonyme Angaben (Datum, Uhrzeit, Personenzahl, Tisch) für unsere Planung."
+        ],
+        "outro": [
+          "Ohne Name, E-Mail-Adresse und Handynummer können wir keine Reservierung annehmen. Du kannst jederzeit ohne Reservierung vorbeikommen."
+        ]
+      },
+      {
+        "heading": "5. Deine Rechte (Betroffenenrechte)",
         "intro": [
           "Dir stehen nach der DSGVO folgende Rechte zu:"
         ],
@@ -597,7 +644,7 @@
         ]
       },
       {
-        "heading": "5. Beschwerderecht bei einer Aufsichtsbehörde",
+        "heading": "6. Beschwerderecht bei einer Aufsichtsbehörde",
         "intro": [
           "Du hast das Recht, dich bei einer Datenschutz-Aufsichtsbehörde zu beschweren (Art. 77 DSGVO) – insbesondere in dem Mitgliedstaat deines gewöhnlichen Aufenthaltsorts, deines Arbeitsplatzes oder des Orts des mutmaßlichen Verstoßes.",
           "Für uns zuständig: Bayerisches Landesamt für Datenschutzaufsicht (BayLDA), Promenade 18, 91522 Ansbach."
@@ -606,7 +653,7 @@
         "outro": []
       },
       {
-        "heading": "6. Cookies",
+        "heading": "7. Cookies",
         "intro": [
           "Technisch notwendige Cookies bzw. vergleichbare Speichervorgänge sind für den Betrieb der Website erforderlich und werden auf Grundlage von § 25 Abs. 2 Nr. 2 TDDDG gesetzt; eine Einwilligung ist dafür nicht erforderlich. Hierzu zählt auch die Speicherung deiner Cookie-Auswahl selbst.",
           "Darüber hinaus binden wir mit dem Meta Pixel und dem Conversion-Tracking von Google Ads (siehe folgende Abschnitte) optionale Marketing-Technologien ein. Diese werden ausschließlich nach deiner ausdrücklichen Einwilligung über unseren Cookie-Banner geladen. Ohne deine Einwilligung werden sie nicht geladen; es werden dafür keine Cookies gesetzt und keine Daten an Meta oder Google übermittelt.",
@@ -616,7 +663,7 @@
         "outro": []
       },
       {
-        "heading": "7. Meta Pixel (Facebook Pixel)",
+        "heading": "8. Meta Pixel (Facebook Pixel)",
         "intro": [
           "Auf Grundlage deiner Einwilligung setzen wir das „Meta Pixel“ (auch „Facebook Pixel“) ein, einen Dienst der Meta Platforms Ireland Limited, Merrion Road, Dublin 4, Irland („Meta“). Der Pixel wird erst geladen, nachdem du im Cookie-Banner „Alle akzeptieren“ ausgewählt hast."
         ],
@@ -633,7 +680,7 @@
         ]
       },
       {
-        "heading": "8. Google Ads (Conversion-Tracking)",
+        "heading": "9. Google Ads (Conversion-Tracking)",
         "intro": [
           "Auf Grundlage deiner Einwilligung nutzen wir das Conversion-Tracking von Google Ads, einem Dienst der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland („Google“). Das Google-Tag (gtag.js) wird erst geladen, nachdem du im Cookie-Banner „Alle akzeptieren“ ausgewählt hast."
         ],
@@ -650,7 +697,7 @@
         ]
       },
       {
-        "heading": "9. Google Maps (Anfahrtskarte)",
+        "heading": "10. Google Maps (Anfahrtskarte)",
         "intro": [
           "Auf unserer Kontaktseite kannst du eine Karte von Google Maps laden, einem Dienst der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland („Google“). Die Karte wird erst geladen, wenn du auf „Karte laden“ klickst – vorher wird keine Verbindung zu Google aufgebaut."
         ],
@@ -666,7 +713,7 @@
         ]
       },
       {
-        "heading": "10. Keine automatisierte Entscheidungsfindung",
+        "heading": "11. Keine automatisierte Entscheidungsfindung",
         "intro": [
           "Eine automatisierte Entscheidungsfindung einschließlich Profiling (Art. 22 DSGVO) findet nicht statt."
         ],

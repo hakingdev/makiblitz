@@ -61,7 +61,7 @@ export function ContactStep() {
   }
 
   function blur(name: FieldName) {
-    if (!contact[name] && name !== "phone") return;
+    if (!contact[name]) return;
     setErrors((e) => ({ ...e, [name]: validate(contact)[name] }));
   }
 
@@ -153,11 +153,17 @@ export function ContactStep() {
         label={c.phone.label}
         placeholder={c.phone.placeholder}
         autoComplete="tel"
+        inputMode="tel"
+        required
+        aria-describedby="contact-phone-hint"
         value={contact.phone}
         error={errors.phone}
         onChange={(e) => update("phone", e.target.value)}
         onBlur={() => blur("phone")}
       />
+      <p id="contact-phone-hint" className="-mt-4 text-xs leading-[18px] text-muted">
+        {c.phone.hint}
+      </p>
 
       <div className="flex flex-col gap-2">
         <TextareaField

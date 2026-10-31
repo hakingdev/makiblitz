@@ -188,6 +188,43 @@ revoke all on function public.book_reservation(date, time, integer, integer, jso
 grant execute on function public.book_reservation(date, time, integer, integer, jsonb, jsonb, smallint[], text, text, text, text, text, text, text)
   to service_role;
 
+-- ---------------------------------------------------------------------------
+-- Guest confirmation, reminders and retention
+-- ---------------------------------------------------------------------------
+--   manage_token          — random code in the guest's link /r/<token>
+--                           (confirm or cancel); never the reservation id.
+--   confirmed_at          — guest pressed "Ja, wir kommen".
+--   cancelled_by          — 'guest' (via the link) or 'staff' (Telegram).
+--   messaging             — guest gets WhatsApp/SMS; false for bookings made
+--                           before this migration, true for new ones.
+--   reminder_24h_at / reminder_2h_at / unconfirmed_alert_at
+--                         — set once the cron job has sent that message.
+--   anonymized_at         — personal data wiped 90 days after the visit.
+alter table public.reservations add column if not exists manage_token text;
+update public.reservations
+  set manage_token = replace(gen_random_uuid()::text, '-', '')
+  where manage_token is null;
+alter table public.reservations
+  alter column manage_token set default replace(gen_random_uuid()::text, '-', '');
+create unique index if not exists reservations_manage_token_idx
+  on public.reservations (manage_token);
+
+alter table public.reservations add column if not exists confirmed_at timestamptz;
+alter table public.reservations add column if not exists cancelled_by text;
+do $$ begin
+  alter table public.reservations
+    add constraint reservations_cancelled_by_check check (cancelled_by in ('guest', 'staff'));
+exception when duplicate_object then null;
+end $$;
+
+alter table public.reservations add column if not exists messaging boolean not null default false;
+alter table public.reservations alter column messaging set default true;
+
+alter table public.reservations add column if not exists reminder_24h_at timestamptz;
+alter table public.reservations add column if not exists reminder_2h_at timestamptz;
+alter table public.reservations add column if not exists unconfirmed_alert_at timestamptz;
+alter table public.reservations add column if not exists anonymized_at timestamptz;
+
 -- ===========================================================================
 -- Table contact_requests (Kontakt form, /kontakt)
 -- ===========================================================================
