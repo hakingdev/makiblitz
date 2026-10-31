@@ -226,6 +226,33 @@ alter table public.reservations add column if not exists unconfirmed_alert_at ti
 alter table public.reservations add column if not exists anonymized_at timestamptz;
 
 -- ===========================================================================
+-- Table guest_messages (WhatsApp/SMS via Twilio)
+-- ===========================================================================
+-- Every message to or from a guest: delivery status (drives the one-time SMS
+-- fallback), the guest's last message (24-hour WhatsApp reply window) and the
+-- booking it belongs to. Deleted 90 days after it was written.
+create table if not exists public.guest_messages (
+  id             uuid        primary key default gen_random_uuid(),
+  reservation_id uuid        references public.reservations (id) on delete set null,
+  phone          text        not null,          -- E.164
+  direction      text        not null check (direction in ('out', 'in')),
+  kind           text        not null
+    check (kind in ('booked', 'reminder_24h', 'reminder_2h', 'reply', 'inbound')),
+  channel        text        not null check (channel in ('whatsapp', 'sms')),
+  body           text,
+  twilio_sid     text        unique,
+  status         text,
+  error_code     text,
+  fallback_of    uuid        references public.guest_messages (id) on delete set null,
+  created_at     timestamptz not null default now()
+);
+
+create index if not exists guest_messages_phone_idx
+  on public.guest_messages (phone, created_at desc);
+
+alter table public.guest_messages enable row level security;
+
+-- ===========================================================================
 -- Table contact_requests (Kontakt form, /kontakt)
 -- ===========================================================================
 -- Stored so the restaurant can answer from the Telegram bot: the bot message

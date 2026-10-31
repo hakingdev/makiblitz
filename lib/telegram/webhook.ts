@@ -18,6 +18,8 @@ import {
 } from "./hall";
 import { parseNoteRef, parseRef, parseReplyCallback, refLine } from "./refs";
 import { firstName, loadRecipient, sendReplyMail, whatsappText, type Recipient } from "./replies";
+import { isWhatsAppWindowOpen } from "@/lib/messaging/log";
+import { sendWhatsAppReply } from "@/lib/messaging/guest";
 
 /**
  * Handles Telegram updates for the owner chat(s):
@@ -48,7 +50,18 @@ function isOwnerChat(chatId: number | undefined) {
 }
 
 function recipientLine(r: Recipient) {
-  return `<b>${tgEscape(r.name)}</b> · ${tgEscape(r.email)}${r.phone ? ` · ${tgEscape(r.phone)}` : ""}`;
+  return [r.name && `<b>${tgEscape(r.name)}</b>`, r.email && tgEscape(r.email), r.phone && tgEscape(r.phone)]
+    .filter(Boolean)
+    .join(" · ");
+}
+
+/**
+ * Where a reply goes (decision Q20: WhatsApp and e-mail only, never SMS):
+ * WhatsApp while the guest's 24-hour window is open, otherwise e-mail.
+ */
+async function replyChannel(r: Recipient): Promise<"whatsapp" | "email" | null> {
+  if (r.phone && (await isWhatsAppWindowOpen(r.phone))) return "whatsapp";
+  return r.email ? "email" : null;
 }
 
 async function onReplyButton(query: TgCallbackQuery) {
@@ -60,14 +73,22 @@ async function onReplyButton(query: TgCallbackQuery) {
     return;
   }
   await callTelegram("answerCallbackQuery", { callback_query_id: query.id });
+  const channel = await replyChannel(recipient);
+  if (!channel) {
+    await sendTelegramMessage(
+      chatId,
+      `⚠️ Письменно ответить нельзя: окно WhatsApp (24 ч после сообщения гостя) закрыто, e-mail нет.\nПозвони гостю: ${tgEscape(recipient.phone ?? "—")}`,
+    );
+    return;
+  }
   await sendTelegramMessage(
     chatId,
     [
       `✍️ Ответ для ${recipientLine(recipient)}`,
-      "Напиши текст ответом на это сообщение — он уйдёт гостю на e-mail.",
+      `Напиши текст ответом на это сообщение — он уйдёт гостю ${channel === "whatsapp" ? "в WhatsApp" : "на e-mail"}.`,
       refLine(ref.kind, ref.id),
     ].join("\n"),
-    { force_reply: true, input_field_placeholder: `Ответ для ${firstName(recipient.name)}…` },
+    { force_reply: true, input_field_placeholder: `Ответ для ${firstName(recipient.name) || recipient.phone || "гостя"}…` },
   );
 }
 
@@ -85,6 +106,21 @@ async function onAnswer(message: TgMessage) {
   const recipient = await loadRecipient(ref);
   if (!recipient) {
     await sendTelegramMessage(message.chat.id, "⚠️ Запрос не найден — ответ не отправлен.");
+    return;
+  }
+
+  if ((await replyChannel(recipient)) === "whatsapp") {
+    const reservationId = recipient.ref.kind === "r" ? recipient.ref.id : null;
+    if (await sendWhatsAppReply(recipient.phone!, whatsappText(recipient, answer), reservationId)) {
+      await sendTelegramMessage(message.chat.id, `✅ Ответ отправлен в WhatsApp ${tgEscape(recipient.phone!)}`);
+      return;
+    }
+  }
+  if (!recipient.email) {
+    await sendTelegramMessage(
+      message.chat.id,
+      `⚠️ Ответ не отправлен: WhatsApp не принял сообщение, e-mail нет. Позвони гостю: ${tgEscape(recipient.phone ?? "—")}`,
+    );
     return;
   }
 
