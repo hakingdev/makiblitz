@@ -7,10 +7,10 @@
 export const RESTAURANT_TIME_ZONE = "Europe/Berlin";
 
 /**
- * Bookable days. For now only these two dates; set to `null` to switch to
- * the regular schedule in OPEN_WEEKDAYS.
+ * Bookable days. For now only these dates (past ones simply drop out); set to
+ * `null` to switch to the regular schedule in OPEN_WEEKDAYS.
  */
-export const OPEN_DATES: readonly string[] | null = ["2026-10-30", "2026-10-31"];
+export const OPEN_DATES: readonly string[] | null = ["2026-10-30", "2026-10-31", "2026-11-07", "2026-11-08"];
 
 /** Regular schedule once OPEN_DATES is null (0 = Sunday … 5 = Friday, 6 = Saturday). */
 export const OPEN_WEEKDAYS: readonly number[] = [5, 6];
