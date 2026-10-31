@@ -365,7 +365,7 @@
   },
   "consent": {
     "ariaLabel": "Cookie-Einstellungen",
-    "textPrefix": "Wir nutzen Cookies, um den Erfolg unserer Werbung zu messen (Meta Pixel, Google Ads). Das hilft uns, MakiLove bekannter zu machen. Details findest du in der ",
+    "textPrefix": "Wir nutzen Cookies, um den Erfolg unserer Werbung zu messen (Meta Pixel, Google Ads, TikTok). Das hilft uns, MakiLove bekannter zu machen. Details findest du in der ",
     "privacyLink": "Datenschutzerklärung",
     "textSuffix": ".",
     "acceptAll": "Alle akzeptieren",
@@ -659,7 +659,7 @@
         "heading": "7. Cookies",
         "intro": [
           "Technisch notwendige Cookies bzw. vergleichbare Speichervorgänge sind für den Betrieb der Website erforderlich und werden auf Grundlage von § 25 Abs. 2 Nr. 2 TDDDG gesetzt; eine Einwilligung ist dafür nicht erforderlich. Hierzu zählt auch die Speicherung deiner Cookie-Auswahl selbst.",
-          "Darüber hinaus binden wir mit dem Meta Pixel und dem Conversion-Tracking von Google Ads (siehe folgende Abschnitte) optionale Marketing-Technologien ein. Diese werden ausschließlich nach deiner ausdrücklichen Einwilligung über unseren Cookie-Banner geladen. Ohne deine Einwilligung werden sie nicht geladen; es werden dafür keine Cookies gesetzt und keine Daten an Meta oder Google übermittelt.",
+          "Darüber hinaus binden wir mit dem Meta Pixel, dem Conversion-Tracking von Google Ads und dem TikTok Pixel (siehe folgende Abschnitte) optionale Marketing-Technologien ein. Diese werden ausschließlich nach deiner ausdrücklichen Einwilligung über unseren Cookie-Banner geladen. Ohne deine Einwilligung werden sie nicht geladen; es werden dafür keine Cookies gesetzt und keine Daten an Meta, Google oder TikTok übermittelt.",
           "Deine Auswahl kannst du jederzeit mit Wirkung für die Zukunft ändern oder widerrufen – über den Link „Cookie-Einstellungen“ im Footer der Website."
         ],
         "list": [],
@@ -700,7 +700,25 @@
         ]
       },
       {
-        "heading": "10. Google Maps (Anfahrtskarte)",
+        "heading": "10. TikTok Pixel und TikTok Events API",
+        "intro": [
+          "Auf Grundlage deiner Einwilligung setzen wir das „TikTok Pixel“ und die „TikTok Events API“ ein, Dienste der TikTok Technology Limited, 10 Earlsfort Terrace, Dublin, D02 T380, Irland („TikTok“). Das Pixel wird erst geladen, nachdem du im Cookie-Banner „Alle akzeptieren“ ausgewählt hast."
+        ],
+        "list": [
+          "Zweck: Messung und Optimierung unserer Werbekampagnen auf TikTok (Conversion-Tracking) – insbesondere um zu erkennen, welche Anzeigen zu einer Tischreservierung führen.",
+          "Verarbeitete Daten: Cookie-IDs (z. B. „_ttp“), die Klick-ID aus der Anzeige („ttclid“), die von dir besuchten Seiten (u. a. die Bestätigung deiner Tischreservierung), deine IP-Adresse sowie Geräte- und Browserdaten.",
+          "Klick-ID: Kommst du über eine TikTok-Anzeige zu uns, speichern wir deren Klick-ID nach deiner Einwilligung lokal in deinem Browser (localStorage), damit wir eine Reservierung der Anzeige zuordnen können. Nach 7 Tagen verwenden wir sie nicht mehr und löschen sie bei deinem nächsten Besuch.",
+          "Reservierung über die Events API: Nach deiner Reservierung meldet zusätzlich unser Server die Reservierung direkt an TikTok – mit den genannten IDs, deiner IP-Adresse und deinem User-Agent sowie deiner E-Mail-Adresse, deiner Handynummer und einer internen Reservierungskennung. Diese drei Angaben übermitteln wir nur als SHA-256-Hashwert (pseudonymisiert, nicht im Klartext); TikTok gleicht sie mit seinen Nutzerkonten ab, um die Reservierung einer Anzeige zuzuordnen („Advanced Matching“). Name, Datum, Uhrzeit, Personenzahl und deinen Hinweis übermitteln wir nicht.",
+          "Rechtsgrundlage: deine Einwilligung nach Art. 6 Abs. 1 lit. a DSGVO in Verbindung mit § 25 Abs. 1 TDDDG."
+        ],
+        "outro": [
+          "Übermittlung in Drittländer: TikTok speichert Daten auf Servern in den USA, in Malaysia und in Singapur und übermittelt sie auch an Unternehmen der TikTok-Gruppe in Ländern, für die kein Angemessenheitsbeschluss der EU-Kommission besteht. TikTok stützt diese Übermittlungen auf EU-Standardvertragsklauseln (Art. 46 DSGVO).",
+          "Widerruf: Du kannst deine Einwilligung jederzeit mit Wirkung für die Zukunft widerrufen – über den Link „Cookie-Einstellungen“ im Footer der Website. Wir löschen dann eine gespeicherte Klick-ID; das Pixel wird ab dem nächsten Seitenaufruf nicht mehr geladen, und unser Server meldet keine weiteren Reservierungen an TikTok.",
+          "Weitere Informationen findest du in der Datenschutzerklärung von TikTok unter https://www.tiktok.com/legal/page/eea/privacy-policy/de."
+        ]
+      },
+      {
+        "heading": "11. Google Maps (Anfahrtskarte)",
         "intro": [
           "Auf unserer Kontaktseite kannst du eine Karte von Google Maps laden, einem Dienst der Google Ireland Limited, Gordon House, Barrow Street, Dublin 4, Irland („Google“). Die Karte wird erst geladen, wenn du auf „Karte laden“ klickst – vorher wird keine Verbindung zu Google aufgebaut."
         ],
@@ -716,7 +734,7 @@
         ]
       },
       {
-        "heading": "11. Keine automatisierte Entscheidungsfindung",
+        "heading": "12. Keine automatisierte Entscheidungsfindung",
         "intro": [
           "Eine automatisierte Entscheidungsfindung einschließlich Profiling (Art. 22 DSGVO) findet nicht statt."
         ],
@@ -724,6 +742,6 @@
         "outro": []
       }
     ],
-    "stand": "Stand: 17. Oktober 2026"
+    "stand": "Stand: 31. Oktober 2026"
   }
 }

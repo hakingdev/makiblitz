@@ -113,7 +113,7 @@ components/
   menu/                   # Speisekarte category + dish row
   contact/                # Kontakt message form
   reservation/            # provider, steps, header/footer/progress, summary
-  consent/ analytics/     # cookie banner + consent-gated Meta Pixel
+  consent/ analytics/     # cookie banner + consent-gated Meta Pixel, Google Ads, TikTok Pixel
 lib/
   reservation/            # slot config, Berlin-time date helpers, .ics builder
   waitlist/  email/       # Supabase store, Brevo mailer, e-mail validation (reused)
@@ -127,3 +127,9 @@ public/images, public/icons  # photos + SVG icons exported from Figma
 - Instagram link in the footer appears once `INSTAGRAM_URL` in `lib/site.ts` is set.
 - Meta Pixel loads only after "Alle akzeptieren" and only when
   `NEXT_PUBLIC_FB_PIXEL_ID` is set at build time.
+- TikTok Pixel (also only after "Alle akzeptieren") counts every booking as
+  `CompleteRegistration` on `/reservieren/bestaetigt`. The same event goes from
+  the server via the Events API (`POST /api/tiktok-event`, needs
+  `TIKTOK_ACCESS_TOKEN` and the `tiktok_event_at` column from
+  `supabase/schema.sql`) with hashed e-mail/phone; TikTok deduplicates both
+  by `event_id`.

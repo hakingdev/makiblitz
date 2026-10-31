@@ -309,3 +309,10 @@ create table if not exists public.mailbox_state (
 );
 
 alter table public.mailbox_state enable row level security;
+
+-- ===========================================================================
+-- TikTok Events API (CompleteRegistration per online booking)
+-- ===========================================================================
+--   tiktok_event_at — set once the server has sent the booking to TikTok
+--                     (app/api/tiktok-event), so it never goes out twice.
+alter table public.reservations add column if not exists tiktok_event_at timestamptz;

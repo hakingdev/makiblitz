@@ -11,6 +11,7 @@ import { VisitSummary, guestsLabel } from "@/components/reservation/VisitSummary
 import { useReservation } from "@/components/reservation/ReservationProvider";
 import { ScheduleEvent } from "@/components/analytics/ScheduleEvent";
 import { GoogleAdsConversion } from "@/components/analytics/GoogleAdsConversion";
+import { TikTokConversion } from "@/components/analytics/TikTokConversion";
 
 const t = getMessages();
 const c = t.reservation.confirmed;
@@ -45,6 +46,7 @@ export function ConfirmedStep() {
     <div className="page-container flex flex-col items-center pb-8 pt-6 lg:pb-16 lg:pt-12">
       <ScheduleEvent reservationId={reservationId} />
       <GoogleAdsConversion reservationId={reservationId} />
+      <TikTokConversion reservationId={reservationId} />
       <div className="flex w-full max-w-[680px] flex-col items-center gap-6 text-center lg:rounded-3xl lg:border lg:border-line lg:bg-white lg:p-12">
         <div className="grid size-[72px] place-items-center rounded-full bg-blush">
           <Icon name="check-32" />

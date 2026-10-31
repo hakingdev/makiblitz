@@ -56,8 +56,8 @@ export type StoredReservation = {
 
 export type CancelledBy = "guest" | "staff";
 
-/** Columns the reminder job stamps once a message went out. */
-export type SentMark = "reminder_24h_at" | "reminder_2h_at" | "unconfirmed_alert_at";
+/** Columns stamped once a message (or the TikTok server event) went out. */
+export type SentMark = "reminder_24h_at" | "reminder_2h_at" | "unconfirmed_alert_at" | "tiktok_event_at";
 
 export type BookResult =
   | { ok: true; id: string; tables: number[] }
@@ -307,7 +307,12 @@ class SupabaseReservationStore implements ReservationStore {
   }
 }
 
-type LocalRow = StoredReservation & { ipHash: string | null; userAgent: string | null; anonymizedAt?: string | null };
+type LocalRow = StoredReservation & {
+  ipHash: string | null;
+  userAgent: string | null;
+  anonymizedAt?: string | null;
+  tiktokEventAt?: string | null;
+};
 
 const LOCAL_FILE =
   process.env.RESERVATIONS_FILE ?? path.join(process.cwd(), "reservations.local.json");
@@ -484,7 +489,8 @@ const LOCAL_MARKS = {
   reminder_24h_at: "reminder24hAt",
   reminder_2h_at: "reminder2hAt",
   unconfirmed_alert_at: "unconfirmedAlertAt",
-} as const satisfies Record<SentMark, keyof StoredReservation>;
+  tiktok_event_at: "tiktokEventAt",
+} as const satisfies Record<SentMark, keyof LocalRow>;
 
 let store: ReservationStore | undefined;
 
