@@ -13,9 +13,9 @@ import {
  * Lightweight, self-hosted consent state (§ 25 TDDDG, Art. 6 Abs. 1 lit. a
  * DSGVO) — no third-party CMP.
  *
- * "all"       → the Meta Pixel may load.
+ * "all"       → the Meta Pixel, Google Ads and the TikTok Pixel may load.
  * "necessary" → nothing but technically required storage; no pixel, no
- *               requests to facebook/meta domains.
+ *               requests to meta, google or tiktok domains.
  *
  * The choice itself is stored in localStorage (technisch notwendig, keine
  * Einwilligung nötig). Storing the choice is not the same as acting on it:
