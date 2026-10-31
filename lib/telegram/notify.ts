@@ -1,5 +1,6 @@
 import { tablesLabel } from "@/lib/reservation/tables";
 import type { NewReservation, StoredReservation } from "@/lib/reservation/store";
+import { minutesUntilVisit } from "@/lib/reservation/manage";
 import type { NewContactRequest } from "@/lib/contact/store";
 import {
   isTelegramConfigured,
@@ -114,6 +115,54 @@ export async function notifyUnconfirmed(r: StoredReservation, minutesLeft: numbe
   const sent = await Promise.all(
     telegramChatIds().map((chatId) => sendTelegramMessage(chatId, text, { inline_keyboard: keyboard })),
   );
+  return sent.some(Boolean);
+}
+
+/** A guest wrote to the WhatsApp number: forward it with "✍️ Ответить". */
+export async function notifyGuestWhatsApp(msg: {
+  phone: string;
+  profileName: string | null;
+  body: string;
+  media: number;
+  reservation: StoredReservation | null;
+}) {
+  if (!isTelegramConfigured()) return false;
+  const r = msg.reservation;
+  const upcoming = r && r.status === "confirmed" && minutesUntilVisit(r) > 0;
+  const text = lines([
+    "💬 <b>WhatsApp от гостя</b>",
+    "",
+    `👤 ${tgEscape(r?.name ?? msg.profileName ?? "—")} · 📞 ${tgEscape(msg.phone)}`,
+    r && `📅 ${tgEscape(formatRuDate(r.date))} · ${tgEscape(r.time)} · стол ${tablesLabel(r.tables)} · ${r.guests} чел.${r.status === "cancelled" ? " · отменена" : ""}`,
+    "",
+    msg.body.trim() ? `<blockquote>${tgEscape(msg.body.trim())}</blockquote>` : null,
+    msg.media > 0 && "📎 Гость прислал вложение — посмотри в Twilio.",
+    r ? refLine("r", r.id) : refLine("w", msg.phone),
+  ]);
+  const replyRef = r ? `r:${r.id}` : `w:${msg.phone}`;
+  const keyboard: InlineButton[][] = [
+    [{ text: "✍️ Ответить", callback_data: `reply:${replyRef}` }],
+    ...(upcoming ? [[{ text: "❌ Отменить бронь", callback_data: `cx:${r.id}` }]] : []),
+  ];
+  const sent = await Promise.all(
+    telegramChatIds().map((chatId) => sendTelegramMessage(chatId, text, { inline_keyboard: keyboard })),
+  );
+  return sent.some(Boolean);
+}
+
+/** WhatsApp and the SMS fallback both failed (or a reply didn't arrive): call the guest. */
+export async function notifyUndeliverable(phone: string, reservation: StoredReservation | null, what: string) {
+  if (!isTelegramConfigured()) return false;
+  const r = reservation;
+  const text = lines([
+    `📵 <b>Не доставлено гостю</b> — ${tgEscape(what)}`,
+    "",
+    `👤 ${tgEscape(r?.name ?? "—")} · 📞 ${tgEscape(phone)}`,
+    r && `📅 ${tgEscape(formatRuDate(r.date))} · ${tgEscape(r.time)} · стол ${tablesLabel(r.tables)} · ${r.guests} чел.`,
+    "",
+    "Позвони гостю или напиши ему сам.",
+  ]);
+  const sent = await Promise.all(telegramChatIds().map((chatId) => sendTelegramMessage(chatId, text)));
   return sent.some(Boolean);
 }
 

@@ -83,6 +83,8 @@ interface ReservationStore {
   release(id: string, mark: SentMark): Promise<void>;
   /** Wipes personal data of visits before `beforeDate`; returns how many. */
   anonymizeBefore(beforeDate: string): Promise<number>;
+  /** The guest's latest booking for a phone number (E.164), any status. */
+  latestByPhone(phone: string): Promise<StoredReservation | null>;
   /** Confirmed bookings from `fromDate` on, in order. */
   upcoming(fromDate: string, limit: number): Promise<StoredReservation[]>;
   /** Replaces the comment of a confirmed booking (null clears it). */
@@ -233,6 +235,19 @@ class SupabaseReservationStore implements ReservationStore {
   async release(id: string, mark: SentMark): Promise<void> {
     const { error } = await this.client.from("reservations").update({ [mark]: null }).eq("id", id);
     if (error) console.error("[reservation] Supabase release failed:", error);
+  }
+
+  async latestByPhone(phone: string): Promise<StoredReservation | null> {
+    const { data, error } = await this.client
+      .from("reservations")
+      .select(COLUMNS)
+      .eq("phone", phone)
+      .order("visit_date", { ascending: false })
+      .order("visit_time", { ascending: false })
+      .limit(1);
+    if (error) console.error("[reservation] Supabase read failed:", error);
+    const row = (data as Row[] | null)?.[0];
+    return row ? fromRow(row) : null;
   }
 
   async anonymizeBefore(beforeDate: string): Promise<number> {
@@ -422,6 +437,14 @@ class LocalReservationStore implements ReservationStore {
     });
   }
 
+  async latestByPhone(phone: string): Promise<StoredReservation | null> {
+    return (
+      (await this.rows())
+        .filter((r) => r.phone === phone)
+        .sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time))[0] ?? null
+    );
+  }
+
   anonymizeBefore(beforeDate: string): Promise<number> {
     return this.serialized(async (rows) => {
       let count = 0;
@@ -508,6 +531,10 @@ export function releaseSent(id: string, mark: SentMark): Promise<void> {
 
 export function anonymizeReservationsBefore(beforeDate: string): Promise<number> {
   return getStore().anonymizeBefore(beforeDate);
+}
+
+export function latestReservationByPhone(phone: string): Promise<StoredReservation | null> {
+  return getStore().latestByPhone(phone);
 }
 
 export function setReservationNotes(id: string, notes: string | null): Promise<StoredReservation | null> {

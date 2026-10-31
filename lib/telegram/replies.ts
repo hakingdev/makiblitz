@@ -12,7 +12,8 @@ const m = t.emails.reply;
 export type Recipient = {
   ref: Ref;
   name: string;
-  email: string;
+  /** Null for walk-ins with only a phone and for WhatsApp numbers without a booking. */
+  email: string | null;
   phone: string | null;
   subject: string;
   quoteLabel: string;
@@ -26,6 +27,9 @@ function fill(template: string, values: Record<string, string | number>) {
 const berlinDate = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin", dateStyle: "medium" });
 
 export async function loadRecipient(ref: Ref): Promise<Recipient | null> {
+  if (ref.kind === "w") {
+    return { ref, name: "", email: null, phone: ref.id, subject: "", quoteLabel: "", quote: "" };
+  }
   if (ref.kind === "c") {
     const req = await getContactRequest(ref.id);
     if (!req) return null;
@@ -40,7 +44,7 @@ export async function loadRecipient(ref: Ref): Promise<Recipient | null> {
     };
   }
   const res = await getReservation(ref.id);
-  if (!res?.email) return null; // walk-ins have no address
+  if (!res || (!res.email && !res.phone)) return null; // walk-ins have neither
   const guests = `${res.guests} ${res.guests === 1 ? t.reservation.person : t.reservation.persons}`;
   return {
     ref,
@@ -57,20 +61,24 @@ export function firstName(name: string) {
   return name.trim().split(/\s+/)[0] ?? name;
 }
 
+/** "Hallo Anna," — or just "Hallo," when we don't know the name. */
+const greetingFor = (name: string) => fill(m.greeting, { name: firstName(name) }).replace(/\s+,/, ",");
+
 /** Text for the WhatsApp button, so the same answer can go out there with one tap. */
 export function whatsappText(recipient: Recipient, answer: string) {
-  return `${fill(m.greeting, { name: firstName(recipient.name) })}\n\n${answer}\n\n${m.whatsappSignoff}`;
+  return `${greetingFor(recipient.name)}\n\n${answer}\n\n${m.whatsappSignoff}`;
 }
 
 /** Sends the owner's answer to the guest by e-mail; replies from the guest go to MAIL_TO. */
 export type ReplyMailResult = "sent" | "no_credits" | "failed";
 
 export async function sendReplyMail(recipient: Recipient, answer: string): Promise<ReplyMailResult> {
+  if (!recipient.email) return "failed";
   if (!isMailConfigured()) {
     console.info("[telegram] mail not configured — reply to", recipient.email, `(${answer.length} chars)`);
     return "failed";
   }
-  const greeting = fill(m.greeting, { name: firstName(recipient.name) });
+  const greeting = greetingFor(recipient.name);
   const footer = [t.emails.footer.sender, ...t.emails.footer.senderLines];
   try {
     await sendMail({
