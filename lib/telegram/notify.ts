@@ -70,6 +70,18 @@ export async function notifyReservation(r: NewReservation, id: string, tables: n
   return sent.some(Boolean);
 }
 
+/** Guest pressed "Ja, wir kommen" on /r/<token>: one short line, no plan. */
+export async function notifyGuestConfirmed(r: StoredReservation) {
+  if (!isTelegramConfigured()) return false;
+  const text = `✅ <b>Гость подтвердил</b> · ${tgEscape(formatRuDate(r.date))} · ${tgEscape(r.time)} · стол ${tablesLabel(r.tables)} · ${r.guests} чел. · ${tgEscape(r.name)}`;
+  const sent = await Promise.all(
+    telegramChatIds().map((chatId) =>
+      sendTelegramMessage(chatId, text, { inline_keyboard: [[{ text: "📅 Схема дня", callback_data: `pv:${r.date}` }]] }),
+    ),
+  );
+  return sent.some(Boolean);
+}
+
 /** Guest cancelled on /r/<token>: the freed table on the plan of that window. */
 export async function notifyGuestCancelled(r: StoredReservation) {
   if (!isTelegramConfigured()) return false;

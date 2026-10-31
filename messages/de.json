@@ -306,6 +306,7 @@
       "body": "Diese Reservierung kann nicht mehr geändert werden. Bis zum nächsten Mal!"
     },
     "confirm": "Ja, wir kommen",
+    "sending": "Wird gesendet…",
     "cancel": "Leider absagen",
     "cancelLater": "Doch verhindert? Reservierung absagen",
     "cancelAsk": "Reservierung wirklich absagen? Der Tisch wird dann für andere Gäste frei.",
