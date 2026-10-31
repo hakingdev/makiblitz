@@ -58,5 +58,8 @@ guest-messages.local.json
 # Local contact-request store (dev fallback without Supabase — personal data)
 contact-requests.local.json
 
+# Local store of guest e-mails forwarded to Telegram (dev fallback — personal data)
+inbound-emails.local.json
+
 # SQL with secrets (filled-in copies of supabase/*.sql)
 supabase/*.local.sql

@@ -1,15 +1,16 @@
 /**
  * Every bot message about a guest ends with "ref: c:<uuid>" (contact request),
- * "ref: r:<uuid>" (reservation) or "ref: w:+49…" (a WhatsApp message from a
- * number without a booking). A reply to such a message — or to the "Antwort"
+ * "ref: r:<uuid>" (reservation), "ref: e:<uuid>" (an e-mail to the restaurant
+ * mailbox) or "ref: w:+49…" (a WhatsApp message from a number without a
+ * booking). A reply to such a message — or to the "Antwort"
  * prompt — is matched back to the guest through this line, so the bot needs
  * no conversation state.
  */
 
-export type RefKind = "c" | "r" | "w";
+export type RefKind = "c" | "r" | "e" | "w";
 export type Ref = { kind: RefKind; id: string };
 
-const REF = /ref:\s*(?:([cr]):([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(w):(\+\d{8,15}))/i;
+const REF = /ref:\s*(?:([cre]):([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})|(w):(\+\d{8,15}))/i;
 
 export function refLine(kind: RefKind, id: string) {
   return `<code>ref: ${kind}:${id}</code>`;

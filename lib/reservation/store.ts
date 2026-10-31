@@ -83,8 +83,8 @@ interface ReservationStore {
   release(id: string, mark: SentMark): Promise<void>;
   /** Wipes personal data of visits before `beforeDate`; returns how many. */
   anonymizeBefore(beforeDate: string): Promise<number>;
-  /** The guest's latest booking for a phone number (E.164), any status. */
-  latestByPhone(phone: string): Promise<StoredReservation | null>;
+  /** The guest's latest booking for a phone number (E.164) or e-mail address (lower case), any status. */
+  latestBy(field: "phone" | "email", value: string): Promise<StoredReservation | null>;
   /** Confirmed bookings from `fromDate` on, in order. */
   upcoming(fromDate: string, limit: number): Promise<StoredReservation[]>;
   /** Replaces the comment of a confirmed booking (null clears it). */
@@ -237,11 +237,11 @@ class SupabaseReservationStore implements ReservationStore {
     if (error) console.error("[reservation] Supabase release failed:", error);
   }
 
-  async latestByPhone(phone: string): Promise<StoredReservation | null> {
+  async latestBy(field: "phone" | "email", value: string): Promise<StoredReservation | null> {
     const { data, error } = await this.client
       .from("reservations")
       .select(COLUMNS)
-      .eq("phone", phone)
+      .eq(field, value)
       .order("visit_date", { ascending: false })
       .order("visit_time", { ascending: false })
       .limit(1);
@@ -437,10 +437,10 @@ class LocalReservationStore implements ReservationStore {
     });
   }
 
-  async latestByPhone(phone: string): Promise<StoredReservation | null> {
+  async latestBy(field: "phone" | "email", value: string): Promise<StoredReservation | null> {
     return (
       (await this.rows())
-        .filter((r) => r.phone === phone)
+        .filter((r) => r[field] === value)
         .sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time))[0] ?? null
     );
   }
@@ -534,7 +534,12 @@ export function anonymizeReservationsBefore(beforeDate: string): Promise<number>
 }
 
 export function latestReservationByPhone(phone: string): Promise<StoredReservation | null> {
-  return getStore().latestByPhone(phone);
+  return getStore().latestBy("phone", phone);
+}
+
+/** Booking e-mails are stored in lower case (validateEmail). */
+export function latestReservationByEmail(email: string): Promise<StoredReservation | null> {
+  return getStore().latestBy("email", email.trim().toLowerCase());
 }
 
 export function setReservationNotes(id: string, notes: string | null): Promise<StoredReservation | null> {

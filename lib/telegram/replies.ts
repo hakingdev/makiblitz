@@ -2,6 +2,8 @@ import { getMessages } from "@/lib/i18n";
 import { getContactRequest, markContactRequestAnswered } from "@/lib/contact/store";
 import { formatLongDate, formatShortDate } from "@/lib/reservation/dates";
 import { getReservation } from "@/lib/reservation/store";
+import { getInboundEmail } from "@/lib/mailbox/store";
+import { replySubject } from "@/lib/mailbox/parse";
 import { MailQuotaError, escapeHtml, isMailConfigured, sendMail } from "@/lib/waitlist/mailer";
 import type { Ref } from "./refs";
 
@@ -18,6 +20,8 @@ export type Recipient = {
   subject: string;
   quoteLabel: string;
   quote: string;
+  /** Message-ID of the guest's e-mail, so the answer threads under it. */
+  inReplyTo?: string;
 };
 
 function fill(template: string, values: Record<string, string | number>) {
@@ -29,6 +33,21 @@ const berlinDate = new Intl.DateTimeFormat("de-DE", { timeZone: "Europe/Berlin",
 export async function loadRecipient(ref: Ref): Promise<Recipient | null> {
   if (ref.kind === "w") {
     return { ref, name: "", email: null, phone: ref.id, subject: "", quoteLabel: "", quote: "" };
+  }
+  if (ref.kind === "e") {
+    // Answered by e-mail only, even when the address matches a booking with a phone.
+    const mail = await getInboundEmail(ref.id);
+    if (!mail) return null;
+    return {
+      ref,
+      name: mail.fromName,
+      email: mail.fromEmail,
+      phone: null,
+      subject: replySubject(mail.subject, m.contactSubject),
+      quoteLabel: fill(m.contactQuote, { date: berlinDate.format(new Date(mail.receivedAt)) }),
+      quote: mail.excerpt,
+      inReplyTo: mail.messageId ?? undefined,
+    };
   }
   if (ref.kind === "c") {
     const req = await getContactRequest(ref.id);
@@ -84,6 +103,7 @@ export async function sendReplyMail(recipient: Recipient, answer: string): Promi
     await sendMail({
       to: recipient.email,
       subject: recipient.subject,
+      inReplyTo: recipient.inReplyTo,
       text: [greeting, "", answer, "", ...m.signoff, "", "> " + recipient.quoteLabel, ...recipient.quote.split("\n").map((l) => `> ${l}`), "", "--", ...footer].join("\n"),
       html: `<!doctype html><html lang="de"><body style="margin:0;background:#FFFCF8;font-family:Mulish,Arial,sans-serif;color:#211D1B;">
 <div style="max-width:560px;margin:0 auto;padding:32px 24px;">
