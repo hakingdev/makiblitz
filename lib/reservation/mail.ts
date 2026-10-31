@@ -35,7 +35,7 @@ ${inner}
 }
 
 /** Confirmation to the guest — transactional, no marketing content. */
-async function sendGuestMail(r: NewReservation & { email: string }) {
+async function sendGuestMail(r: NewReservation & { email: string }, manageLink: string | null) {
   const firstName = r.name.split(/\s+/)[0] ?? r.name;
   const rows: [string, string][] = [
     [g.labels.date, formatLongDate(r.date)],
@@ -55,6 +55,7 @@ async function sendGuestMail(r: NewReservation & { email: string }) {
     g.address,
     MAPS_URL,
     "",
+    ...(manageLink ? [g.manage, manageLink, ""] : []),
     g.change,
     "",
     g.signoff,
@@ -70,6 +71,12 @@ async function sendGuestMail(r: NewReservation & { email: string }) {
 <table role="presentation" style="border-collapse:collapse;font-size:15px;">${rowsHtml(rows)}</table>
 </div>
 <p style="margin:0 0 16px;font-size:14px;line-height:22px;color:#706864;"><a href="${MAPS_URL}" style="color:#706864;">${escapeHtml(g.address)}</a></p>
+${
+    manageLink
+      ? `<p style="margin:0 0 12px;font-size:15px;line-height:24px;">${escapeHtml(g.manage)}</p>
+<p style="margin:0 0 20px;"><a href="${escapeHtml(manageLink)}" style="display:inline-block;background:#D91F2D;color:#FFFFFF;text-decoration:none;font-weight:700;font-size:15px;padding:12px 22px;border-radius:999px;">${escapeHtml(g.manageButton)}</a></p>`
+      : ""
+  }
 <p style="margin:0 0 16px;font-size:14px;line-height:22px;color:#706864;">${escapeHtml(g.change)}</p>
 <p style="margin:0;font-size:16px;line-height:26px;">${escapeHtml(g.signoff)}</p>
 <hr style="margin:28px 0 16px;border:none;border-top:1px solid #E7DED8;"/>
@@ -115,14 +122,17 @@ export async function sendReservationMails(
   r: NewReservation,
   id: string,
   tables: number[],
-  { ownerFallback }: { ownerFallback: boolean },
+  { ownerFallback, manageLink = null }: { ownerFallback: boolean; manageLink?: string | null },
 ) {
   if (!isMailConfigured()) {
     console.info("[reservation] mail not configured — booked", id, r.date, r.time, `${r.guests}p`);
     return;
   }
   const email = r.email;
-  const jobs = [...(email ? [sendGuestMail({ ...r, email })] : []), ...(ownerFallback ? [sendOwnerMail(r, id, tables)] : [])];
+  const jobs = [
+    ...(email ? [sendGuestMail({ ...r, email }, manageLink)] : []),
+    ...(ownerFallback ? [sendOwnerMail(r, id, tables)] : []),
+  ];
   const results = await Promise.allSettled(jobs);
   results.forEach((result, i) => {
     if (result.status === "rejected") {

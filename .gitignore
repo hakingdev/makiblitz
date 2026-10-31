@@ -56,3 +56,6 @@ reservations.local.json
 
 # Local contact-request store (dev fallback without Supabase — personal data)
 contact-requests.local.json
+
+# SQL with secrets (filled-in copies of supabase/*.sql)
+supabase/*.local.sql

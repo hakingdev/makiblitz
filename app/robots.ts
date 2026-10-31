@@ -12,6 +12,7 @@ export default function robots(): MetadataRoute.Robots {
           "/api/",
           "/reservieren/kontakt",
           "/reservieren/bestaetigt",
+          "/r/",
           "/confirm",
           "/abmelden",
         ],

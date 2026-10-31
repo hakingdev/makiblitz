@@ -14,10 +14,13 @@ function inputState(invalid: boolean) {
 
 type Common = { label: string; error?: string | null; className?: string };
 
+/** The error message plus any hint the caller links (aria-describedby). */
+const describedByIds = (...ids: (string | undefined)[]) => ids.filter(Boolean).join(" ") || undefined;
+
 export const Field = forwardRef<
   HTMLInputElement,
   Common & Omit<InputHTMLAttributes<HTMLInputElement>, "className">
->(function Field({ label, error, className, id, ...props }, ref) {
+>(function Field({ label, error, className, id, "aria-describedby": describedBy, ...props }, ref) {
   const errorId = error ? `${id}-error` : undefined;
   return (
     <div className={cn("flex flex-col gap-2", className)}>
@@ -28,7 +31,7 @@ export const Field = forwardRef<
         ref={ref}
         id={id}
         aria-invalid={error ? true : undefined}
-        aria-describedby={errorId}
+        aria-describedby={describedByIds(errorId, describedBy)}
         className={cn(inputBase, "h-14", inputState(Boolean(error)))}
         {...props}
       />
@@ -44,7 +47,10 @@ export const Field = forwardRef<
 export const TextareaField = forwardRef<
   HTMLTextAreaElement,
   Common & { inputClassName?: string } & Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "className">
->(function TextareaField({ label, error, className, inputClassName, id, ...props }, ref) {
+>(function TextareaField(
+  { label, error, className, inputClassName, id, "aria-describedby": describedBy, ...props },
+  ref,
+) {
   const errorId = error ? `${id}-error` : undefined;
   return (
     <div className={cn("flex flex-col gap-2", className)}>
@@ -55,7 +61,7 @@ export const TextareaField = forwardRef<
         ref={ref}
         id={id}
         aria-invalid={error ? true : undefined}
-        aria-describedby={errorId}
+        aria-describedby={describedByIds(errorId, describedBy)}
         className={cn(inputBase, "min-h-[112px] resize-y py-[15px]", inputState(Boolean(error)), inputClassName)}
         {...props}
       />

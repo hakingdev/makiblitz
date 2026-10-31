@@ -75,6 +75,14 @@ const deDate = (iso: string) =>
 
 const people = (n: number) => `${n} чел.`;
 const noteText = (notes: string | null | undefined) => (notes?.trim() ? ` · 📝 ${tgEscape(notes.trim())}` : "");
+
+/**
+ * Guest status in front of online bookings: ✅ confirmed via the link,
+ * ⏳ asked by WhatsApp/SMS but not confirmed yet. Walk-ins and older
+ * bookings without reminders get no mark.
+ */
+const statusMark = (b: { source?: string; confirmed?: boolean; messaging?: boolean }) =>
+  b.source === "walk_in" ? "" : b.confirmed ? "✅ " : b.messaging ? "⏳ " : "";
 const until = (time: string) => hhmm(timeToMinutes(time) + VISIT_DURATION_MINUTES);
 
 function marks(bookings: Booking[], highlightId?: string): PlanMark[] {
@@ -157,7 +165,7 @@ export async function sendPlanNow(chatId: string | number) {
 
 function dayLine(b: Booking) {
   const who = b.source === "walk_in" ? "Walk-in" : tgEscape(b.name ?? "");
-  return `${b.time} · стол ${tablesLabel(b.tables)} · ${people(b.guests)} · ${who}${noteText(b.notes)}`;
+  return `${statusMark(b)}${b.time} · стол ${tablesLabel(b.tables)} · ${people(b.guests)} · ${who}${noteText(b.notes)}`;
 }
 
 /** Keeps whole lines until the caption limit, then "… ещё N". */
@@ -461,7 +469,8 @@ export async function walkInBook(chatId: string | number, messageId: number | un
 
 function bookingLine(r: StoredReservation, withDate = false) {
   const who = r.source === "walk_in" ? "Walk-in" : tgEscape(r.name);
-  return `${withDate ? `${ruDate(r.date)} · ` : ""}${r.time} · стол ${tablesLabel(r.tables)} · ${people(r.guests)} · ${who}${noteText(r.notes)}`;
+  const mark = statusMark({ source: r.source, confirmed: Boolean(r.confirmedAt), messaging: r.messaging });
+  return `${mark}${withDate ? `${ruDate(r.date)} · ` : ""}${r.time} · стол ${tablesLabel(r.tables)} · ${people(r.guests)} · ${who}${noteText(r.notes)}`;
 }
 
 /** Upcoming confirmed bookings (still running or later), each with a cancel button. */

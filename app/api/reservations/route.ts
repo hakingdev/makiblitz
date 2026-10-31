@@ -3,7 +3,8 @@ import { GUEST_OPTIONS } from "@/lib/reservation/config";
 import { isBookable, restaurantNow } from "@/lib/reservation/dates";
 import { sendReservationMails } from "@/lib/reservation/mail";
 import { notifyReservation } from "@/lib/telegram/notify";
-import { bookReservation, type NewReservation } from "@/lib/reservation/store";
+import { bookReservation, getReservation, type NewReservation } from "@/lib/reservation/store";
+import { manageUrl } from "@/lib/reservation/links";
 import { contactErrors, normalizeContact } from "@/lib/reservation/validate";
 import { hashIp } from "@/lib/waitlist/crypto";
 import { isRateLimited } from "@/lib/waitlist/rate-limit";
@@ -85,6 +86,10 @@ export async function POST(req: NextRequest) {
 
   // Telegram is the owner's main channel; e-mail to MAIL_TO only if it fails.
   const notified = await notifyReservation(reservation, result.id, result.tables);
-  await sendReservationMails(reservation, result.id, result.tables, { ownerFallback: !notified });
+  const token = (await getReservation(result.id))?.manageToken;
+  await sendReservationMails(reservation, result.id, result.tables, {
+    ownerFallback: !notified,
+    manageLink: token ? manageUrl(token) : null,
+  });
   return NextResponse.json({ ok: true, id: result.id }, { status: 201 });
 }
