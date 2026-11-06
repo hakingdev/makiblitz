@@ -41,7 +41,7 @@ Mobile navigation: 15:1144. `/restaurant` redirects to `/galerie`.
 
 Rules live in `lib/reservation/config.ts` and `lib/reservation/tables.ts`:
 
-- **Open days:** only 30 + 31 October 2026 for now (`OPEN_DATES`); set it to
+- **Open days:** only the dates listed in `OPEN_DATES` for now; set it to
   `null` to switch to the regular Friday/Saturday schedule (`OPEN_WEEKDAYS`).
 - **Arrival times:** 17:00 – 20:30 every 30 min (`TIME_SLOTS`).
 - **Tables:** 11 tables / 30 seats as on the restaurant's floor plan (`TABLES`,
