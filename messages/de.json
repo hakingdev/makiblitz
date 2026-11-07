@@ -215,7 +215,7 @@
       "timeLabel": "Um wie viel Uhr?",
       "timeHint": "Grau markierte Zeiten sind bereits belegt.",
       "submit": "Weiter zu deinen Daten",
-      "groupNote": "Für mehr als 5 Personen: makilove@hotel-weisses-haus.com",
+      "groupNote": "Für mehr als 8 Personen: makilove@hotel-weisses-haus.com",
       "noDates": "Aktuell sind leider keine Termine online buchbar. Schreib uns gern an makilove@hotel-weisses-haus.com.",
       "overbooked": "Leider sind wir um {time} Uhr für {guests} ausgebucht.",
       "overbookedSuggest": "Versuch es zu einer anderen Uhrzeit, z. B. um {alt} Uhr.",
