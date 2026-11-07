@@ -113,13 +113,13 @@ export function VisitStep() {
 
       <fieldset className="flex flex-col gap-2">
         <legend className={cn(fieldLabel, "mb-2")}>{v.guestsLabel}</legend>
-        <div className="grid grid-cols-5 gap-2">
-          {GUEST_OPTIONS.map((g, i) => (
+        <div className="grid grid-cols-4 gap-2">
+          {GUEST_OPTIONS.map((g) => (
             <Choice
               key={g}
               name="guests"
               value={String(g)}
-              label={i === GUEST_OPTIONS.length - 1 ? `${g}+` : String(g)}
+              label={String(g)}
               checked={guests === g}
               onSelect={(value) => setVisit({ guests: Number(value) })}
             />
